@@ -13,7 +13,7 @@ module id_ex(
 	output Word_t     ex_reg1,
 	output Word_t     ex_reg2,
 	output Bit_t      ex_reg_we,
-	output RegAddr_t  ex_reg_waddr,
+	output RegAddr_t  ex_reg_waddr
 );
 
 always @(posedge clk)

@@ -1,8 +1,6 @@
 `ifndef CPU_DEFS_SVH
 `define CPU_DEFS_SVH
 
-`default_nettype none
-
 // data formats
 typedef logic           Bit_t;
 typedef logic [7:0]     Byte_t;

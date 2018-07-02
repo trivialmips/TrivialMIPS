@@ -8,8 +8,8 @@ module cpu_id(
 	input  Word_t     reg1_i,
 	input  Word_t     reg2_i,
 
-	output RegAddr_t  reg_raddr1;
-	output RegAddr_t  reg_raddr2;
+	output RegAddr_t  reg_raddr1,
+	output RegAddr_t  reg_raddr2,
 
 	output Oper_t     op,
 	output Word_t     reg1_o,
