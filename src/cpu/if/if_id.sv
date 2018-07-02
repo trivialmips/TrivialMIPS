@@ -8,4 +8,16 @@ module if_id(
 	output Inst_t     id_inst
 );
 
+always @(posedge clk)
+begin
+	if(rst == 1'b1)
+	begin
+		id_pc   <= `ZERO_WORD;
+		id_inst <= `ZERO_WORD;
+	end else begin
+		id_pc   <= if_pc;
+		id_inst <= if_inst;
+	end
+end
+
 endmodule

@@ -10,6 +10,11 @@ typedef logic [15:0]    HalfWord_t;
 typedef logic [31:0]    Word_t;
 typedef logic [63:0]    DoubleWord_t;
 
+`define ZERO_BYTE       8'h0;
+`define ZERO_HWORD      16'h0;
+`define ZERO_WORD       32'h0;
+`define ZERO_DWORD      64'h0;
+
 // instructment
 `define INST_WIDTH      32
 `define INST_ADDR_WIDTH 32
