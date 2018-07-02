@@ -1,7 +1,7 @@
 `include "cpu_defs.svh"
 
 module cpu_wb(
-	input  rst,
+	input  clk, rst,
 
 	input  Bit_t      we_i,
 	input  RegAddr_t  waddr_i,
@@ -9,7 +9,7 @@ module cpu_wb(
 
 	output Bit_t      we_o,
 	output RegAddr_t  waddr_o,
-	output Word_t     wdata_o,
+	output Word_t     wdata_o
 );
 
 always @(posedge clk)

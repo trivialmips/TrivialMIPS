@@ -10,7 +10,7 @@ module trivial_mips(
 );
 
 // general registers
-logic     reg_we;
+Bit_t     reg_we;
 RegAddr_t reg_waddr, reg_raddr1, reg_raddr2;
 Word_t    reg_wdata, reg_rdata1, reg_rdata2;
 
@@ -55,7 +55,8 @@ if_id stage_if_id(
 // ID stage
 Oper_t id_op;
 Word_t id_reg1, id_reg2;
-Bit_t id_reg_we, id_reg_waddr;
+Bit_t id_reg_we;
+RegAddr_t id_reg_waddr;
 
 cpu_id stage_id(
 	.rst,
@@ -74,7 +75,8 @@ cpu_id stage_id(
 
 Oper_t ex_op;
 Word_t ex_reg1, ex_reg2;
-Bit_t ex_reg_we, ex_reg_waddr;
+Bit_t ex_reg_we;
+RegAddr_t ex_reg_waddr;
 
 id_ex stage_id_ex(
 	.clk,
@@ -91,5 +93,69 @@ id_ex stage_id_ex(
 	.ex_reg_waddr
 );
 
+// EX stage
+Word_t ex_ret;
+cpu_ex stage_ex(
+	.rst,
+	.op(ex_op),
+	.reg1(ex_reg1),
+	.reg2(ex_reg2),
+	.ret(ex_ret)
+);
+
+Bit_t      mem_reg_we;
+RegAddr_t  mem_reg_waddr;
+Word_t     mem_reg_wdata;
+ex_mem stage_ex_mem(
+	.clk,
+	.rst,
+	.ex_reg_we,
+	.ex_reg_waddr,
+	.ex_reg_wdata(ex_ret),
+	.mem_reg_we,
+	.mem_reg_waddr,
+	.mem_reg_wdata
+);
+
+// MEM stage
+Bit_t      memwb_reg_we;
+RegAddr_t  memwb_reg_waddr;
+Word_t     memwb_reg_wdata;
+cpu_mem stage_mem(
+	.rst,
+	.we_i(mem_reg_we),
+	.waddr_i(mem_reg_waddr),
+	.wdata_i(mem_reg_wdata),
+
+	.we_o(memwb_reg_we),
+	.waddr_o(memwb_reg_waddr),
+	.wdata_o(memwb_reg_wdata)
+);
+
+Bit_t      wb_reg_we;
+RegAddr_t  wb_reg_waddr;
+Word_t     wb_reg_wdata;
+mem_wb stage_mem_wb(
+	.clk,
+	.rst,
+	.mem_reg_we(memwb_reg_we),
+	.mem_reg_waddr(memwb_reg_waddr),
+	.mem_reg_wdata(memwb_reg_wdata),
+	.wb_reg_we(wb_reg_we),
+	.wb_reg_waddr(wb_reg_waddr),
+	.wb_reg_wdata(wb_reg_wdata)
+);
+
+// WB stage
+cpu_wb stage_wb(
+	.clk,
+	.rst,
+	.we_i(wb_reg_we),
+	.waddr_i(wb_reg_waddr),
+	.wdata_i(wb_reg_wdata),
+	.we_o(reg_we),
+	.waddr_o(reg_waddr),
+	.wdata_o(reg_wdata)
+);
 
 endmodule

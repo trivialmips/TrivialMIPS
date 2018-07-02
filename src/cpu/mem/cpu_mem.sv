@@ -9,7 +9,7 @@ module cpu_mem(
 
 	output Bit_t      we_o,
 	output RegAddr_t  waddr_o,
-	output Word_t     wdata_o,
+	output Word_t     wdata_o
 );
 
 always_comb

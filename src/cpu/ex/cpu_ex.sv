@@ -5,7 +5,7 @@ module cpu_ex(
 	input  Oper_t     op,
 	input  Word_t     reg1,
 	input  Word_t     reg2,
-	output Word_t     ret;
+	output Word_t     ret
 );
 
 always_comb
@@ -17,8 +17,9 @@ begin
 		case(op)
 		OP_ORI:
 			ret = reg1 | reg2;
-		default:
-			ret = `ZERO_WORD;
+		default: begin
+            ret = `ZERO_WORD;
+        end
 		endcase
 	end
 end
