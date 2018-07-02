@@ -25,9 +25,6 @@ typedef logic [`INST_ADDR_WIDTH - 1:0] InstAddr_t;
 `define REG_DATA_WIDTH 32
 typedef logic [`REG_ADDR_WIDTH - 1:0] RegAddr_t;
 
-// operation
-typedef Byte_t Oper_t;
-
 // bus
 typedef struct packed {
 	Word_t addr, data;
@@ -39,5 +36,12 @@ typedef struct packed {
 	Word_t data;
 	logic ack;
 } WishboneRes_t;
+
+// operation
+typedef enum {
+	OP_NOP,
+	OP_ORI,
+	OP_INVALID
+} Oper_t;
 
 `endif

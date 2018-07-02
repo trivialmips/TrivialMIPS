@@ -20,7 +20,7 @@ always @(posedge clk)
 begin
 	if(rst == 1'b1)
 	begin
-		ex_op        <= `ZERO_WORD;
+		ex_op        <= OP_NOP;
 		ex_reg1      <= `ZERO_WORD;
 		ex_reg2      <= `ZERO_WORD;
 		ex_reg_we    <= 1'b0;
