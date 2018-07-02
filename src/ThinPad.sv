@@ -1,6 +1,6 @@
 `default_nettype none
 
-module TrivialMIPS(
+module ThinPad(
     input wire clk_50M,           // 50MHz clock
     input wire clk_11M0592,       // 11.0592MHz clock
 
