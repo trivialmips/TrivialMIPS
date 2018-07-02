@@ -37,6 +37,12 @@ typedef struct packed {
 	logic ack;
 } WishboneRes_t;
 
+typedef struct packed {
+	Bit_t     we;
+	RegAddr_t waddr;
+	Word_t    wdata;
+} RegWriteReq_t;
+
 // operation
 typedef enum {
 	OP_NOP,

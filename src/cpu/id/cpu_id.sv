@@ -17,7 +17,10 @@ module cpu_id(
 	// whether to write register
 	output Bit_t      reg_we,
 	// the address of register to be written
-	output RegAddr_t  reg_waddr
+	output RegAddr_t  reg_waddr,
+
+	input RegWriteReq_t ex_wr,
+	input RegWriteReq_t mem_wr
 );
 
 // 6-bit primary operation code
@@ -47,6 +50,33 @@ Word_t imm_zero_ext, imm_signed_ext;
 assign imm_zero_ext   = { 16'h0, immediate };
 assign imm_signed_ext = { {16{immediate[15]}}, immediate };
 
+// deal with the harzard
+Word_t safe_reg1, safe_reg2;
+always_comb
+begin
+	if(rst == 1'b1)
+	begin
+		safe_reg1 = `ZERO_WORD;
+	end else if(ex_wr.we && ex_wr.waddr == reg_raddr1) begin
+		safe_reg1 = ex_wr.wdata;
+	end else if(mem_wr.we && mem_wr.waddr == reg_raddr1) begin
+		safe_reg1 = mem_wr.wdata;
+	end else begin
+		safe_reg1 = reg1_i;
+	end
+
+	if(rst == 1'b1)
+	begin
+		safe_reg2 = `ZERO_WORD;
+	end else if(ex_wr.we && ex_wr.waddr == reg_raddr2) begin
+		safe_reg2 = ex_wr.wdata;
+	end else if(mem_wr.we && mem_wr.waddr == reg_raddr2) begin
+		safe_reg2 = mem_wr.wdata;
+	end else begin
+		safe_reg2 = reg2_i;
+	end
+end
+
 /* immediate (I-Type) instructions */
 Oper_t op_type_i;
 Bit_t unsigned_imm_type_i;
@@ -62,7 +92,7 @@ begin
 	begin
 		op = op_type_i;
 		reg_raddr1 = rs;
-		reg1_o = reg1_i;
+		reg1_o = safe_reg1;
 		reg2_o = unsigned_imm_type_i ? imm_zero_ext : imm_signed_ext;
 		reg_we = 1'b1;
 		reg_waddr = rt;

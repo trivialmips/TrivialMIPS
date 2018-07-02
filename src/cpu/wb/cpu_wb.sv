@@ -3,26 +3,19 @@
 module cpu_wb(
 	input  clk, rst,
 
-	input  Bit_t      we_i,
-	input  RegAddr_t  waddr_i,
-	input  Word_t     wdata_i,
-
-	output Bit_t      we_o,
-	output RegAddr_t  waddr_o,
-	output Word_t     wdata_o
+	input  RegWriteReq_t wr_i,
+	output RegWriteReq_t wr_o
 );
 
 always @(posedge clk)
 begin
 	if(rst == 1'b1)
 	begin
-		we_o    <= 1'b0;
-		waddr_o <= `ZERO_WORD;
-		wdata_o <= `ZERO_WORD;
+		wr_o.we    <= 1'b0;
+		wr_o.waddr <= `ZERO_WORD;
+		wr_o.wdata <= `ZERO_WORD;
 	end else begin
-		we_o    <= we_i;
-		waddr_o <= waddr_i;
-		wdata_o <= wdata_i;
+		wr_o <= wr_i;
 	end
 end
 

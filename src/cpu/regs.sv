@@ -4,9 +4,7 @@ module regs(
 	input  clk, rst,
 
 	// write port
-	input           we,
-	input RegAddr_t waddr,
-	input Word_t    wdata,
+	input  RegWriteReq_t wr,
 
 	// read port 1
 	input  RegAddr_t raddr1,
@@ -18,6 +16,13 @@ module regs(
 ); 
 
 reg [`REG_DATA_WIDTH - 1:0] registers[0:`REG_NUM - 1];
+
+Bit_t we;
+RegAddr_t waddr;
+Word_t wdata;
+assign we    = wr.we;
+assign waddr = wr.waddr;
+assign wdata = wr.wdata;
 
 // write control
 always @(posedge clk)
