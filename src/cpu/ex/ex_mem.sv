@@ -5,8 +5,10 @@ module ex_mem(
 
 	input  RegWriteReq_t  ex_reg_wr,
 	input  HiloWriteReq_t ex_hilo_wr,
+	input  MemAccessReq_t ex_memory_req,
 	output RegWriteReq_t  mem_reg_wr,
 	output HiloWriteReq_t mem_hilo_wr,
+	output MemAccessReq_t mem_memory_req,
 
 	input  Stall_t       stall
 );
@@ -15,14 +17,19 @@ always @(posedge clk)
 begin
 	if(rst == 1'b1 || (stall.stall_ex && ~stall.stall_mem))
 	begin
-		mem_reg_wr.we    <= 1'b0;
-		mem_reg_wr.waddr <= `ZERO_WORD;
-		mem_reg_wr.wdata <= `ZERO_WORD;
-		mem_hilo_wr.we   <= 1'b0;
-		mem_hilo_wr.hilo <= `ZERO_DWORD;
+		mem_reg_wr.we        <= 1'b0;
+		mem_reg_wr.waddr     <= `ZERO_WORD;
+		mem_reg_wr.wdata     <= `ZERO_WORD;
+		mem_hilo_wr.we       <= 1'b0;
+		mem_hilo_wr.hilo     <= `ZERO_DWORD;
+		mem_memory_req.ce    <= 1'b0;
+		mem_memory_req.we    <= 1'b0;
+		mem_memory_req.addr  <= `ZERO_WORD;
+		mem_memory_req.wdata <= `ZERO_WORD;
 	end else if(~stall.stall_ex) begin
-		mem_reg_wr  <= ex_reg_wr;
-		mem_hilo_wr <= ex_hilo_wr;
+		mem_reg_wr     <= ex_reg_wr;
+		mem_hilo_wr    <= ex_hilo_wr;
+		mem_memory_req <= ex_memory_req;
 	end
 end
 

@@ -85,12 +85,13 @@ if_id stage_if_id(
 
 // ID stage
 Oper_t id_op;
-Word_t id_reg1, id_reg2;
+Word_t id_reg1, id_reg2, id_imm;
 Word_t safe_rs, safe_rt;
 Bit_t id_reg_we;
 RegAddr_t id_reg_waddr;
 RegWriteReq_t ex_reg_wr;
 RegWriteReq_t memwb_reg_wr;
+MemAccessReq_t ex_memory_req;
 
 cpu_id stage_id(
 	.rst,
@@ -103,12 +104,14 @@ cpu_id stage_id(
 	.op(id_op),
 	.reg1_o(id_reg1),
 	.reg2_o(id_reg2),
+	.imm_o(id_imm),
 	.safe_rs,
 	.safe_rt,
 	.reg_we(id_reg_we),
 	.reg_waddr(id_reg_waddr),
 	.stall_req(stall_from_id),
 	// data forward
+	.ex_memory_req,
 	.mem_wr(memwb_reg_wr),
 	.ex_wr(ex_reg_wr)
 );
@@ -125,7 +128,7 @@ branch branch_instance(
 );
 
 Oper_t ex_op;
-Word_t ex_reg1, ex_reg2;
+Word_t ex_reg1, ex_reg2, ex_imm;
 InstAddr_t ex_pc;
 
 id_ex stage_id_ex(
@@ -135,12 +138,14 @@ id_ex stage_id_ex(
 	.id_pc,
 	.id_reg1,
 	.id_reg2,
+	.id_imm,
 	.id_reg_we,
 	.id_reg_waddr,
 	.ex_op,
 	.ex_pc,
 	.ex_reg1,
 	.ex_reg2,
+	.ex_imm,
 	.ex_reg_we(ex_reg_wr.we),
 	.ex_reg_waddr(ex_reg_wr.waddr),
 	.stall
@@ -156,8 +161,10 @@ cpu_ex stage_ex(
 	.pc(ex_pc),
 	.reg1(ex_reg1),
 	.reg2(ex_reg2),
+	.imm(ex_imm),
 	.hilo_unsafe(reg_hilo),
 	.hilo_wr(ex_hilo_wr),
+	.memory_req(ex_memory_req),
 	.ret(ex_reg_wr.wdata),
 	.stall_req(stall_from_ex),
 	.mem_hilo_wr(memwb_hilo_wr)
@@ -165,13 +172,16 @@ cpu_ex stage_ex(
 
 RegWriteReq_t mem_reg_wr;
 HiloWriteReq_t mem_hilo_wr;
+MemAccessReq_t mem_memory_req;
 ex_mem stage_ex_mem(
 	.clk,
 	.rst,
 	.ex_reg_wr,
 	.ex_hilo_wr,
+	.ex_memory_req,
 	.mem_reg_wr,
 	.mem_hilo_wr,
+	.mem_memory_req,
 	.stall
 );
 
@@ -180,6 +190,9 @@ cpu_mem stage_mem(
 	.rst,
 	.wr_i(mem_reg_wr),
 	.wr_o(memwb_reg_wr),
+	.memory_req(mem_memory_req),
+	.dbus_req,
+	.dbus_res,
 	.stall_req(stall_from_mem)
 );
 

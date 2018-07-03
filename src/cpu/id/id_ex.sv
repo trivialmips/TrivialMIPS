@@ -7,6 +7,7 @@ module id_ex(
 	input  InstAddr_t id_pc,
 	input  Word_t     id_reg1,
 	input  Word_t     id_reg2,
+	input  Word_t     id_imm,
 	input  Bit_t      id_reg_we,
 	input  RegAddr_t  id_reg_waddr,
 	// signals to ex
@@ -14,6 +15,7 @@ module id_ex(
 	output InstAddr_t ex_pc,
 	output Word_t     ex_reg1,
 	output Word_t     ex_reg2,
+	output Word_t     ex_imm,
 	output Bit_t      ex_reg_we,
 	output RegAddr_t  ex_reg_waddr,
 
@@ -28,6 +30,7 @@ begin
 		ex_pc        <= `ZERO_WORD;
 		ex_reg1      <= `ZERO_WORD;
 		ex_reg2      <= `ZERO_WORD;
+		ex_imm       <= `ZERO_WORD;
 		ex_reg_we    <= 1'b0;
 		ex_reg_waddr <= 5'b0;
 	end else if(~stall.stall_id) begin
@@ -35,6 +38,7 @@ begin
 		ex_pc        <= id_pc;
 		ex_reg1      <= id_reg1;
 		ex_reg2      <= id_reg2;
+		ex_imm       <= id_imm;
 		ex_reg_we    <= id_reg_we;
 		ex_reg_waddr <= id_reg_waddr;
 	end

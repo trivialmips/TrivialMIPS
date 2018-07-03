@@ -25,6 +25,9 @@ typedef logic [`INST_ADDR_WIDTH - 1:0] InstAddr_t;
 `define REG_DATA_WIDTH 32
 typedef logic [`REG_ADDR_WIDTH - 1:0] RegAddr_t;
 
+// memory
+typedef Word_t  MemAddr_t;
+
 // bus
 typedef struct packed {
 	Word_t addr, data;
@@ -37,6 +40,7 @@ typedef struct packed {
 	logic ack;
 } WishboneRes_t;
 
+// register access
 typedef struct packed {
 	Bit_t     we;
 	RegAddr_t waddr;
@@ -47,6 +51,17 @@ typedef struct packed {
 	Bit_t        we;
 	DoubleWord_t hilo;
 } HiloWriteReq_t;
+
+// memory access
+typedef struct packed {
+	// READ  if ce = 1 and we = 0
+	// WRITE if ce = 1 and we = 1
+	Bit_t       ce;
+	Bit_t       we;
+	logic [3:0] sel;
+	MemAddr_t   addr;
+	Word_t      wdata;
+} MemAccessReq_t;
 
 // stall
 typedef struct packed {
@@ -65,6 +80,7 @@ typedef enum {
 	OP_ORI,
 	OP_MADDU,
 	OP_J, OP_JAL,
+	OP_LW, OP_SW,
 	OP_INVALID
 } Oper_t;
 

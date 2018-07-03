@@ -18,17 +18,17 @@ module cpu_id(
 	output Oper_t     op,
 	output Word_t     reg1_o,
 	output Word_t     reg2_o,
+	output Word_t     imm_o,
 	// whether to write register
 	output Bit_t      reg_we,
 	// the address of register to be written
 	output RegAddr_t  reg_waddr,
 	output Bit_t      stall_req,
 
-	input  RegWriteReq_t ex_wr,
-	input  RegWriteReq_t mem_wr
+	input  MemAccessReq_t ex_memory_req,
+	input  RegWriteReq_t  ex_wr,
+	input  RegWriteReq_t  mem_wr
 );
-
-assign stall_req = 1'b0;
 
 // 6-bit primary operation code
 logic [5:0] opcode;
@@ -51,6 +51,12 @@ assign reg_raddr1 = rs;
 assign reg_raddr2 = rt;
 assign safe_rs = safe_reg1;
 assign safe_rt = safe_reg2;
+
+// load related stalling
+Bit_t is_ex_load_inst;
+assign is_ex_load_inst = ex_memory_req.ce && ~ex_memory_req.we;
+assign stall_req = is_ex_load_inst && 
+	(ex_wr.waddr == reg_raddr1 || ex_wr.waddr == reg_raddr2);
 
 // the zero-extended/signed-extended immediate
 Word_t imm_zero_ext, imm_signed_ext;
@@ -114,13 +120,15 @@ begin
 	begin
 		op = op_type_i;
 		reg1_o = safe_rs;
-		reg2_o = unsigned_imm_type_i ? imm_zero_ext : imm_signed_ext;
+		reg2_o = safe_rt;
+		imm_o  = unsigned_imm_type_i ? imm_zero_ext : imm_signed_ext;
 		reg_we = 1'b1;
 		reg_waddr = rt;
 	end else if(op_type_j != OP_INVALID) begin
 		op = op_type_j;
 		reg1_o = `ZERO_WORD;
 		reg2_o = `ZERO_WORD;
+		imm_o  = `ZERO_WORD;
 
 		// only two instructions: J (6'b000010) and JAL (6'b000011)
 		// for J,   no write operation
@@ -131,12 +139,14 @@ begin
 		op = op_type_r;
 		reg1_o = safe_rs;
 		reg2_o = safe_rt;
+		imm_o  = `ZERO_WORD;
 		reg_we = 1'b1;
 		reg_waddr = rd;
 	end else begin
 		op = OP_INVALID;
 		reg1_o = `ZERO_WORD;
 		reg2_o = `ZERO_WORD;
+		imm_o  = `ZERO_WORD;
 		reg_we = 1'b0;
 		reg_waddr = `ZERO_WORD;
 	end
