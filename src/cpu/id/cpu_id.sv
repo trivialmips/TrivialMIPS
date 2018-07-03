@@ -38,10 +38,6 @@ RegAddr_t rs, rd, rt;
 HalfWord_t immediate;
 // 26-bit index shifted left two bits to supply the low-order 28 bits of the jump target address
 logic [25:0] instr_index;
-// 5-bit shift amount
-logic [4:0] sa;
-// 6-bit function field used to specify functions within the primary opcode SPECIAL
-logic [5:0] funct;
 
 assign opcode = inst[31:26];
 assign rs = inst[25:21];
@@ -49,8 +45,6 @@ assign rt = inst[20:16];
 assign rd = inst[15:11];
 assign immediate = inst[15:0];
 assign instr_index = inst[25:0];
-assign sa = inst[10:6];
-assign funct = inst[5:0];
 
 InstAddr_t safe_reg1, safe_reg2;
 assign reg_raddr1 = rs;
@@ -91,13 +85,11 @@ end
 
 /* immediate (I-Type) instructions */
 Oper_t op_type_i;
-RegAddr_t waddr_type_i;
 Bit_t unsigned_imm_type_i;
 id_type_i id_type_i_instance(
 	.opcode,
 	.inst,
 	.op(op_type_i),
-	.waddr(waddr_type_i),
 	.unsigned_imm(unsigned_imm_type_i)
 );
 
@@ -108,19 +100,23 @@ id_type_j id_type_j_instance(
 	.op(op_type_j)
 );
 
+/* register (R-Type) instructions */
+Oper_t op_type_r;
+id_type_r id_type_r_instance(
+	.opcode,
+	.inst,
+	.op(op_type_r)
+);
+
 always_comb
 begin
 	if(op_type_i != OP_INVALID)
 	begin
 		op = op_type_i;
 		reg1_o = safe_rs;
-		if(opcode == 6'b000000 || opcode == 6'b011100) // SPECIAL/SPECIAL2
-			reg2_o = safe_rt;
-		else reg2_o = unsigned_imm_type_i ? imm_zero_ext : imm_signed_ext;
-		// if the instruction does not have write operation
-		// waddr will be 5'b00000
+		reg2_o = unsigned_imm_type_i ? imm_zero_ext : imm_signed_ext;
 		reg_we = 1'b1;
-		reg_waddr = waddr_type_i;
+		reg_waddr = rt;
 	end else if(op_type_j != OP_INVALID) begin
 		op = op_type_j;
 		reg1_o = `ZERO_WORD;
@@ -131,6 +127,12 @@ begin
 		// for JAL, $31 <- $pc+8
 		reg_we = opcode[0];
 		reg_waddr = 5'd31;
+	end else if(op_type_r != OP_INVALID) begin
+		op = op_type_r;
+		reg1_o = safe_rs;
+		reg2_o = safe_rt;
+		reg_we = 1'b1;
+		reg_waddr = rd;
 	end else begin
 		op = OP_INVALID;
 		reg1_o = `ZERO_WORD;
