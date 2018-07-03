@@ -4,10 +4,13 @@ module id_type_i(
 	input  [5:0]     opcode,
 	input  Inst_t    inst,
 	output Oper_t    op,
-	output Bit_t     unsigned_imm
+	output Bit_t     unsigned_imm,
+	output Bit_t     read_rt
 );
 
 assign unsigned_imm = (opcode == 6'b001101);
+
+assign read_rt = (op == OP_SW);
 
 always_comb
 begin

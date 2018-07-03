@@ -47,8 +47,6 @@ assign immediate = inst[15:0];
 assign instr_index = inst[25:0];
 
 InstAddr_t safe_reg1, safe_reg2;
-assign reg_raddr1 = rs;
-assign reg_raddr2 = rt;
 assign safe_rs = safe_reg1;
 assign safe_rt = safe_reg2;
 
@@ -56,7 +54,8 @@ assign safe_rt = safe_reg2;
 Bit_t is_ex_load_inst;
 assign is_ex_load_inst = ex_memory_req.ce && ~ex_memory_req.we;
 assign stall_req = is_ex_load_inst && 
-	(ex_wr.waddr == reg_raddr1 || ex_wr.waddr == reg_raddr2);
+	(ex_wr.waddr == reg_raddr1 && reg_raddr1 != 5'b0 ||
+	 ex_wr.waddr == reg_raddr2 && reg_raddr2 != 5'b0);
 
 // the zero-extended/signed-extended immediate
 Word_t imm_zero_ext, imm_signed_ext;
@@ -91,11 +90,12 @@ end
 
 /* immediate (I-Type) instructions */
 Oper_t op_type_i;
-Bit_t unsigned_imm_type_i;
+Bit_t unsigned_imm_type_i, read_rt_i;
 id_type_i id_type_i_instance(
 	.opcode,
 	.inst,
 	.op(op_type_i),
+	.read_rt(read_rt_i),
 	.unsigned_imm(unsigned_imm_type_i)
 );
 
@@ -119,6 +119,8 @@ begin
 	if(op_type_i != OP_INVALID)
 	begin
 		op = op_type_i;
+		reg_raddr1 = rs;
+		reg_raddr2 = read_rt_i ? rt : 5'b0;
 		reg1_o = safe_rs;
 		reg2_o = safe_rt;
 		imm_o  = unsigned_imm_type_i ? imm_zero_ext : imm_signed_ext;
@@ -126,6 +128,8 @@ begin
 		reg_waddr = rt;
 	end else if(op_type_j != OP_INVALID) begin
 		op = op_type_j;
+		reg_raddr1 = 5'b0;
+		reg_raddr2 = 5'b0;
 		reg1_o = `ZERO_WORD;
 		reg2_o = `ZERO_WORD;
 		imm_o  = `ZERO_WORD;
@@ -137,6 +141,8 @@ begin
 		reg_waddr = 5'd31;
 	end else if(op_type_r != OP_INVALID) begin
 		op = op_type_r;
+		reg_raddr1 = rs;
+		reg_raddr2 = rt;
 		reg1_o = safe_rs;
 		reg2_o = safe_rt;
 		imm_o  = `ZERO_WORD;
@@ -144,6 +150,8 @@ begin
 		reg_waddr = rd;
 	end else begin
 		op = OP_INVALID;
+		reg_raddr1 = 5'b0;
+		reg_raddr2 = 5'b0;
 		reg1_o = `ZERO_WORD;
 		reg2_o = `ZERO_WORD;
 		imm_o  = `ZERO_WORD;

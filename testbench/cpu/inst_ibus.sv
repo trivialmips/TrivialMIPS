@@ -16,7 +16,7 @@ begin
 	begin
 		ibus_res.data = `ZERO_WORD;
 	end else begin
-		ibus_res.data = inst_mem[ibus_req.addr[9:2]];
+		ibus_res.data = inst_mem[ibus_req.addr[11:2]];
 	end
 end
 

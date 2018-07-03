@@ -27,6 +27,13 @@ inst_ibus ibus_instance(
 	.ibus_res
 );
 
+inst_dbus dbus_instance(
+	.clk(clk50M),
+	.rst,
+	.dbus_req,
+	.dbus_res
+);
+
 trivial_mips trivial_cpu_instance(
 	.clk(clk50M),
 	.rst,
