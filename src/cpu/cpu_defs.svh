@@ -13,7 +13,7 @@ typedef logic [63:0]    DoubleWord_t;
 `define ZERO_WORD       32'h0;
 `define ZERO_DWORD      64'h0;
 
-// instructment
+// instructions
 `define INST_WIDTH      32
 `define INST_ADDR_WIDTH 32
 typedef Word_t                         Inst_t;
@@ -42,6 +42,11 @@ typedef struct packed {
 	RegAddr_t waddr;
 	Word_t    wdata;
 } RegWriteReq_t;
+
+typedef struct packed {
+	Bit_t        we;
+	DoubleWord_t hilo;
+} HiloWriteReq_t;
 
 // operation
 typedef enum {

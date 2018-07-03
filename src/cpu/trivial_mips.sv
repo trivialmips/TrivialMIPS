@@ -24,6 +24,16 @@ regs general_regs_instance(
 	.rdata2(reg_rdata2)
 );
 
+// HILO registers
+HiloWriteReq_t hilo_wr;
+DoubleWord_t reg_hilo;
+hilo hilo_instance(
+	.clk,
+	.rst,
+	.wr(hilo_wr),
+	.hilo(reg_hilo)
+);
+
 // IF stage
 InstAddr_t if_pc, jump_to;
 Bit_t is_branch, jump;
