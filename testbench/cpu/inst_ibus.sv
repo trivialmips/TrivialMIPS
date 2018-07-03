@@ -8,8 +8,6 @@ module inst_ibus(
 
 reg [`INST_WIDTH - 1:0] inst_mem[1023:0];
 
-initial $readmemh("inst_data.bin", inst_mem);
-
 always_comb
 begin
 	if(rst == 1'b1 || ibus_req.cyc == 1'b0 || ibus_req.stb == 1'b0)
