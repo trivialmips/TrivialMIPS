@@ -15,12 +15,14 @@ module id_ex(
 	output Word_t     ex_reg1,
 	output Word_t     ex_reg2,
 	output Bit_t      ex_reg_we,
-	output RegAddr_t  ex_reg_waddr
+	output RegAddr_t  ex_reg_waddr,
+
+	input  Stall_t    stall
 );
 
 always @(posedge clk)
 begin
-	if(rst == 1'b1)
+	if(rst == 1'b1 || (stall.stall_id && ~stall.stall_ex))
 	begin
 		ex_op        <= OP_NOP;
 		ex_pc        <= `ZERO_WORD;
@@ -28,7 +30,7 @@ begin
 		ex_reg2      <= `ZERO_WORD;
 		ex_reg_we    <= 1'b0;
 		ex_reg_waddr <= 5'b0;
-	end else begin
+	end else if(~stall.stall_id) begin
 		ex_op        <= id_op;
 		ex_pc        <= id_pc;
 		ex_reg1      <= id_reg1;

@@ -34,6 +34,23 @@ hilo hilo_instance(
 	.hilo(reg_hilo)
 );
 
+// stall control
+Stall_t stall;
+Bit_t stall_from_if;
+Bit_t stall_from_id;
+Bit_t stall_from_mem;
+Bit_t stall_from_ex;
+Bit_t stall_from_wb;
+ctrl ctrl_instance(
+	.rst,
+	.stall_from_if,
+	.stall_from_id,
+	.stall_from_ex,
+	.stall_from_mem,
+	.stall_from_wb,
+	.stall
+);
+
 // IF stage
 InstAddr_t if_pc, jump_to;
 Bit_t is_branch, jump;
@@ -43,13 +60,15 @@ reg_pc pc_instance(
 	.rst,
 	.pc(if_pc),
 	.jump,
-	.jump_to
+	.jump_to,
+	.hold_pc(stall.hold_pc)
 );
 
 cpu_if stage_if(
 	.rst,
 	.pc(if_pc),
-	.ibus(ibus_req)
+	.ibus(ibus_req),
+	.stall_req(stall_from_if)
 );
 
 Inst_t     id_inst;
@@ -60,7 +79,8 @@ if_id stage_if_id(
 	.if_pc,
 	.if_inst(ibus_res.data),
 	.id_pc,
-	.id_inst
+	.id_inst,
+	.stall
 );
 
 // ID stage
@@ -87,6 +107,7 @@ cpu_id stage_id(
 	.safe_rt,
 	.reg_we(id_reg_we),
 	.reg_waddr(id_reg_waddr),
+	.stall_req(stall_from_id),
 	// data forward
 	.mem_wr(memwb_reg_wr),
 	.ex_wr(ex_reg_wr)
@@ -121,7 +142,8 @@ id_ex stage_id_ex(
 	.ex_reg1,
 	.ex_reg2,
 	.ex_reg_we(ex_reg_wr.we),
-	.ex_reg_waddr(ex_reg_wr.waddr)
+	.ex_reg_waddr(ex_reg_wr.waddr),
+	.stall
 );
 
 // EX stage
@@ -131,7 +153,8 @@ cpu_ex stage_ex(
 	.pc(ex_pc),
 	.reg1(ex_reg1),
 	.reg2(ex_reg2),
-	.ret(ex_reg_wr.wdata)
+	.ret(ex_reg_wr.wdata),
+	.stall_req(stall_from_ex)
 );
 
 RegWriteReq_t mem_reg_wr;
@@ -139,14 +162,16 @@ ex_mem stage_ex_mem(
 	.clk,
 	.rst,
 	.ex_wr(ex_reg_wr),
-	.mem_wr(mem_reg_wr)
+	.mem_wr(mem_reg_wr),
+	.stall
 );
 
 // MEM stage
 cpu_mem stage_mem(
 	.rst,
 	.wr_i(mem_reg_wr),
-	.wr_o(memwb_reg_wr)
+	.wr_o(memwb_reg_wr),
+	.stall_req(stall_from_mem)
 );
 
 RegWriteReq_t wb_reg_wr;
@@ -154,15 +179,16 @@ mem_wb stage_mem_wb(
 	.clk,
 	.rst,
 	.mem_wr(memwb_reg_wr),
-	.wb_wr(wb_reg_wr)
+	.wb_wr(wb_reg_wr),
+	.stall
 );
 
 // WB stage
 cpu_wb stage_wb(
-	.clk,
 	.rst,
 	.wr_i(wb_reg_wr),
-	.wr_o(reg_wr)
+	.wr_o(reg_wr),
+	.stall_req(stall_from_wb)
 );
 
 endmodule

@@ -48,6 +48,16 @@ typedef struct packed {
 	DoubleWord_t hilo;
 } HiloWriteReq_t;
 
+// stall
+typedef struct packed {
+	Bit_t hold_pc;
+	Bit_t stall_if; 
+	Bit_t stall_id;
+	Bit_t stall_ex;
+	Bit_t stall_mem;
+	Bit_t stall_wb;  // not used
+} Stall_t;
+
 // operation
 typedef enum {
 	OP_NOP,

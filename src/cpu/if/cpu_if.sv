@@ -3,8 +3,11 @@
 module cpu_if(
 	input  rst,
 	input  InstAddr_t    pc,
-	output WishboneReq_t ibus
+	output WishboneReq_t ibus,
+	output Bit_t         stall_req
 );
+
+assign stall_req = 1'b0;
 
 always_comb
 begin

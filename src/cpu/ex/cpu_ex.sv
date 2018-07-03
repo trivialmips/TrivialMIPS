@@ -6,8 +6,11 @@ module cpu_ex(
 	input  InstAddr_t pc,
 	input  Word_t     reg1,
 	input  Word_t     reg2,
-	output Word_t     ret
+	output Word_t     ret,
+	output Bit_t      stall_req
 );
+
+assign stall_req = 1'b0;
 
 always_comb
 begin
