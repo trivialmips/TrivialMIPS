@@ -147,22 +147,30 @@ id_ex stage_id_ex(
 );
 
 // EX stage
+HiloWriteReq_t ex_hilo_wr;
+HiloWriteReq_t memwb_hilo_wr;
 cpu_ex stage_ex(
 	.rst,
 	.op(ex_op),
 	.pc(ex_pc),
 	.reg1(ex_reg1),
 	.reg2(ex_reg2),
+	.hilo_unsafe(reg_hilo),
+	.hilo_wr(ex_hilo_wr),
 	.ret(ex_reg_wr.wdata),
-	.stall_req(stall_from_ex)
+	.stall_req(stall_from_ex),
+	.mem_hilo_wr(memwb_hilo_wr)
 );
 
 RegWriteReq_t mem_reg_wr;
+HiloWriteReq_t mem_hilo_wr;
 ex_mem stage_ex_mem(
 	.clk,
 	.rst,
-	.ex_wr(ex_reg_wr),
-	.mem_wr(mem_reg_wr),
+	.ex_reg_wr,
+	.ex_hilo_wr,
+	.mem_reg_wr,
+	.mem_hilo_wr,
 	.stall
 );
 
@@ -174,12 +182,16 @@ cpu_mem stage_mem(
 	.stall_req(stall_from_mem)
 );
 
+assign memwb_hilo_wr = mem_hilo_wr;
+
 RegWriteReq_t wb_reg_wr;
 mem_wb stage_mem_wb(
 	.clk,
 	.rst,
-	.mem_wr(memwb_reg_wr),
-	.wb_wr(wb_reg_wr),
+	.mem_reg_wr(memwb_reg_wr),
+	.mem_hilo_wr(memwb_hilo_wr),
+	.wb_reg_wr,
+	.wb_hilo_wr(hilo_wr),
 	.stall
 );
 

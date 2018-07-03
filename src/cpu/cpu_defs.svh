@@ -61,9 +61,9 @@ typedef struct packed {
 // operation
 typedef enum {
 	OP_NOP,
+	OP_MTHI, OP_MTLO, OP_MFHI, OP_MFLO,
 	OP_ORI,
-	OP_J,
-	OP_JAL,
+	OP_J, OP_JAL,
 	OP_INVALID
 } Oper_t;
 
