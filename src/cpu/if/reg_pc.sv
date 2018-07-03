@@ -1,8 +1,10 @@
 `include "cpu_defs.svh"
 
 module reg_pc(
-	input             clk, rst,
-	output reg        ce,
+	input  clk, rst,
+	input  Bit_t      jump,
+	input  InstAddr_t jump_to,
+	output Bit_t      ce,
 	output InstAddr_t pc
 );
 
@@ -22,7 +24,7 @@ begin
 	begin
 		pc <= 32'h0;
 	end else begin
-		pc <= pc + 32'h4;
+		pc <= jump ? jump_to : pc + 32'h4;
 	end
 end
 

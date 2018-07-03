@@ -47,6 +47,8 @@ typedef struct packed {
 typedef enum {
 	OP_NOP,
 	OP_ORI,
+	OP_J,
+	OP_JAL,
 	OP_INVALID
 } Oper_t;
 

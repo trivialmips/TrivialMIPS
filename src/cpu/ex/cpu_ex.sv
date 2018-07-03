@@ -3,6 +3,7 @@
 module cpu_ex(
 	input  rst,
 	input  Oper_t     op,
+	input  InstAddr_t pc,
 	input  Word_t     reg1,
 	input  Word_t     reg2,
 	output Word_t     ret
@@ -17,6 +18,8 @@ begin
 		case(op)
 		OP_ORI:
 			ret = reg1 | reg2;
+		OP_JAL:
+			ret = pc + 32'd8;
 		default: begin
             ret = `ZERO_WORD;
         end

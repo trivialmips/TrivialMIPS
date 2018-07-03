@@ -25,12 +25,15 @@ regs general_regs_instance(
 );
 
 // IF stage
-InstAddr_t if_pc;
+InstAddr_t if_pc, jump_to;
+Bit_t is_branch, jump;
 
 reg_pc pc_instance(
 	.clk,
 	.rst,
-	.pc(if_pc)
+	.pc(if_pc),
+	.jump,
+	.jump_to
 );
 
 cpu_if stage_if(
@@ -53,6 +56,7 @@ if_id stage_if_id(
 // ID stage
 Oper_t id_op;
 Word_t id_reg1, id_reg2;
+Word_t safe_rs, safe_rt;
 Bit_t id_reg_we;
 RegAddr_t id_reg_waddr;
 RegWriteReq_t ex_reg_wr;
@@ -69,6 +73,8 @@ cpu_id stage_id(
 	.op(id_op),
 	.reg1_o(id_reg1),
 	.reg2_o(id_reg2),
+	.safe_rs,
+	.safe_rt,
 	.reg_we(id_reg_we),
 	.reg_waddr(id_reg_waddr),
 	// data forward
@@ -76,18 +82,32 @@ cpu_id stage_id(
 	.ex_wr(ex_reg_wr)
 );
 
+branch branch_instance(
+	.rst,
+	.pc(id_pc),
+	.inst(id_inst),
+	.rs(safe_rs),
+	.rt(safe_rt),
+	.is_branch,
+	.jump,
+	.jump_to
+);
+
 Oper_t ex_op;
 Word_t ex_reg1, ex_reg2;
+InstAddr_t ex_pc;
 
 id_ex stage_id_ex(
 	.clk,
 	.rst,
 	.id_op,
+	.id_pc,
 	.id_reg1,
 	.id_reg2,
 	.id_reg_we,
 	.id_reg_waddr,
 	.ex_op,
+	.ex_pc,
 	.ex_reg1,
 	.ex_reg2,
 	.ex_reg_we(ex_reg_wr.we),
@@ -98,6 +118,7 @@ id_ex stage_id_ex(
 cpu_ex stage_ex(
 	.rst,
 	.op(ex_op),
+	.pc(ex_pc),
 	.reg1(ex_reg1),
 	.reg2(ex_reg2),
 	.ret(ex_reg_wr.wdata)
