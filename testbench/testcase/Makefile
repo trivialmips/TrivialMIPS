@@ -5,7 +5,7 @@ MEMS=$(SRCS:.s=.mem)
 info:
 	@echo "Please use ./build.sh, do not make directly"
 
-all: $(MEMS)
+mem: $(MEMS)
 
 %.om: %.s
 	$(ARCH)-as -mips32 $< -o $@

@@ -4,9 +4,9 @@
 
 case $NAME in
 "Arch Linux")
-    ARCH=mips-elf make
+    ARCH=mips-elf make mem
     ;;
 "Ubuntu")
-    ARCH=mipsel-linux-gnu make
+    ARCH=mipsel-linux-gnu make mem
     ;;
 esac
