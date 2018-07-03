@@ -4,8 +4,8 @@ module branch(
 	input  rst,
 	input  InstAddr_t pc,
 	input  Inst_t     inst,
-	input  Word_t     rs,
-	input  Word_t     rt,
+	input  Word_t     reg1,
+	input  Word_t     reg2,
 
 	output Bit_t      is_branch,
 	output Bit_t      jump,

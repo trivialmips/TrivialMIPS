@@ -86,7 +86,6 @@ if_id stage_if_id(
 // ID stage
 Oper_t id_op;
 Word_t id_reg1, id_reg2, id_imm;
-Word_t safe_rs, safe_rt;
 Bit_t id_reg_we;
 RegAddr_t id_reg_waddr;
 RegWriteReq_t ex_reg_wr;
@@ -105,8 +104,6 @@ cpu_id stage_id(
 	.reg1_o(id_reg1),
 	.reg2_o(id_reg2),
 	.imm_o(id_imm),
-	.safe_rs,
-	.safe_rt,
 	.reg_we(id_reg_we),
 	.reg_waddr(id_reg_waddr),
 	.stall_req(stall_from_id),
@@ -120,8 +117,8 @@ branch branch_instance(
 	.rst,
 	.pc(id_pc),
 	.inst(id_inst),
-	.rs(safe_rs),
-	.rt(safe_rt),
+	.reg1(id_reg1),
+	.reg2(id_reg2),
 	.is_branch,
 	.jump,
 	.jump_to

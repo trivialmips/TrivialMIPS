@@ -53,6 +53,14 @@ begin
 	end
 end
 
+// whether to write hilo
+Bit_t we_hilo;
+assign we_hilo = (
+	op == OP_MTHI ||
+	op == OP_MTLO ||
+	op == OP_MADDU
+);
+
 DoubleWord_t multi_cyc_ret;
 ex_multi_cyc multi_cyc_instance(
 	.clk,
@@ -66,6 +74,7 @@ ex_multi_cyc multi_cyc_instance(
 	.is_busy(stall_req)
 );
 
+
 always_comb
 begin
 	if(rst == 1'b1)
@@ -74,7 +83,7 @@ begin
 		hilo_wr.we = 1'b0;
 		hilo_wr.hilo = `ZERO_DWORD;
 	end else begin
-		hilo_wr.we = 1'b1;
+		hilo_wr.we = we_hilo;
 		hilo_wr.hilo = hilo_safe;
 
 		case(op)
