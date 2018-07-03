@@ -5,16 +5,18 @@ module if_id(
 	input  InstAddr_t if_pc,
 	input  Inst_t     if_inst,
 	output InstAddr_t id_pc,
-	output Inst_t     id_inst
+	output Inst_t     id_inst,
+
+	input  Stall_t    stall
 );
 
 always @(posedge clk)
 begin
-	if(rst == 1'b1)
+	if(rst == 1'b1 || (stall.stall_if && ~stall.stall_id))
 	begin
 		id_pc   <= `ZERO_WORD;
 		id_inst <= `ZERO_WORD;
-	end else begin
+	end else if(~stall.stall_if) begin
 		id_pc   <= if_pc;
 		id_inst <= if_inst;
 	end

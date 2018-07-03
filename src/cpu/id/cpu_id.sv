@@ -22,10 +22,13 @@ module cpu_id(
 	output Bit_t      reg_we,
 	// the address of register to be written
 	output RegAddr_t  reg_waddr,
+	output Bit_t      stall_req,
 
 	input  RegWriteReq_t ex_wr,
 	input  RegWriteReq_t mem_wr
 );
+
+assign stall_req = 1'b0;
 
 // 6-bit primary operation code
 logic [5:0] opcode;

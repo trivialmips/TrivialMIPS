@@ -4,8 +4,11 @@ module cpu_mem(
 	input  rst,
 
 	input  RegWriteReq_t wr_i,
-	output RegWriteReq_t wr_o
+	output RegWriteReq_t wr_o,
+	output Bit_t         stall_req
 );
+
+assign stall_req = 1'b0;
 
 always_comb
 begin
