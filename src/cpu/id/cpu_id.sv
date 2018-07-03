@@ -114,7 +114,9 @@ begin
 	begin
 		op = op_type_i;
 		reg1_o = safe_rs;
-		reg2_o = unsigned_imm_type_i ? imm_zero_ext : imm_signed_ext;
+		if(opcode == 6'b000000 || opcode == 6'b011100) // SPECIAL/SPECIAL2
+			reg2_o = safe_rt;
+		else reg2_o = unsigned_imm_type_i ? imm_zero_ext : imm_signed_ext;
 		// if the instruction does not have write operation
 		// waddr will be 5'b00000
 		reg_we = 1'b1;

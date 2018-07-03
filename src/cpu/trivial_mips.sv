@@ -150,6 +150,7 @@ id_ex stage_id_ex(
 HiloWriteReq_t ex_hilo_wr;
 HiloWriteReq_t memwb_hilo_wr;
 cpu_ex stage_ex(
+	.clk,
 	.rst,
 	.op(ex_op),
 	.pc(ex_pc),

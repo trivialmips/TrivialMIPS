@@ -27,6 +27,13 @@ begin
 			default: op = OP_INVALID;
 			endcase
 		end
+		6'b011100: // SPECIAL2
+		begin 
+			case(inst[5:0])
+			6'b000001: op = OP_MADDU;
+			default: op = OP_INVALID;
+			endcase
+		end
 		6'b001101: op = OP_ORI;
 		default: op = OP_INVALID;
 	endcase
