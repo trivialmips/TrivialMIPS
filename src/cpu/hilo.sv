@@ -23,7 +23,7 @@ begin
 	if(rst == 1'b1)
 	begin
 		hilo = `ZERO_DWORD;
-	end else if(we == 1'b1) begin
+	end else if(wr.we == 1'b1) begin
 		hilo = wr.hilo;
 	end else begin
 		hilo = reg_hilo;
