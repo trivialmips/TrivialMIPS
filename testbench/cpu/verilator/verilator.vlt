@@ -1,0 +1,5 @@
+`verilator_config
+lint_off -msg WIDTH
+lint_off -msg PINMISSING
+lint_off -msg STMTDLY
+tracing_on
