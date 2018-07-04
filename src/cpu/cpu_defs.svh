@@ -79,6 +79,9 @@ typedef struct packed {
 
 // CP0 registers
 typedef struct packed {
+	/* The order of the following registers is important.
+	 * DO NOT change them. New registers must be added 
+	 * BEFORE this comment */
 	Word_t 
 	// primary 32 registers (sel = 0)
 	 desave,    error_epc,  tag_hi,     tag_lo,    
