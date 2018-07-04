@@ -9,7 +9,7 @@ info:
 mem: $(MEMS) $(ANSES)
 
 %.om: %.s
-	$(ARCH)-as -mips32 $< -o $@
+	$(ARCH)-as -mips32 -EL $< -o $@ 
 
 %.ans: %.s
 	grep -Po "(?<=# ans:\s).*" $< | sed "s/\s*$$//" > $@

@@ -14,7 +14,11 @@ begin
 	begin
 		ibus_res.data = `ZERO_WORD;
 	end else begin
-		ibus_res.data = inst_mem[ibus_req.addr[11:2]];
+		Word_t data = inst_mem[ibus_req.addr[11:2]];
+		ibus_res.data[31:24] = data[7:0];
+		ibus_res.data[23:16] = data[15:8];
+		ibus_res.data[15:8] = data[23:16];
+		ibus_res.data[7:0] = data[31:24];
 	end
 end
 
