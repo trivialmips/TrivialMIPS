@@ -4,12 +4,14 @@ module ex_mem(
 	input  clk, rst,
 
 	input  InstAddr_t     ex_pc,
+	input  Bit_t          ex_delayslot,
 	input  RegWriteReq_t  ex_reg_wr,
 	input  RegWriteReq_t  ex_cp0_reg_wr,
 	input  HiloWriteReq_t ex_hilo_wr,
 	input  MemAccessReq_t ex_memory_req,
 	input  ExceptInfo_t   ex_except,
 	output InstAddr_t     mem_pc,
+	output Bit_t          mem_delayslot,
 	output RegWriteReq_t  mem_reg_wr,
 	output RegWriteReq_t  mem_cp0_reg_wr,
 	output HiloWriteReq_t mem_hilo_wr,
@@ -38,6 +40,7 @@ begin
 		mem_memory_req.addr  <= `ZERO_WORD;
 		mem_memory_req.wdata <= `ZERO_WORD;
 		mem_except.occur     <= 1'b0;
+		mem_delayslot        <= 1'b0;
 	end else if(~stall.stall_ex) begin
 		mem_pc         <= ex_pc;
 		mem_reg_wr     <= ex_reg_wr;
@@ -45,6 +48,7 @@ begin
 		mem_hilo_wr    <= ex_hilo_wr;
 		mem_memory_req <= ex_memory_req;
 		mem_except     <= ex_except;
+		mem_delayslot  <= ex_delayslot;
 	end
 end
 

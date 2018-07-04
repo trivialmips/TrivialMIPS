@@ -35,6 +35,7 @@ hilo hilo_instance(
 );
 
 // coprocesser 0
+ExceptReq_t except_req;
 CP0Regs_t cp0_regs;
 RegAddr_t cp0_raddr;
 RegWriteReq_t cp0_reg_wr;
@@ -44,6 +45,7 @@ cp0 cp0_instance(
 	.rst,
 	.raddr(cp0_raddr),
 	.wr(cp0_reg_wr),
+	.except_req,
 	.rdata(cp0_rdata),
 	.regs(cp0_regs)
 );
@@ -56,7 +58,6 @@ Bit_t stall_from_id;
 Bit_t stall_from_mem;
 Bit_t stall_from_ex;
 Bit_t stall_from_wb;
-ExceptReq_t except_req;
 ctrl ctrl_instance(
 	.rst,
 	.stall_from_if,
@@ -96,9 +97,11 @@ if_id stage_if_id(
 	.clk,
 	.rst,
 	.if_pc,
+	.if_delayslot(is_branch),
 	.if_inst(ibus_res.data),
 	.id_pc,
 	.id_inst,
+	.id_delayslot,
 	.stall,
 	.flush
 );
@@ -106,6 +109,7 @@ if_id stage_if_id(
 // ID stage
 Oper_t id_op;
 Word_t id_reg1, id_reg2, id_imm;
+Bit_t id_delayslot;
 Bit_t id_reg_we;
 RegAddr_t id_reg_waddr;
 RegWriteReq_t ex_reg_wr;
@@ -146,6 +150,7 @@ branch branch_instance(
 	.jump_to
 );
 
+Bit_t  ex_delayslot;
 Oper_t ex_op;
 Word_t ex_reg1, ex_reg2, ex_imm;
 Inst_t ex_inst;
@@ -163,6 +168,7 @@ id_ex stage_id_ex(
 	.id_imm,
 	.id_reg_we,
 	.id_reg_waddr,
+	.id_delayslot,
 	.id_except,
 	.ex_op,
 	.ex_pc,
@@ -170,6 +176,7 @@ id_ex stage_id_ex(
 	.ex_reg1,
 	.ex_reg2,
 	.ex_imm,
+	.ex_delayslot,
 	.ex_reg_we(ex_reg_wr.we),
 	.ex_reg_waddr(ex_reg_wr.waddr),
 	.ex_except(idex_except),
@@ -205,6 +212,7 @@ cpu_ex stage_ex(
 	.mem_cp0_reg_wr(mem_cp0_reg_wr)
 );
 
+Bit_t mem_delayslot;
 InstAddr_t mem_pc;
 RegWriteReq_t mem_reg_wr;
 HiloWriteReq_t mem_hilo_wr;
@@ -218,12 +226,14 @@ ex_mem stage_ex_mem(
 	.ex_cp0_reg_wr,
 	.ex_hilo_wr,
 	.ex_memory_req,
+	.ex_delayslot,
 	.ex_except(idex_except.occur ? idex_except : ex_except),
 	.mem_pc,
 	.mem_reg_wr,
 	.mem_hilo_wr,
 	.mem_cp0_reg_wr,
 	.mem_memory_req,
+	.mem_delayslot,
 	.mem_except(exmem_except),
 	.stall,
 	.flush
@@ -242,13 +252,13 @@ cpu_mem stage_mem(
 	.except(mem_except)
 );
 
-RegWriteReq_t except_cp0_reg_wr;
 except except_handler(
 	.rst,
 	.pc(mem_pc),
+	.delayslot(mem_delayslot),
 	.except(exmem_except.occur ? exmem_except : mem_except),
 	.except_req,
-	.cp0_reg_wr(except_cp0_reg_wr)
+	.cp0_regs
 );
 
 assign memwb_hilo_wr = mem_hilo_wr;
@@ -261,7 +271,6 @@ mem_wb stage_mem_wb(
 	.mem_cp0_reg_wr,
 	.mem_reg_wr(memwb_reg_wr),
 	.mem_hilo_wr(memwb_hilo_wr),
-	.except_cp0_reg_wr,
 	.wb_reg_wr,
 	.wb_hilo_wr(hilo_wr),
 	.wb_cp0_reg_wr(cp0_reg_wr),

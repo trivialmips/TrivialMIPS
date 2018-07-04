@@ -78,6 +78,22 @@ begin
 	end
 end
 
+// trap instructions
+always_comb
+begin
+	if(rst == 1'b1)
+	begin
+		except.occur = 1'b0;
+		except.code  = 5'b0;
+	end else begin
+		except.occur = 1'b0;
+		except.code  = `EXCCODE_TR;
+		case(op)
+		OP_TEQI: except.occur = (reg1 == imm);
+		endcase
+	end
+end
+
 // whether to write hilo
 Bit_t we_hilo;
 assign we_hilo = (

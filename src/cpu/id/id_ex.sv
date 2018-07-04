@@ -10,6 +10,7 @@ module id_ex(
 	input  Word_t     id_reg2,
 	input  Word_t     id_imm,
 	input  Bit_t      id_reg_we,
+	input  Bit_t      id_delayslot,
 	input  RegAddr_t  id_reg_waddr,
 	input  ExceptInfo_t id_except,
 	// signals to ex
@@ -20,6 +21,7 @@ module id_ex(
 	output Word_t     ex_reg2,
 	output Word_t     ex_imm,
 	output Bit_t      ex_reg_we,
+	output Bit_t      ex_delayslot,
 	output RegAddr_t  ex_reg_waddr,
 	output ExceptInfo_t ex_except,
 
@@ -39,6 +41,7 @@ begin
 		ex_imm       <= `ZERO_WORD;
 		ex_reg_we    <= 1'b0;
 		ex_reg_waddr <= 5'b0;
+		ex_delayslot <= 1'b0;
 		ex_except.occur <= 1'b0;
 	end else if(~stall.stall_id) begin
 		ex_op        <= id_op;
@@ -49,6 +52,7 @@ begin
 		ex_imm       <= id_imm;
 		ex_reg_we    <= id_reg_we;
 		ex_reg_waddr <= id_reg_waddr;
+		ex_delayslot <= id_delayslot;
 		ex_except    <= id_except;
 	end
 end

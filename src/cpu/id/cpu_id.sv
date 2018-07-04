@@ -84,12 +84,17 @@ end
 
 /* immediate (I-Type) instructions */
 Oper_t op_type_i;
-Bit_t unsigned_imm_type_i, read_rt_i;
+Bit_t unsigned_imm_type_i;
+Bit_t reg_we_i;
+RegAddr_t reg_raddr1_i, reg_raddr2_i, reg_waddr_i;
 id_type_i id_type_i_instance(
 	.opcode,
 	.inst,
 	.op(op_type_i),
-	.read_rt(read_rt_i),
+	.reg_raddr1(reg_raddr1_i),
+	.reg_raddr2(reg_raddr2_i),
+	.reg_waddr(reg_waddr_i),
+	.reg_we(reg_we_i),
 	.unsigned_imm(unsigned_imm_type_i)
 );
 
@@ -122,11 +127,11 @@ begin
 	if(op_type_i != OP_INVALID)
 	begin
 		op = op_type_i;
-		reg_raddr1 = rs;
-		reg_raddr2 = read_rt_i ? rt : 5'b0;
+		reg_raddr1 = reg_raddr1_i;
+		reg_raddr2 = reg_raddr2_i;
+		reg_we     = reg_we_i;
+		reg_waddr  = reg_waddr_i;
 		imm_o  = unsigned_imm_type_i ? imm_zero_ext : imm_signed_ext;
-		reg_we = 1'b1;
-		reg_waddr = rt;
 	end else if(op_type_j != OP_INVALID) begin
 		op = op_type_j;
 		reg_raddr1 = 5'b0;

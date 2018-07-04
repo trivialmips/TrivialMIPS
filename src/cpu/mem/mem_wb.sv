@@ -7,7 +7,6 @@ module mem_wb(
 	input  RegWriteReq_t  mem_reg_wr,
 	input  RegWriteReq_t  mem_cp0_reg_wr,
 	input  HiloWriteReq_t mem_hilo_wr,
-	input  RegWriteReq_t  except_cp0_reg_wr,
 
 	output RegWriteReq_t  wb_reg_wr,
 	output RegWriteReq_t  wb_cp0_reg_wr,
@@ -32,7 +31,7 @@ begin
 	end else if(~stall.stall_mem) begin
 		wb_reg_wr     <= mem_reg_wr;
 		wb_hilo_wr    <= mem_hilo_wr;
-		wb_cp0_reg_wr <= except_cp0_reg_wr.we ? except_cp0_reg_wr : mem_cp0_reg_wr;
+		wb_cp0_reg_wr <= mem_cp0_reg_wr;
 	end
 end
 
