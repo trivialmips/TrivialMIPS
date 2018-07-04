@@ -96,6 +96,19 @@ typedef struct packed {
 
 `define CP0_REG_COUNT  5'd9
 
+// exception
+typedef struct packed {
+	Bit_t occur;
+	Bit_t delayslot;
+	Word_t except;
+} ExceptInfo_t;
+
+typedef struct packed {
+	Bit_t flush;
+	Word_t except;
+	InstAddr_t ret_pc, jump_pc;
+} ExceptReq_t;
+
 // operation
 typedef enum {
 	OP_NOP,

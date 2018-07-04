@@ -8,12 +8,18 @@ module mem_wb(
 	output RegWriteReq_t  wb_reg_wr,
 	output HiloWriteReq_t wb_hilo_wr,
 
-	input  Stall_t       stall
+	input  ExceptInfo_t except,
+	output ExceptReq_t  except_req,
+
+	input  Stall_t      stall,
+	input  Bit_t        flush
 );
+
+assign except_req.flush = 1'b0;
 
 always @(posedge clk)
 begin
-	if(rst == 1'b1 || (stall.stall_mem && ~stall.stall_wb))
+	if(rst || flush || (stall.stall_mem && ~stall.stall_wb))
 	begin
 		wb_reg_wr.we    <= 1'b0;
 		wb_reg_wr.waddr <= `ZERO_WORD;

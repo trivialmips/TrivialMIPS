@@ -7,12 +7,13 @@ module if_id(
 	output InstAddr_t id_pc,
 	output Inst_t     id_inst,
 
-	input  Stall_t    stall
+	input  Stall_t    stall,
+	input  Bit_t      flush
 );
 
 always @(posedge clk)
 begin
-	if(rst == 1'b1 || (stall.stall_if && ~stall.stall_id))
+	if(rst || flush || (stall.stall_if && ~stall.stall_id))
 	begin
 		id_pc   <= `ZERO_WORD;
 		id_inst <= `ZERO_WORD;

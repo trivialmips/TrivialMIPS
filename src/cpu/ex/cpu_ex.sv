@@ -12,7 +12,8 @@ module cpu_ex(
 	output HiloWriteReq_t hilo_wr,
 	output MemAccessReq_t memory_req,
 	output Word_t         ret,
-	output Bit_t          stall_req
+	output Bit_t          stall_req,
+	output ExceptInfo_t   except
 );
 
 DoubleWord_t hilo_safe;

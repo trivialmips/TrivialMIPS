@@ -10,7 +10,8 @@ module cpu_mem(
 	input  WishboneRes_t dbus_res,
 	output WishboneReq_t dbus_req,
 
-	output Bit_t         stall_req
+	output Bit_t         stall_req,
+	output ExceptInfo_t  except
 );
 
 assign stall_req = 1'b0;

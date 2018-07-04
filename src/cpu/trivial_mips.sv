@@ -50,11 +50,13 @@ cp0 cp0_instance(
 
 // stall control
 Stall_t stall;
+Bit_t flush;
 Bit_t stall_from_if;
 Bit_t stall_from_id;
 Bit_t stall_from_mem;
 Bit_t stall_from_ex;
 Bit_t stall_from_wb;
+ExceptReq_t except_req;
 ctrl ctrl_instance(
 	.rst,
 	.stall_from_if,
@@ -62,7 +64,9 @@ ctrl ctrl_instance(
 	.stall_from_ex,
 	.stall_from_mem,
 	.stall_from_wb,
-	.stall
+	.stall,
+	.except_req,
+	.flush
 );
 
 // IF stage
@@ -75,6 +79,7 @@ reg_pc pc_instance(
 	.pc(if_pc),
 	.jump,
 	.jump_to,
+	.except_req,
 	.hold_pc(stall.hold_pc)
 );
 
@@ -94,7 +99,8 @@ if_id stage_if_id(
 	.if_inst(ibus_res.data),
 	.id_pc,
 	.id_inst,
-	.stall
+	.stall,
+	.flush
 );
 
 // ID stage
@@ -105,6 +111,7 @@ RegAddr_t id_reg_waddr;
 RegWriteReq_t ex_reg_wr;
 RegWriteReq_t memwb_reg_wr;
 MemAccessReq_t ex_memory_req;
+ExceptInfo_t id_except;
 
 cpu_id stage_id(
 	.rst,
@@ -121,6 +128,7 @@ cpu_id stage_id(
 	.reg_we(id_reg_we),
 	.reg_waddr(id_reg_waddr),
 	.stall_req(stall_from_id),
+	.except(id_except),
 	// data forward
 	.ex_memory_req,
 	.mem_wr(memwb_reg_wr),
@@ -141,6 +149,7 @@ branch branch_instance(
 Oper_t ex_op;
 Word_t ex_reg1, ex_reg2, ex_imm;
 InstAddr_t ex_pc;
+ExceptInfo_t idex_except;
 
 id_ex stage_id_ex(
 	.clk,
@@ -152,6 +161,7 @@ id_ex stage_id_ex(
 	.id_imm,
 	.id_reg_we,
 	.id_reg_waddr,
+	.id_except,
 	.ex_op,
 	.ex_pc,
 	.ex_reg1,
@@ -159,12 +169,15 @@ id_ex stage_id_ex(
 	.ex_imm,
 	.ex_reg_we(ex_reg_wr.we),
 	.ex_reg_waddr(ex_reg_wr.waddr),
-	.stall
+	.ex_except(idex_except),
+	.stall,
+	.flush
 );
 
 // EX stage
 HiloWriteReq_t ex_hilo_wr;
 HiloWriteReq_t memwb_hilo_wr;
+ExceptInfo_t ex_except;
 cpu_ex stage_ex(
 	.clk,
 	.rst,
@@ -178,25 +191,31 @@ cpu_ex stage_ex(
 	.memory_req(ex_memory_req),
 	.ret(ex_reg_wr.wdata),
 	.stall_req(stall_from_ex),
+	.except(ex_except),
 	.mem_hilo_wr(memwb_hilo_wr)
 );
 
 RegWriteReq_t mem_reg_wr;
 HiloWriteReq_t mem_hilo_wr;
 MemAccessReq_t mem_memory_req;
+ExceptInfo_t exmem_except;
 ex_mem stage_ex_mem(
 	.clk,
 	.rst,
 	.ex_reg_wr,
 	.ex_hilo_wr,
 	.ex_memory_req,
+	.ex_except(idex_except.occur ? idex_except : ex_except),
 	.mem_reg_wr,
 	.mem_hilo_wr,
 	.mem_memory_req,
-	.stall
+	.mem_except(exmem_except),
+	.stall,
+	.flush
 );
 
 // MEM stage
+ExceptInfo_t mem_except;
 cpu_mem stage_mem(
 	.rst,
 	.wr_i(mem_reg_wr),
@@ -204,7 +223,8 @@ cpu_mem stage_mem(
 	.memory_req(mem_memory_req),
 	.dbus_req,
 	.dbus_res,
-	.stall_req(stall_from_mem)
+	.stall_req(stall_from_mem),
+	.except(mem_except)
 );
 
 assign memwb_hilo_wr = mem_hilo_wr;
@@ -215,9 +235,12 @@ mem_wb stage_mem_wb(
 	.rst,
 	.mem_reg_wr(memwb_reg_wr),
 	.mem_hilo_wr(memwb_hilo_wr),
+	.except(exmem_except.occur ? exmem_except : mem_except),
+	.except_req,
 	.wb_reg_wr,
 	.wb_hilo_wr(hilo_wr),
-	.stall
+	.stall,
+	.flush
 );
 
 // WB stage

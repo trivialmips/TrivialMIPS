@@ -10,6 +10,7 @@ module id_ex(
 	input  Word_t     id_imm,
 	input  Bit_t      id_reg_we,
 	input  RegAddr_t  id_reg_waddr,
+	input  ExceptInfo_t id_except,
 	// signals to ex
 	output Oper_t     ex_op,
 	output InstAddr_t ex_pc,
@@ -18,13 +19,15 @@ module id_ex(
 	output Word_t     ex_imm,
 	output Bit_t      ex_reg_we,
 	output RegAddr_t  ex_reg_waddr,
+	output ExceptInfo_t ex_except,
 
-	input  Stall_t    stall
+	input  Stall_t    stall,
+	input  Bit_t      flush
 );
 
 always @(posedge clk)
 begin
-	if(rst == 1'b1 || (stall.stall_id && ~stall.stall_ex))
+	if(rst || flush || (stall.stall_id && ~stall.stall_ex))
 	begin
 		ex_op        <= OP_NOP;
 		ex_pc        <= `ZERO_WORD;
@@ -33,6 +36,7 @@ begin
 		ex_imm       <= `ZERO_WORD;
 		ex_reg_we    <= 1'b0;
 		ex_reg_waddr <= 5'b0;
+		ex_except.occur <= 1'b0;
 	end else if(~stall.stall_id) begin
 		ex_op        <= id_op;
 		ex_pc        <= id_pc;
@@ -41,6 +45,7 @@ begin
 		ex_imm       <= id_imm;
 		ex_reg_we    <= id_reg_we;
 		ex_reg_waddr <= id_reg_waddr;
+		ex_except    <= id_except;
 	end
 end
 

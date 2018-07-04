@@ -20,6 +20,7 @@ module cpu_id(
 	// the address of register to be written
 	output RegAddr_t  reg_waddr,
 	output Bit_t      stall_req,
+	output ExceptInfo_t except,
 
 	input  MemAccessReq_t ex_memory_req,
 	input  RegWriteReq_t  ex_wr,
