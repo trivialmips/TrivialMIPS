@@ -34,6 +34,20 @@ hilo hilo_instance(
 	.hilo(reg_hilo)
 );
 
+// coprocesser 0
+CP0Regs_t cp0_regs;
+RegAddr_t cp0_raddr;
+RegWriteReq_t cp0_wr;
+Word_t cp0_rdata;
+cp0 cp0_instance(
+	.clk,
+	.rst,
+	.raddr(cp0_raddr),
+	.wr(cp0_wr),
+	.rdata(cp0_rdata),
+	.regs(cp0_regs)
+);
+
 // stall control
 Stall_t stall;
 Bit_t stall_from_if;

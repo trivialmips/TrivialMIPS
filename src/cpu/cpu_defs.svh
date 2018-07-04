@@ -73,6 +73,22 @@ typedef struct packed {
 	Bit_t stall_wb;  // not used
 } Stall_t;
 
+// CP0 registers
+typedef struct packed {
+	Word_t 
+	// primary 32 registers (sel = 0)
+	 desave,    error_epc,  tag_hi,     tag_lo,    
+	 cache_err, err_ctl,    perf_cnt,   depc,      
+	 debug,     reserved22, reserved21, reserved20,
+	 watch_hi,  watch_lo,   ll_addr,    config0,   
+	 prid,      epc,        cause,      status,    
+	 compare,   entry_hi,   count,      bad_vaddr, 
+	 reserved7, wired,      page_mask,  context_,  
+	 entry_lo1, entry_lo0,  random,     index;
+} CP0Regs_t;
+
+`define CP0_REG_COUNT  5'd9
+
 // operation
 typedef enum {
 	OP_NOP,
@@ -81,6 +97,7 @@ typedef enum {
 	OP_MADDU,
 	OP_J, OP_JAL,
 	OP_LW, OP_SW,
+	OP_MFC0, OP_MTC0,
 	OP_INVALID
 } Oper_t;
 
