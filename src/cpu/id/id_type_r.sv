@@ -29,14 +29,23 @@ begin
 	case(opcode)
 		6'b000000: // SPECIAL
 		begin 
-			reg_we = ~inst[0];
-			case(inst[5:0])
-			6'b010000: op = OP_MFHI;
-			6'b010001: op = OP_MTHI;
-			6'b010010: op = OP_MFLO;
-			6'b010011: op = OP_MTLO;
-			default: op = OP_INVALID;
-			endcase
+			if(inst == 32'b0)
+			begin
+				// TODO: removed when SLL instruction is implemented
+				reg_raddr1 = 5'b0;
+				reg_raddr2 = 5'b0;
+				reg_we = 1'b0;
+				op = OP_NOP;
+			end else begin
+				reg_we = ~inst[0];
+				case(inst[5:0])
+				6'b010000: op = OP_MFHI;
+				6'b010001: op = OP_MTHI;
+				6'b010010: op = OP_MFLO;
+				6'b010011: op = OP_MTLO;
+				default: op = OP_INVALID;
+				endcase
+			end
 		end
 		6'b011100: // SPECIAL2
 		begin 
@@ -60,6 +69,12 @@ begin
 			5'b00100: 
 			begin
 				op = OP_MTC0;
+				reg_we     = 1'b0;
+				reg_raddr1 = 5'b0;
+			end
+			5'b10000:
+			begin
+				op = (inst[5:0] == 6'b011000) ? OP_ERET : OP_INVALID;
 				reg_we     = 1'b0;
 				reg_raddr1 = 5'b0;
 			end

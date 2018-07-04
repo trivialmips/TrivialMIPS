@@ -127,12 +127,12 @@ typedef struct packed {
 
 // exception
 typedef struct packed {
-	Bit_t occur;
+	Bit_t occur, eret;
 	logic [4:0] code;
 } ExceptInfo_t;
 
 typedef struct packed {
-	Bit_t flush, delayslot;
+	Bit_t flush, delayslot, eret;
 	logic [4:0] code;
 	InstAddr_t cur_pc, jump_pc;
 } ExceptReq_t;
@@ -148,7 +148,7 @@ typedef enum {
 	OP_MADDU,
 	OP_J, OP_JAL,
 	OP_LW, OP_SW,
-	OP_MFC0, OP_MTC0,
+	OP_MFC0, OP_MTC0, OP_ERET,
 	OP_TEQI,
 	OP_INVALID
 } Oper_t;

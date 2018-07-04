@@ -17,14 +17,21 @@ begin
 	begin
 		except_req.flush   = 1'b0;
 		except_req.code    = 5'b0;
+		except_req.eret    = 1'b0;
 		except_req.cur_pc  = `ZERO_WORD;
 		except_req.jump_pc = `ZERO_WORD;
 	end else begin
 		except_req.flush  = 1'b1;
 		except_req.code   = except.code;
 		except_req.cur_pc = pc;
-		if(cp0_regs.status.exl == 1'b0)
+		except_req.eret   = except.eret;
+		if(except.eret)
 		begin
+			if(cp0_regs.status.erl)
+				except_req.jump_pc = cp0_regs.error_epc;
+			else except_req.jump_pc = cp0_regs.epc;
+			// TODO: Reset LLbit
+		end else if(cp0_regs.status.exl == 1'b0) begin
 			// TODO: Add MMU, update the jump_pc to virtual addr.
 			except_req.jump_pc = 32'h180;
 		end else begin

@@ -15,6 +15,7 @@ module cpu_mem(
 );
 
 assign stall_req = 1'b0;
+assign except.occur = 1'b0;
 
 always_comb
 begin
@@ -30,6 +31,8 @@ begin
 		dbus_req.sel  = 4'b0000;
 		dbus_req.addr = `ZERO_WORD;
 		dbus_req.data = `ZERO_WORD;
+
+		// except.occur = 1'b0;
 	end else if(memory_req.ce) begin
 		if(memory_req.we)
 		begin

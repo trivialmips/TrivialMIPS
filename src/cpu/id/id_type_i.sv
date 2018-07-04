@@ -37,10 +37,16 @@ begin
 		begin
 			op = OP_SW;
 			reg_we = 1'b0;
-			reg_raddr1 = 5'b0;
+			reg_raddr1 = rs;
 			reg_raddr2 = rt;
 		end
-		6'b100011: op = OP_LW;
+		6'b100011:
+		begin
+			op = OP_LW;
+			reg_we = 1'b1;
+			reg_raddr1 = rs;
+			reg_raddr2 = rt;
+		end
 		default: op = OP_INVALID;
 	endcase
 end

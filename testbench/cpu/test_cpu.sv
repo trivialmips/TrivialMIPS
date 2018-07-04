@@ -102,6 +102,7 @@ begin
 	unittest("inst_mem");
 	unittest("inst_jump");
 	unittest("inst_multicyc");
+	unittest("inst_except");
 	$finish;
 end
 

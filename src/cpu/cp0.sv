@@ -47,21 +47,28 @@ begin
 	/* exception (MEM stage) */
 	if(except_req.flush)
 	begin
-		if(regs_new.status.exl == 1'b0)
+		if(except_req.eret)
 		begin
-			if(except_req.delayslot)
+			if(regs_new.status.erl)
+				regs_new.status.erl = 1'b0;
+			else regs_new.status.exl = 1'b0;
+		end else begin
+			if(regs_new.status.exl == 1'b0)
 			begin
-				regs_new.epc = except_req.cur_pc - 32'h4;
-				regs_new.cause.bd = 1'b1;
-			end else begin
-				regs_new.epc = except_req.cur_pc;
-				regs_new.cause.bd = 1'b0;
+				if(except_req.delayslot)
+				begin
+					regs_new.epc = except_req.cur_pc - 32'h4;
+					regs_new.cause.bd = 1'b1;
+				end else begin
+					regs_new.epc = except_req.cur_pc;
+					regs_new.cause.bd = 1'b0;
+				end
 			end
-		end
 
-		regs_new.status.exl = 1'b1;
-		regs_new.cause.ce   = 2'b0;  // TODO: not sure
-		regs_new.cause.exc_code = except_req.exc_code;
+			regs_new.status.exl = 1'b1;
+			regs_new.cause.ce   = 2'b0;  // TODO: not sure
+			regs_new.cause.exc_code = except_req.code;
+		end
 	end
 end
 

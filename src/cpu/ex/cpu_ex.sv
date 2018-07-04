@@ -85,11 +85,17 @@ begin
 	begin
 		except.occur = 1'b0;
 		except.code  = 5'b0;
+		except.eret  = 1'b0;
 	end else begin
 		except.occur = 1'b0;
 		except.code  = `EXCCODE_TR;
+		except.eret  = 1'b0;
 		case(op)
 		OP_TEQI: except.occur = (reg1 == imm);
+		OP_ERET: begin
+			except.occur = 1'b1;
+			except.eret  = 1'b1;
+		end
 		endcase
 	end
 end

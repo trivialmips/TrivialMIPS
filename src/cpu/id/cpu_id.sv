@@ -27,6 +27,8 @@ module cpu_id(
 	input  RegWriteReq_t  mem_wr
 );
 
+assign except.occur = 1'b0;
+
 // 6-bit primary operation code
 logic [5:0] opcode;
 // 5-bit specifier for the source/destination/target register
