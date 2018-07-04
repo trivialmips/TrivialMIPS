@@ -1,6 +1,10 @@
 `ifndef CPU_DEFS_SVH
 `define CPU_DEFS_SVH
 
+// project configuration
+`default_nettype wire
+`timescale 1ns / 1ps
+
 // data formats
 typedef logic           Bit_t;
 typedef logic [7:0]     Byte_t;
