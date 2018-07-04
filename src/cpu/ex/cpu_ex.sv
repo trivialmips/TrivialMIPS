@@ -4,18 +4,24 @@ module cpu_ex(
 	input  clk, rst,
 	input  Oper_t         op,
 	input  InstAddr_t     pc,
+	input  Inst_t         inst,
 	input  Word_t         reg1,
 	input  Word_t         reg2,
 	input  Word_t         imm,
+	input  Word_t         cp0_rdata_unsafe,
 	input  DoubleWord_t   hilo_unsafe,
+	input  RegWriteReq_t  mem_cp0_reg_wr,
 	input  HiloWriteReq_t mem_hilo_wr,
 	output HiloWriteReq_t hilo_wr,
+	output RegWriteReq_t  cp0_reg_wr,
+	output RegAddr_t      cp0_raddr,
 	output MemAccessReq_t memory_req,
 	output Word_t         ret,
 	output Bit_t          stall_req,
 	output ExceptInfo_t   except
 );
 
+// safe HILO
 DoubleWord_t hilo_safe;
 Word_t hi, lo;
 assign { hi, lo } = hilo_safe;
@@ -34,6 +40,24 @@ end
 // unsigned register arithmetic
 DoubleWord_t mul_u;
 assign mul_u = reg1 * reg2;
+
+// CP0 operation
+Word_t cp0_rdata_safe;
+always_comb
+begin
+	if(rst)
+	begin
+		cp0_rdata_safe = `ZERO_DWORD;
+	end else if(mem_cp0_reg_wr.we && mem_cp0_reg_wr.waddr == cp0_raddr) begin
+		cp0_rdata_safe = mem_cp0_reg_wr.wdata;
+	end else begin
+		cp0_rdata_safe = cp0_rdata_unsafe;
+	end
+end
+assign cp0_raddr = inst[15:11];
+assign cp0_reg_wr.we = (op == OP_MTC0);
+assign cp0_reg_wr.wdata = reg2;
+assign cp0_reg_wr.waddr = inst[15:11];
 
 // memory operation
 Bit_t is_load_memory_inst;
@@ -95,6 +119,7 @@ begin
 		OP_MTHI: hilo_wr.hilo = { reg1, lo };
 		OP_MTLO: hilo_wr.hilo = { hi, reg1 };
 		OP_MADDU: hilo_wr.hilo = multi_cyc_ret;
+		OP_MFC0: ret = cp0_rdata_safe;
 		default: begin
             ret = `ZERO_WORD;
         end

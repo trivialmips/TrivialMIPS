@@ -5,6 +5,7 @@ module id_ex(
 	// signals from id
 	input  Oper_t     id_op,
 	input  InstAddr_t id_pc,
+	input  Inst_t     id_inst,
 	input  Word_t     id_reg1,
 	input  Word_t     id_reg2,
 	input  Word_t     id_imm,
@@ -14,6 +15,7 @@ module id_ex(
 	// signals to ex
 	output Oper_t     ex_op,
 	output InstAddr_t ex_pc,
+	output Inst_t     ex_inst,
 	output Word_t     ex_reg1,
 	output Word_t     ex_reg2,
 	output Word_t     ex_imm,
@@ -31,6 +33,7 @@ begin
 	begin
 		ex_op        <= OP_NOP;
 		ex_pc        <= `ZERO_WORD;
+		ex_inst      <= `ZERO_WORD;
 		ex_reg1      <= `ZERO_WORD;
 		ex_reg2      <= `ZERO_WORD;
 		ex_imm       <= `ZERO_WORD;
@@ -40,6 +43,7 @@ begin
 	end else if(~stall.stall_id) begin
 		ex_op        <= id_op;
 		ex_pc        <= id_pc;
+		ex_inst      <= id_inst;
 		ex_reg1      <= id_reg1;
 		ex_reg2      <= id_reg2;
 		ex_imm       <= id_imm;

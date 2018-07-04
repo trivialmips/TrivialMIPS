@@ -95,19 +95,23 @@ typedef struct packed {
 } CP0Regs_t;
 
 `define CP0_REG_COUNT  5'd9
+`define CP0_REG_COMPARE  5'd11
 
 // exception
 typedef struct packed {
 	Bit_t occur;
 	Bit_t delayslot;
-	Word_t except;
+	logic [4:0] code;
 } ExceptInfo_t;
 
 typedef struct packed {
 	Bit_t flush;
-	Word_t except;
+	logic [4:0] code;
 	InstAddr_t ret_pc, jump_pc;
 } ExceptReq_t;
+
+/* cause register exc_code field */
+`define EXCCODE_TR  5'h0d  // trap exception
 
 // operation
 typedef enum {

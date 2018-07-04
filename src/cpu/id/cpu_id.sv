@@ -102,9 +102,15 @@ id_type_j id_type_j_instance(
 
 /* register (R-Type) instructions */
 Oper_t op_type_r;
+Bit_t reg_we_r;
+RegAddr_t reg_raddr1_r, reg_raddr2_r, reg_waddr_r;
 id_type_r id_type_r_instance(
 	.opcode,
 	.inst,
+	.reg_raddr1(reg_raddr1_r),
+	.reg_raddr2(reg_raddr2_r),
+	.reg_waddr(reg_waddr_r),
+	.reg_we(reg_we_r),
 	.op(op_type_r)
 );
 
@@ -133,12 +139,12 @@ begin
 		reg_we = opcode[0];
 		reg_waddr = 5'd31;
 	end else if(op_type_r != OP_INVALID) begin
-		op = op_type_r;
-		reg_raddr1 = rs;
-		reg_raddr2 = rt;
-		imm_o  = `ZERO_WORD;
-		reg_we = 1'b1;
-		reg_waddr = rd;
+		op         = op_type_r;
+		reg_raddr1 = reg_raddr1_r;
+		reg_raddr2 = reg_raddr2_r;
+		imm_o      = `ZERO_WORD;
+		reg_we     = reg_we_r;
+		reg_waddr  = reg_waddr_r;
 	end else begin
 		op = OP_INVALID;
 		reg_raddr1 = 5'b0;

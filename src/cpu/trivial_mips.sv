@@ -37,13 +37,13 @@ hilo hilo_instance(
 // coprocesser 0
 CP0Regs_t cp0_regs;
 RegAddr_t cp0_raddr;
-RegWriteReq_t cp0_wr;
+RegWriteReq_t cp0_reg_wr;
 Word_t cp0_rdata;
 cp0 cp0_instance(
 	.clk,
 	.rst,
 	.raddr(cp0_raddr),
-	.wr(cp0_wr),
+	.wr(cp0_reg_wr),
 	.rdata(cp0_rdata),
 	.regs(cp0_regs)
 );
@@ -148,6 +148,7 @@ branch branch_instance(
 
 Oper_t ex_op;
 Word_t ex_reg1, ex_reg2, ex_imm;
+Inst_t ex_inst;
 InstAddr_t ex_pc;
 ExceptInfo_t idex_except;
 
@@ -156,6 +157,7 @@ id_ex stage_id_ex(
 	.rst,
 	.id_op,
 	.id_pc,
+	.id_inst,
 	.id_reg1,
 	.id_reg2,
 	.id_imm,
@@ -164,6 +166,7 @@ id_ex stage_id_ex(
 	.id_except,
 	.ex_op,
 	.ex_pc,
+	.ex_inst,
 	.ex_reg1,
 	.ex_reg2,
 	.ex_imm,
@@ -177,24 +180,32 @@ id_ex stage_id_ex(
 // EX stage
 HiloWriteReq_t ex_hilo_wr;
 HiloWriteReq_t memwb_hilo_wr;
+RegWriteReq_t mem_cp0_reg_wr;
+RegWriteReq_t ex_cp0_reg_wr;
 ExceptInfo_t ex_except;
 cpu_ex stage_ex(
 	.clk,
 	.rst,
 	.op(ex_op),
 	.pc(ex_pc),
+	.inst(ex_inst),
 	.reg1(ex_reg1),
 	.reg2(ex_reg2),
 	.imm(ex_imm),
 	.hilo_unsafe(reg_hilo),
 	.hilo_wr(ex_hilo_wr),
+	.cp0_reg_wr(ex_cp0_reg_wr),
+	.cp0_rdata_unsafe(cp0_rdata),
+	.cp0_raddr(cp0_raddr),
 	.memory_req(ex_memory_req),
 	.ret(ex_reg_wr.wdata),
 	.stall_req(stall_from_ex),
 	.except(ex_except),
-	.mem_hilo_wr(memwb_hilo_wr)
+	.mem_hilo_wr(memwb_hilo_wr),
+	.mem_cp0_reg_wr(mem_cp0_reg_wr)
 );
 
+InstAddr_t mem_pc;
 RegWriteReq_t mem_reg_wr;
 HiloWriteReq_t mem_hilo_wr;
 MemAccessReq_t mem_memory_req;
@@ -202,12 +213,16 @@ ExceptInfo_t exmem_except;
 ex_mem stage_ex_mem(
 	.clk,
 	.rst,
+	.ex_pc,
 	.ex_reg_wr,
+	.ex_cp0_reg_wr,
 	.ex_hilo_wr,
 	.ex_memory_req,
 	.ex_except(idex_except.occur ? idex_except : ex_except),
+	.mem_pc,
 	.mem_reg_wr,
 	.mem_hilo_wr,
+	.mem_cp0_reg_wr,
 	.mem_memory_req,
 	.mem_except(exmem_except),
 	.stall,
@@ -227,18 +242,29 @@ cpu_mem stage_mem(
 	.except(mem_except)
 );
 
+RegWriteReq_t except_cp0_reg_wr;
+except except_handler(
+	.rst,
+	.pc(mem_pc),
+	.except(exmem_except.occur ? exmem_except : mem_except),
+	.except_req,
+	.cp0_reg_wr(except_cp0_reg_wr)
+);
+
 assign memwb_hilo_wr = mem_hilo_wr;
 
 RegWriteReq_t wb_reg_wr;
 mem_wb stage_mem_wb(
 	.clk,
 	.rst,
+	.mem_pc,
+	.mem_cp0_reg_wr,
 	.mem_reg_wr(memwb_reg_wr),
 	.mem_hilo_wr(memwb_hilo_wr),
-	.except(exmem_except.occur ? exmem_except : mem_except),
-	.except_req,
+	.except_cp0_reg_wr,
 	.wb_reg_wr,
 	.wb_hilo_wr(hilo_wr),
+	.wb_cp0_reg_wr(cp0_reg_wr),
 	.stall,
 	.flush
 );
