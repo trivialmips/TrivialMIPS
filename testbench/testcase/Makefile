@@ -18,4 +18,4 @@ mem: $(MEMS) $(ANSES)
 	$(ARCH)-objcopy --dump-section .text=/dev/stdout $< | xxd -c 4 -g 32 | cut -f 2 -d " " > $@
 
 clean:
-	rm *.mem
+	rm *.mem *.ans || true
