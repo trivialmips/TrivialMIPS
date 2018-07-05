@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="test_cpu_one_tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="\$unit__home_miskcoo_WorkPlace_TrivialMIPS_src_cpu_id_branch_sv " />
+            <top_module name="glbl" />
+            <top_module name="test_cpu_one_tb" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0fs"></ZoomStartTime>
+      <ZoomEndTime time="130400001fs"></ZoomEndTime>
+      <Cursor1Time time="1000000000fs"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="175"></NameColumnWidth>
+      <ValueColumnWidth column_width="116"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="26" />
+   <wvobject type="logic" fp_name="/test_cpu_one_tb/clk50M">
+      <obj_property name="ElementShortName">clk50M</obj_property>
+      <obj_property name="ObjectShortName">clk50M</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/test_cpu_one_tb/rst">
+      <obj_property name="ElementShortName">rst</obj_property>
+      <obj_property name="ObjectShortName">rst</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/test_cpu_one_tb/ibus_req">
+      <obj_property name="ElementShortName">ibus_req</obj_property>
+      <obj_property name="ObjectShortName">ibus_req</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/test_cpu_one_tb/dbus_req">
+      <obj_property name="ElementShortName">dbus_req</obj_property>
+      <obj_property name="ObjectShortName">dbus_req</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/test_cpu_one_tb/ibus_res">
+      <obj_property name="ElementShortName">ibus_res</obj_property>
+      <obj_property name="ObjectShortName">ibus_res</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/test_cpu_one_tb/dbus_res">
+      <obj_property name="ElementShortName">dbus_res</obj_property>
+      <obj_property name="ObjectShortName">dbus_res</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/test_cpu_one_tb/trivial_cpu_instance/pc_instance/pc">
+      <obj_property name="ElementShortName">pc[31:0]</obj_property>
+      <obj_property name="ObjectShortName">pc[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/test_cpu_one_tb/trivial_cpu_instance/stage_if_id/id_inst">
+      <obj_property name="ElementShortName">id_inst[31:0]</obj_property>
+      <obj_property name="ObjectShortName">id_inst[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/test_cpu_one_tb/trivial_cpu_instance/stage_ex/op">
+      <obj_property name="ElementShortName">op[31:0]</obj_property>
+      <obj_property name="ObjectShortName">op[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/test_cpu_one_tb/trivial_cpu_instance/stage_id_ex/id_reg1">
+      <obj_property name="ElementShortName">id_reg1[31:0]</obj_property>
+      <obj_property name="ObjectShortName">id_reg1[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/test_cpu_one_tb/trivial_cpu_instance/stage_id_ex/id_reg2">
+      <obj_property name="ElementShortName">id_reg2[31:0]</obj_property>
+      <obj_property name="ObjectShortName">id_reg2[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/test_cpu_one_tb/trivial_cpu_instance/stage_id_ex/id_reg_we">
+      <obj_property name="ElementShortName">id_reg_we</obj_property>
+      <obj_property name="ObjectShortName">id_reg_we</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/test_cpu_one_tb/trivial_cpu_instance/stage_id_ex/id_reg_waddr">
+      <obj_property name="ElementShortName">id_reg_waddr[4:0]</obj_property>
+      <obj_property name="ObjectShortName">id_reg_waddr[4:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/test_cpu_one_tb/trivial_cpu_instance/ctrl_instance/stall">
+      <obj_property name="ElementShortName">stall</obj_property>
+      <obj_property name="ObjectShortName">stall</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/test_cpu_one_tb/trivial_cpu_instance/ctrl_instance/flush">
+      <obj_property name="ElementShortName">flush</obj_property>
+      <obj_property name="ObjectShortName">flush</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/test_cpu_one_tb/trivial_cpu_instance/general_regs_instance/registers[1]">
+      <obj_property name="ElementShortName">[1][31:0]</obj_property>
+      <obj_property name="ObjectShortName">[1][31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/test_cpu_one_tb/trivial_cpu_instance/general_regs_instance/registers[2]">
+      <obj_property name="ElementShortName">[2][31:0]</obj_property>
+      <obj_property name="ObjectShortName">[2][31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/test_cpu_one_tb/trivial_cpu_instance/general_regs_instance/registers[3]">
+      <obj_property name="ElementShortName">[3][31:0]</obj_property>
+      <obj_property name="ObjectShortName">[3][31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/test_cpu_one_tb/trivial_cpu_instance/general_regs_instance/registers[4]">
+      <obj_property name="ElementShortName">[4][31:0]</obj_property>
+      <obj_property name="ObjectShortName">[4][31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/test_cpu_one_tb/trivial_cpu_instance/cp0_instance/regs_inner.count">
+      <obj_property name="ElementShortName">.count[31:0]</obj_property>
+      <obj_property name="ObjectShortName">.count[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/test_cpu_one_tb/trivial_cpu_instance/cp0_instance/regs_inner.compare">
+      <obj_property name="ElementShortName">.compare[31:0]</obj_property>
+      <obj_property name="ObjectShortName">.compare[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/test_cpu_one_tb/trivial_cpu_instance/cp0_instance/regs_inner.cause">
+      <obj_property name="ElementShortName">.cause</obj_property>
+      <obj_property name="ObjectShortName">.cause</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/test_cpu_one_tb/trivial_cpu_instance/cp0_instance/regs_inner.status">
+      <obj_property name="ElementShortName">.status</obj_property>
+      <obj_property name="ObjectShortName">.status</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/test_cpu_one_tb/trivial_cpu_instance/cp0_instance/regs_inner.epc">
+      <obj_property name="ElementShortName">.epc[31:0]</obj_property>
+      <obj_property name="ObjectShortName">.epc[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/test_cpu_one_tb/trivial_cpu_instance/except_handler/except_req">
+      <obj_property name="ElementShortName">except_req</obj_property>
+      <obj_property name="ObjectShortName">except_req</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/test_cpu_one_tb/trivial_cpu_instance/except_handler/except">
+      <obj_property name="ElementShortName">except</obj_property>
+      <obj_property name="ObjectShortName">except</obj_property>
+   </wvobject>
+</wave_config>
