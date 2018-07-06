@@ -144,11 +144,14 @@ begin
 		OP_XOR:  ret = reg1 ^ reg2;
 		OP_NOR:  ret = ~(reg1 | reg2);
 
-		OP_JAL: ret = pc + 32'd8;
+		/* move instructions */
 		OP_MFHI: ret = hi;
 		OP_MFLO: ret = lo;
 		OP_MTHI: hilo_wr.hilo = { reg1, lo };
 		OP_MTLO: hilo_wr.hilo = { hi, reg1 };
+		OP_MOVZ, OP_MOVN: ret = reg1; // 'we' is set in ID stage.
+
+		OP_JAL: ret = pc + 32'd8;
 		OP_MADDU: hilo_wr.hilo = multi_cyc_ret;
 		OP_MFC0: ret = cp0_rdata_safe;
 		default: begin
