@@ -38,14 +38,15 @@ begin
 	reg_raddr2 = rt;
 	reg_waddr  = rd;
 	reg_we     = 1'b1;
-	case(opcode)
+	unique case(opcode)
 		6'b000000: // SPECIAL
 		begin 
 			if(inst == 32'b0)
 			begin
+				// TODO: remove this, it can be replaced by OP_SLL
 				`INST_R(OP_NOP, 5'b0, 5'b0)
 			end else begin
-				case(inst[5:0])
+				unique case(inst[5:0])
 				/* logical */
 				6'b100100: `INST_W(OP_AND, rs, rt, rd)
 				6'b100101: `INST_W(OP_OR,  rs, rt, rd)
@@ -62,6 +63,13 @@ begin
 				/* jump */
 				6'b001000: `INST_R(OP_JR,   rs, rt)     //      rt = rd = 0
 				6'b001001: `INST_W(OP_JALR, rs, rt, rd) //      rt      = 0
+				/* shift */
+				6'b000000: `INST_W(OP_SLL,  rs, rt, rd) // rs           = 0
+				6'b000010: `INST_W(OP_SRL,  rs, rt, rd) // rs           = 0
+				6'b000011: `INST_W(OP_SRA,  rs, rt, rd) // rs           = 0
+				6'b000100: `INST_W(OP_SLLV, rs, rt, rd)
+				6'b000110: `INST_W(OP_SRLV, rs, rt, rd)
+				6'b000111: `INST_W(OP_SRAV, rs, rt, rd)
 				default: op = OP_INVALID;
 				endcase
 			end

@@ -135,7 +135,7 @@ typedef enum {
 	/* move instructions */
 	OP_MFHI, OP_MFLO, OP_MTHI, OP_MTLO,
 	OP_MOVN, OP_MOVZ,
-	// OP_MOVF, OP_MOVT,  // floating-point involved
+	// OP_MOVF, OP_MOVT, floating-point involved
 
 	/* shift instructions */
 	OP_SLL, OP_SLLV, OP_SRA, OP_SRAV, OP_SRL, OP_SRLV, 

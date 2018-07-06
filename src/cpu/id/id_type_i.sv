@@ -36,11 +36,11 @@ begin
 	reg_raddr2 = 5'b0;
 	reg_waddr  = rt;
 	reg_we     = 1'b1;
-	case(opcode)
+	unique case(opcode)
 		6'b000001: // REGIMM
 		begin
 			reg_we = 1'b0;
-			case(inst[20:16])
+			unique case(inst[20:16])
 			5'b01100: op = OP_TEQI;
 
 			/* jump */

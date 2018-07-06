@@ -40,7 +40,7 @@ begin
 	end else begin
 		is_branch = 1'b1;
 		jump_to = default_jump_i;
-		case(opcode)
+		unique case(opcode)
 			6'b000001: // REGIMM
 			begin
 				/* In this case, only four jump instructions,
