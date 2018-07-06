@@ -24,7 +24,7 @@ InstAddr_t pc_plus4, pc_plus8;
 InstAddr_t default_jump_j, default_jump_i;
 assign pc_plus4     = pc + 32'd4;
 assign pc_plus8     = pc + 32'd8;
-assign default_jump_i = pc + { {14{offset[15]}}, offset, 2'b0 };
+assign default_jump_i = pc_plus4 + { {14{offset[15]}}, offset, 2'b0 };
 assign default_jump_j = { pc_plus4[31:28], instr_index, 2'b0 };
 
 Bit_t reg_equal;
@@ -54,6 +54,7 @@ begin
 				 * Whether to jump can be determined by only the sign bit */
 				is_branch = (inst[19:17] == 3'b0);
 				jump = (reg1[31] ^ inst[16]) & is_branch;
+				jump_to = default_jump_i;
 			end
 			// BEQ (000100), BNE (000101)
 			//    6'b000100: jump = (reg1 == reg2);
