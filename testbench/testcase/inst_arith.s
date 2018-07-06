@@ -32,6 +32,32 @@ _start:
 	# ans: skip
 	ori $2, $2, 0x0000  # ans: $2=0xff000000
 
+	# === CLO, CLZ ===
+	lui $1, 0xefff         # ans: $1=0xefff0000
+	ori $1, $1, 0xefff     # ans: $1=0xefffefff
+	clo $2, $1             # ans: $2=0x00000003
+	clz $2, $2             # ans: $2=0x0000001e
+	clz $2, $0             # ans: $2=0x00000020
+	lui $2, 0x0008         # ans: $2=0x00080000
+	clz $3, $2             # ans: $3=0x0000000c
+	ori $3, $3, 0x0100     # ans: $3=0x0000010c
+	clz $3, $3             # ans: $3=0x00000017
+
+	# === MUL, MULT, MULTU ===
+	lui $1, 0xffff         # ans: skip
+	ori $1, $1, 0xfffb     # ans: $1=0xfffffffb
+	ori $2, $0, 0x0006     # ans: $2=0x00000006
+	mul $3, $1, $2         # ans: $3=0xffffffe2
+
+	mult  $1, $2  # ans: $hilo=0xffffffffffffffe2
+	multu $1, $2  # ans: $hilo=0x00000005ffffffe2
+
+	# === MADDU, MADD, MSUBU, MSUB ===
+	maddu $1, $1  # ans: $hilo=0xfffffffbfffffffb
+	msub  $1, $2  # ans: $hilo=0xfffffffc00000019
+	msubu $1, $2  # ans: $hilo=0xfffffff600000037
+	madd  $1, $2  # ans: $hilo=0xfffffff600000019
+
 .org 0x180
     # exception handler
 	# return to next instruction

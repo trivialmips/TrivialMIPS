@@ -13,44 +13,41 @@ end
 
 always #10 clk50M = ~clk50M;
 
-WishboneReq_t ibus_req, dbus_req;
-WishboneRes_t ibus_res, dbus_res;
+Bus_if data_bus_if();
+Bus_if inst_bus_if();
 
-inst_ibus ibus_instance(
+fake_inst_bus fake_inst_bus_instance(
 	.rst,
-	.ibus_req,
-	.ibus_res
+	.inst_bus(inst_bus_if.slave)
 );
 
-inst_dbus dbus_instance(
+fake_data_bus fake_data_bus_instance(
 	.clk(clk50M),
 	.rst,
-	.dbus_req,
-	.dbus_res
+	.data_bus(data_bus_if.slave)
 );
 
 trivial_mips trivial_cpu_instance(
 	.clk(clk50M),
 	.rst,
-	.ibus_req,
-	.ibus_res,
-	.dbus_req,
-	.dbus_res
+	.inst_bus(inst_bus_if.master),
+	.data_bus(data_bus_if.master)
 );
 
 initial begin
     integer i;
-    for(i = 0; i < $size(ibus_instance.inst_mem); i = i + 1)
-	   ibus_instance.inst_mem[i] = 32'h0;
 
-    for(i = 0; i < $size(dbus_instance.inst_ram); i = i + 1)
-	   dbus_instance.inst_ram[i] = 32'h0;
+	for(i = 0; i < $size(fake_inst_bus_instance.inst_mem); i = i + 1)
+	fake_inst_bus_instance.inst_mem[i] = 32'h0;
 
-    $readmemh({ `PATH_PREFIX, "inst", ".mem" }, ibus_instance.inst_mem);
+	for(i = 0; i < $size(fake_data_bus_instance.inst_ram); i = i + 1)
+	fake_data_bus_instance.inst_ram[i] = 32'h0;
+
+	$readmemh({ `PATH_PREFIX, "inst", ".mem" }, fake_inst_bus_instance.inst_mem);
 
 	rst = 1'b1;
 	#50 rst = 1'b0;
-	#1000 $stop;
+	#2000 $stop;
 end
 
 endmodule
