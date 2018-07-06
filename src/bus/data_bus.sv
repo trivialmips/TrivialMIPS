@@ -49,7 +49,7 @@ module data_bus(
         ethernet.read  = `ZERO_BIT;
         ethernet.write = `ZERO_BIT;
 
-        cpu.data_rd   = `ZERO_WORD:
+        cpu.data_rd   = `ZERO_WORD;
         cpu.data_rd_2 = `ZERO_WORD; // we only process one word of r/w on dbus at every clock
         cpu.stall     = `ZERO_BIT;
 

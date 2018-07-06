@@ -1,4 +1,4 @@
-`default_nettype none
+`include "common_defs.svh"
 
 module ThinPad(
     input wire clk_50M,           // 50MHz clock
@@ -81,96 +81,39 @@ module ThinPad(
 );
 
 
+Bus_if cpu_data_if();
+Bus_if cpu_inst_if();
 
-// p=dpy0[0] // ---a---
-// c=dpy0[1] // |     |
-// d=dpy0[2] // f     b
-// e=dpy0[3] // |     |
-// b=dpy0[4] // ---g---
-// a=dpy0[5] // |     |
-// f=dpy0[6] // e     c
-// g=dpy0[7] // |     |
-//           // ---d---  p
-
-
-reg[7:0] number;
-LedDecoder segL(.segments(dpy0), .hex(number[3:0])); // lower digit
-LedDecoder segH(.segments(dpy1), .hex(number[7:4])); // higher digit
-
-reg[15:0] led_bits;
-assign leds = led_bits;
-
-always_ff @(posedge clock_btn or posedge reset_btn) begin
-    if (reset_btn) begin
-        number<=0;
-        led_bits <= 16'h1;
-    end
-    else begin
-        number <= number+1;
-        led_bits <= {led_bits[14:0],led_bits[15]};
-    end
-end
-
-// send data from uart rx directly back
-wire [7:0] ext_uart_rx;
-reg  [7:0] ext_uart_buffer, ext_uart_tx;
-wire ext_uart_ready, ext_uart_busy;
-reg ext_uart_start, ext_uart_avai;
-
-AsyncUartReceiver #(
-    .ClkFrequency(50000000),
-    .Baud(115200)
-) ext_uart_r (
+trivial_mips cpu(
     .clk(clk_50M),
-    .RxD(rxd),
-    .RxD_data_ready(ext_uart_ready),
-    .RxD_clear(ext_uart_ready),
-    .RxD_data(ext_uart_rx)
-);
-    
-always_ff @(posedge clk_50M) begin
-    if(ext_uart_ready)begin
-        ext_uart_buffer <= ext_uart_rx;
-        ext_uart_avai <= 1;
-    end else if(!ext_uart_busy && ext_uart_avai)begin 
-        ext_uart_avai <= 0;
-    end
-end
-
-always_ff @(posedge clk_50M) begin
-    if(!ext_uart_busy && ext_uart_avai)begin 
-        ext_uart_tx <= ext_uart_buffer;
-        ext_uart_start <= 1;
-    end else begin 
-        ext_uart_start <= 0;
-    end
-end
-
-AsyncUartTransmitter #(
-    .ClkFrequency(50000000),
-    .Baud(115200)
-) ext_uart_t (
-    .clk(clk_50M),
-    .TxD(txd), 
-    .TxD_busy(ext_uart_busy),
-    .TxD_start(ext_uart_start),
-    .TxD_data(ext_uart_tx)
+    .rst(reset_btn),
+	.inst_bus(cpu_data_if.master),
+	.data_bus(cpu_inst_if.master) 
 );
 
+Bus_if ram_data_if();
+Bus_if ram_inst_if();
+Bus_if bootrom_if();
+Bus_if flash_if();
+Bus_if uart_if();
+Bus_if timer_if();
+Bus_if graphics_if();
+Bus_if ethernet_if();
 
-wire [11:0] hdata;
-assign video_red = hdata < 266 ? 3'b111 : 0; // red bar
-assign video_green = hdata < 532 && hdata >= 266 ? 3'b111 : 0;  // green bar
-assign video_blue = hdata >= 532 ? 2'b11 : 0; // blue bar
-assign video_clk = clk_50M;
+data_bus data_bus_instance(
+    .cpu(cpu_data_if.slave),
+    .ram(ram_data_if.master),
+    .flash(flash_if.master),
+    .uart(uart_if.master),
+    .timer(timer_if.master),
+    .graphics(graphics_if.master),
+    .ethernet(ethernet_if.master)
+);
 
-vga #(12, 800, 856, 976, 1040, 600, 637, 643, 666, 1, 1) vga800x600at75 (
-    .clk(clk_50M), 
-    .hdata(hdata),
-    .vdata(),
-    .hsync(video_hsync),
-    .vsync(video_vsync),
-    .data_enable(video_de)
+instruction_bus instruction_bus_instance(
+    .cpu(cpu_inst_if.slave),
+    .ram(ram_inst_if.master),
+    .bootrom(bootrom_if.master)
 );
 
 endmodule
