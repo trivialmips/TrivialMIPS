@@ -1,48 +1,13 @@
 `ifndef CPU_DEFS_SVH
 `define CPU_DEFS_SVH
 
-// project configuration
-`default_nettype wire
-`timescale 1ns / 1ps
 
-// data formats
-typedef logic           Bit_t;
-typedef logic [7:0]     Byte_t;
-typedef logic [15:0]    HalfWord_t;
-typedef logic [31:0]    Word_t;
-typedef logic [63:0]    DoubleWord_t;
+/*
+	This header defines data structures and constants used in CPU internally
+*/
 
-`define ZERO_BYTE       8'h0;
-`define ZERO_HWORD      16'h0;
-`define ZERO_WORD       32'h0;
-`define ZERO_DWORD      64'h0;
+`include "common_defs.svh"
 
-// instructions
-`define INST_WIDTH      32
-`define INST_ADDR_WIDTH 32
-typedef Word_t                         Inst_t;
-typedef logic [`INST_ADDR_WIDTH - 1:0] InstAddr_t;
-
-// register
-`define REG_NUM        32
-`define REG_ADDR_WIDTH 5
-`define REG_DATA_WIDTH 32
-typedef logic [`REG_ADDR_WIDTH - 1:0] RegAddr_t;
-
-// memory
-typedef Word_t  MemAddr_t;
-
-// bus
-typedef struct packed {
-	Word_t addr, data;
-	logic [3:0] sel;
-	logic we, stb, cyc;
-} WishboneReq_t;
-
-typedef struct packed {
-	Word_t data;
-	logic ack;
-} WishboneRes_t;
 
 // register access
 typedef struct packed {

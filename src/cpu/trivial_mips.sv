@@ -2,11 +2,8 @@
 
 module trivial_mips(
 	input  clk, rst,
-	// assume ibus can return data in one clock.
-	output WishboneReq_t ibus_req,
-	input  WishboneRes_t ibus_res,
-	output WishboneReq_t dbus_req,
-	input  WishboneRes_t dbus_res
+	Bus_if.master inst_bus,
+	Bus_if.master data_bus 
 );
 
 // general registers
@@ -84,10 +81,14 @@ reg_pc pc_instance(
 	.hold_pc(stall.hold_pc)
 );
 
+assign inst_bus.write = `ZERO_BIT;
+assign inst_bus.mask = 4'b1111;
+assign inst_bus.data_wr = `ZERO_WORD:
+
 cpu_if stage_if(
 	.rst,
 	.pc(if_pc),
-	.ibus(ibus_req),
+	.inst_bus
 	.stall_req(stall_from_if)
 );
 
@@ -98,7 +99,7 @@ if_id stage_if_id(
 	.rst,
 	.if_pc,
 	.if_delayslot(is_branch),
-	.if_inst(ibus_res.data),
+	.if_inst(inst_bus.data_rd), // TODO: use inst_bus.data_rd_2 for the second instruction
 	.id_pc,
 	.id_inst,
 	.id_delayslot,
@@ -246,8 +247,7 @@ cpu_mem stage_mem(
 	.wr_i(mem_reg_wr),
 	.wr_o(memwb_reg_wr),
 	.memory_req(mem_memory_req),
-	.dbus_req,
-	.dbus_res,
+	.data_bus
 	.stall_req(stall_from_mem),
 	.except(mem_except)
 );
