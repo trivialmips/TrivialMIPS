@@ -65,6 +65,10 @@ begin
 		6'b001000: `INST_W(OP_ADDI,  rs, 5'b0, rt)
 		6'b001001: `INST_W(OP_ADDIU, rs, 5'b0, rt)
 
+		/* compare and set */
+		6'b001010: `INST_W(OP_SLTI,  rs, 5'b0, rt)
+		6'b001011: `INST_W(OP_SLTIU, rs, 5'b0, rt)
+
 		/* jump */
 		6'b000100: `INST_R(OP_BEQ,  rs, rt)
 		6'b000101: `INST_R(OP_BNE,  rs, rt)

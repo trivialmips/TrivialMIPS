@@ -117,7 +117,7 @@ typedef enum {
 	OP_DIV, OP_DIVU,
 	OP_MADD, OP_MADDU, OP_MSUB, OP_MSUBU,
 	OP_MUL, OP_MULT, OP_MULTU,
-	OP_SLT, OP_SLTI, OP_SLTUI, OP_SLTU,
+	OP_SLT, OP_SLTI, OP_SLTIU, OP_SLTU,
 
 	/* logical instructions */
 	OP_AND, OP_ANDI, OP_LUI, OP_NOR,

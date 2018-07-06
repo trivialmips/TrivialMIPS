@@ -78,6 +78,9 @@ begin
 				/* multiplication */
 				6'b011000: `INST_R(OP_MULT,  rs, rt)    //           rd = 0
 				6'b011001: `INST_R(OP_MULTU, rs, rt)    //           rd = 0
+				/* compare and set */
+				6'b101010: `INST_W(OP_SLT,  rs, rt, rd)
+				6'b101011: `INST_W(OP_SLTU, rs, rt, rd)
 				default: op = OP_INVALID;
 				endcase
 			end

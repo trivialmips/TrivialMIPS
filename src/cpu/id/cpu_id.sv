@@ -140,7 +140,7 @@ begin
 		reg_waddr  = reg_waddr_i;
 		imm_o  = unsigned_imm_type_i ? imm_zero_ext : imm_signed_ext;
 
-		if(op_type_i == OP_ADDI || op_type_i == OP_ADDIU)
+		if(op == OP_ADDI || op == OP_ADDIU || op == OP_SLTI || op == OP_SLTIU)
 			reg2_o = imm_o;
 	end else if(op_type_j != OP_INVALID) begin
 		op = op_type_j;

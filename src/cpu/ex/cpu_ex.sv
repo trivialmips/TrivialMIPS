@@ -203,6 +203,13 @@ begin
 		OP_SRA:  ret = $signed(reg2) >>> inst[10:6];
 		OP_SRAV: ret = $signed(reg2) >>> reg1[4:0];
 
+		/* compare and set
+		 *   for SLTIU and SLTI, reg2 = imm */
+		OP_SLTU, OP_SLTIU:
+			ret = (reg1 < reg2);
+		OP_SLT, OP_SLTI:
+			ret = (reg1[31] != reg2[31]) ? reg1[31] : sub_u[31];
+
 		/* multiplication */
 		OP_MUL: ret = multi_cyc_ret[31:0];
 		OP_MADDU, OP_MADD, OP_MSUBU, OP_MSUB, OP_MULT, OP_MULTU:
