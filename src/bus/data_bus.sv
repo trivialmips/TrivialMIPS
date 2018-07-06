@@ -36,48 +36,48 @@ module data_bus(
 
     always_comb begin
 
-        ram.read <= `ZERO_BIT;
-        ram.write <= `ZERO_BIT;
-        flash.read <= `ZERO_BIT;
-        flash.write <= `ZERO_BIT;
-        uart.read <= `ZERO_BIT;
-        uart.write <= `ZERO_BIT;
-        timer.read <= `ZERO_BIT;
-        timer.write <= `ZERO_BIT;
-        graphics.read <= `ZERO_BIT;
-        graphics.write <= `ZERO_BIT;
-        ethernet.read <= `ZERO_BIT;
-        ethernet.write <= `ZERO_BIT;
+        ram.read       = `ZERO_BIT;
+        ram.write      = `ZERO_BIT;
+        flash.read     = `ZERO_BIT;
+        flash.write    = `ZERO_BIT;
+        uart.read      = `ZERO_BIT;
+        uart.write     = `ZERO_BIT;
+        timer.read     = `ZERO_BIT;
+        timer.write    = `ZERO_BIT;
+        graphics.read  = `ZERO_BIT;
+        graphics.write = `ZERO_BIT;
+        ethernet.read  = `ZERO_BIT;
+        ethernet.write = `ZERO_BIT;
 
-        cpu.data_rd <= `ZERO_WORD:
-        cpu.data_rd_2 <= `ZERO_WORD; // we only process one word of r/w on dbus at every clock
-        cpu.stall <= `ZERO_BIT;
+        cpu.data_rd   = `ZERO_WORD:
+        cpu.data_rd_2 = `ZERO_WORD; // we only process one word of r/w on dbus at every clock
+        cpu.stall     = `ZERO_BIT;
 
         if (`MATCH_PREFIX(cpu.address, `RAM_ADDRESS_PREFIX)) begin
 
         end else if (`MATCH_PREFIX(cpu.address, `FLASH_ADDRESS_PREFIX)) begin
-            ram.read <= cpu.read;
-            ram.write <= cpu.write;
-            cpu.data_rd <= ram.data_rd;
-            cpu.stall <= ram.stall;
+            ram.read    = cpu.read;
+            ram.write   = cpu.write;
+            cpu.data_rd = ram.data_rd;
+            cpu.stall   = ram.stall;
         end else if (`MATCH_PREFIX(cpu.address, `UART_ADDRESS_PREFIX)) begin
-            flash.read <= cpu.read;
-            flash.write <= cpu.write;
-            cpu.data_rd <= flash.data_rd;
-            cpu.stall <= flash.stall;
+            flash.read  = cpu.read;
+            flash.write = cpu.write;
+            cpu.data_rd = flash.data_rd;
+            cpu.stall   = flash.stall;
         end else if (`MATCH_PREFIX(cpu.address, `TIMER_ADDRESS_PREFIX)) begin
-            timer.read <= cpu.read;
-            timer.write <= cpu.write;
-            cpu.data_rd <= timer.data_rd;
+            timer.read  = cpu.read;
+            timer.write = cpu.write;
+            cpu.data_rd = timer.data_rd;
         end else if (`MATCH_PREFIX(cpu.address, `GRAPHICS_ADDRESS_PREFIX)) begin
-            graphics.read <= cpu.read;
-            graphics.write <= cpu.write;
-            cpu.data_rd <= graphics.data_rd;
+            graphics.read  = cpu.read;
+            graphics.write = cpu.write;
+            cpu.data_rd    = graphics.data_rd;
         end else if (`MATCH_PREFIX(cpu.address, `ETHERNET_ADDRESS_PREFIX)) begin
-            ethernet.read <= cpu.read;
-            ethernet.write <= cpu.write;
-            cpu.data_rd <= ethernet.data_rd;
-            cpu.stall <= ethernet.stall;
+            ethernet.read  = cpu.read;
+            ethernet.write = cpu.write;
+            cpu.data_rd    = ethernet.data_rd;
+            cpu.stall      = ethernet.stall;
         end
     end
 
