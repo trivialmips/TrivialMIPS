@@ -1,5 +1,17 @@
 `include "cpu_defs.svh"
 
+`define INST(typ, r1, r2, we, w1) \
+begin \
+	op = typ; \
+	reg_raddr1 = r1; \
+	reg_raddr2 = r2; \
+	reg_waddr = w1; \
+	reg_we = we; \
+end
+
+`define INST_W(typ, r1, r2, w) `INST(typ, r1, r2, 1'b1, w)
+`define INST_R(typ, r1, r2) `INST(typ, r1, r2, 1'b0, 5'b0)
+
 module id_type_i(
 	input  [5:0]     opcode,
 	input  Inst_t    inst,
@@ -11,7 +23,8 @@ module id_type_i(
 	output Bit_t     unsigned_imm
 );
 
-assign unsigned_imm = (opcode == 6'b001101);
+// ANDI, ORI, XORI, LUI
+assign unsigned_imm = (opcode[5:3] == 6'b001);
 
 RegAddr_t rs, rt;
 assign rs = inst[25:21];
@@ -32,7 +45,11 @@ begin
 			default: op = OP_INVALID;
 			endcase
 		end
-		6'b001101: op = OP_ORI;
+		6'b001100: `INST_W(OP_ANDI, rs, 5'b0, rt)
+		6'b001101: `INST_W(OP_ORI, rs, 5'b0, rt)
+		6'b001110: `INST_W(OP_XORI, rs, 5'b0, rt)
+		6'b001111: `INST_W(OP_LUI, 5'b0, 5'b0, rt)
+
 		6'b101011: 
 		begin
 			op = OP_SW;

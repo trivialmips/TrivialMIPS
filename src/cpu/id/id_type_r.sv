@@ -1,5 +1,17 @@
 `include "cpu_defs.svh"
 
+`define INST(typ, r1, r2, we, w1) \
+begin \
+	op = typ; \
+	reg_raddr1 = r1; \
+	reg_raddr2 = r2; \
+	reg_waddr = w1; \
+	reg_we = we; \
+end
+
+`define INST_W(typ, r1, r2, w) `INST(typ, r1, r2, 1'b1, w)
+`define INST_R(typ, r1, r2) `INST(typ, r1, r2, 1'b0, 5'b0)
+
 module id_type_r(
 	input  [5:0]     opcode,
 	input  Inst_t    inst,
@@ -31,14 +43,14 @@ begin
 		begin 
 			if(inst == 32'b0)
 			begin
-				// TODO: removed when SLL instruction is implemented
-				reg_raddr1 = 5'b0;
-				reg_raddr2 = 5'b0;
-				reg_we = 1'b0;
-				op = OP_NOP;
+				`INST_R(OP_NOP, 5'b0, 5'b0)
 			end else begin
-				reg_we = ~inst[0];
 				case(inst[5:0])
+				6'b100100: `INST_W(OP_AND, rs, rt, rd)
+				6'b100101: `INST_W(OP_OR, rs, rt, rd)
+				6'b100110: `INST_W(OP_XOR, rs, rt, rd)
+				6'b100111: `INST_W(OP_NOR, rs, rt, rd)
+
 				6'b010000: op = OP_MFHI;
 				6'b010001: op = OP_MTHI;
 				6'b010010: op = OP_MFLO;

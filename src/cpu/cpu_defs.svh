@@ -107,14 +107,46 @@ typedef struct packed {
 
 // operation
 typedef enum {
-	OP_NOP,
-	OP_MTHI, OP_MTLO, OP_MFHI, OP_MFLO,
-	OP_ORI,
-	OP_MADDU,
-	OP_J, OP_JAL,
-	OP_LW, OP_SW,
-	OP_MFC0, OP_MTC0, OP_ERET,
-	OP_TEQI,
+	/* instruction control instructions */
+	OP_NOP, OP_SSNOP,
+
+	/* arithmetic instructions */
+	OP_ADD, OP_ADDI, OP_ADDUI, OP_ADDU, OP_CLO,
+	OP_CLZ, OP_DIV, OP_DIVU, OP_MADD, OP_MADDU,
+	OP_MSUB, OP_MSUBU, OP_MUL, OP_MULT, OP_MULTU,
+	OP_SLT, OP_SLTI, OP_SLTUI, OP_SLTU, OP_SUB, OP_SUBU,
+
+	/* logical instructions */
+	OP_AND, OP_ANDI, OP_LUI, OP_NOR,
+	OP_OR, OP_ORI, OP_XOR, OP_XORI,
+
+	/* branch and jump instructions */
+	OP_B, OP_BAL, OP_BEQ, OP_BGEZ, OP_BGEZAL,
+	OP_BGTZ, OP_BLEZ, OP_BLTZ, OP_BLTZAL, OP_BNE,
+	OP_J, OP_JAL, OP_JALR, OP_JR,
+
+	/* load, store, and memory control instructions */
+	OP_LB, OP_LBU, OP_LH, OP_LHU, OP_LL, OP_LW,
+	OP_LWL, OP_LWR, OP_PREF, OP_SB, OP_SC, OP_SD,
+	OP_SH, OP_SW, OP_SWL, OP_SWR, OP_SYNC, 
+
+	/* move instructions */
+	OP_MFHI, OP_MFLO, OP_MTHI, OP_MTLO,
+	OP_MOVF, OP_MOVN, OP_MOVT, OP_MOVZ,
+
+	/* shift instructions */
+	OP_SLL, OP_SLLV, OP_SRA, OP_SRAV, OP_SRL, OP_SRLV, 
+
+	/* trap instructions */
+	OP_BREAK, OP_SYSCALL, OP_TEQ, OP_TEQI,
+	OP_TGE, OP_TGEI, OP_TGEIU, OP_TGEU, OP_TNE,
+	OP_TLT, OP_TLTI, OP_TLTIU, OP_TLTU, OP_TNEI,
+
+	/* privileged instructions */
+	OP_CACHE, OP_ERET, OP_MFC0, OP_MTC0,
+	OP_TLBP, OP_TLBR, OP_TLBWI, OP_TLBWR, OP_WAIT,
+
+	/* invalid */
 	OP_INVALID
 } Oper_t;
 

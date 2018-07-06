@@ -134,7 +134,16 @@ begin
 		hilo_wr.hilo = hilo_safe;
 
 		case(op)
-		OP_ORI: ret = reg1 | imm;
+		/* logical instructions */
+		OP_ORI:  ret = reg1 | imm;
+		OP_ANDI: ret = reg1 & imm;
+		OP_XORI: ret = reg1 ^ imm;
+		OP_LUI:  ret = { imm[15:0], 16'b0 };
+		OP_AND:  ret = reg1 & reg2;
+		OP_OR:   ret = reg1 | reg2;
+		OP_XOR:  ret = reg1 ^ reg2;
+		OP_NOR:  ret = ~(reg1 | reg2);
+
 		OP_JAL: ret = pc + 32'd8;
 		OP_MFHI: ret = hi;
 		OP_MFLO: ret = lo;
