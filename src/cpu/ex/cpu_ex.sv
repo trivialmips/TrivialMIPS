@@ -39,11 +39,22 @@ end
 
 // unsigned register arithmetic
 Word_t add_u, sub_u;
-DoubleWord_t mul_u;
-assign mul_u = reg1 * reg2;
-// for ADDI, ADDIU, reg2 = imm
-assign add_u = reg1 + reg2;
+assign add_u = reg1 + reg2;  // for ADDI, ADDIU, reg2 = imm
 assign sub_u = reg1 - reg2;
+
+// count leading bits
+Word_t clz_cnt, clo_cnt;
+ex_count_bit count_clz(
+	.bit_val(1'b0),
+	.val(reg1),
+	.count(clz_cnt)
+);
+
+ex_count_bit count_clo(
+	.bit_val(1'b1),
+	.val(reg1),
+	.count(clo_cnt)
+);
 
 // overflow checking
 Bit_t ov_add, ov_sub, is_overflow;
@@ -120,9 +131,14 @@ end
 // whether to write hilo
 Bit_t we_hilo;
 assign we_hilo = (
-	op == OP_MTHI ||
-	op == OP_MTLO ||
-	op == OP_MADDU
+	op == OP_MTHI  ||
+	op == OP_MTLO  ||
+	op == OP_MADDU ||
+	op == OP_MSUBU ||
+	op == OP_MADD  ||
+	op == OP_MSUB  ||
+	op == OP_MULT  ||
+	op == OP_MULTU
 );
 
 DoubleWord_t multi_cyc_ret;
@@ -132,7 +148,6 @@ ex_multi_cyc multi_cyc_instance(
 	.op,
 	.reg1,
 	.reg2,
-	.mul_u,
 	.hilo(hilo_safe),
 	.ret(multi_cyc_ret),
 	.is_busy(stall_req)
@@ -165,6 +180,10 @@ begin
 		OP_ADD, OP_ADDI, OP_ADDIU, OP_ADDU: ret = add_u;
 		OP_SUB, OP_SUBU: ret = sub_u;
 
+		/* bits counting */
+		OP_CLZ: ret = clz_cnt;
+		OP_CLO: ret = clo_cnt;
+
 		/* move instructions */
 		OP_MFHI: ret = hi;
 		OP_MFLO: ret = lo;
@@ -173,7 +192,8 @@ begin
 		OP_MOVZ, OP_MOVN: ret = reg1; // 'we' is set in ID stage.
 
 		/* jump instructions */
-		OP_JAL, OP_BLTZAL, OP_BGEZAL, OP_JALR: ret = pc + 32'd8;
+		OP_JAL, OP_BLTZAL, OP_BGEZAL, OP_JALR:
+			ret = pc + 32'd8;
 
 		/* shift instructions */
 		OP_SLL:  ret = reg2 << inst[10:6];
@@ -183,7 +203,15 @@ begin
 		OP_SRA:  ret = $signed(reg2) >>> inst[10:6];
 		OP_SRAV: ret = $signed(reg2) >>> reg1[4:0];
 
-		OP_MADDU: hilo_wr.hilo = multi_cyc_ret;
+		/* multiplication */
+		OP_MUL: ret = multi_cyc_ret[31:0];
+		OP_MADDU, OP_MADD, OP_MSUBU, OP_MSUB, OP_MULT, OP_MULTU:
+		begin
+			hilo_wr.hilo = multi_cyc_ret;
+			ret = `ZERO_WORD;
+		end
+
+		/* read CP0 */
 		OP_MFC0: ret = cp0_rdata_safe;
 		default: begin
             ret = `ZERO_WORD;

@@ -75,15 +75,25 @@ begin
 				6'b100001: `INST_W(OP_ADDU, rs, rt, rd)
 				6'b100010: `INST_W(OP_SUB,  rs, rt, rd)
 				6'b100011: `INST_W(OP_SUBU, rs, rt, rd)
+				/* multiplication */
+				6'b011000: `INST_R(OP_MULT,  rs, rt)    //           rd = 0
+				6'b011001: `INST_R(OP_MULTU, rs, rt)    //           rd = 0
 				default: op = OP_INVALID;
 				endcase
 			end
 		end
 		6'b011100: // SPECIAL2
 		begin 
-			reg_we = 1'b0;
 			case(inst[5:0])
-			6'b000001: op = OP_MADDU;
+			6'b100000: `INST_W(OP_CLZ, rs, 5'b0, rd)
+			6'b100001: `INST_W(OP_CLO, rs, 5'b0, rd)
+
+			6'b000000: `INST_R(OP_MADD,  rs, rt)  // rd = 0
+			6'b000001: `INST_R(OP_MADDU, rs, rt)  // rd = 0
+			6'b000100: `INST_R(OP_MSUB,  rs, rt)  // rd = 0
+			6'b000101: `INST_R(OP_MSUBU, rs, rt)  // rd = 0
+
+			6'b000010: `INST_W(OP_MUL, rs, rt, rd)
 			default: op = OP_INVALID;
 			endcase
 		end
