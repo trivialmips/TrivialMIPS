@@ -12,7 +12,7 @@ module cp0(
 
 CP0Regs_t regs_new, regs_inner;
 assign regs  = regs_new;
-assign rdata = regs_new[`CP0_REG_COUNT * `REG_DATA_WIDTH +: 32];
+assign rdata = regs_new[raddr * `REG_DATA_WIDTH +: 32];
 
 always @(posedge clk)
 begin
@@ -35,13 +35,16 @@ begin
 	/* write register (WB stage) */
 	if(wr.we)
 	begin
+		/* 
 		case(wr.waddr)
 			// TODO: add mask for writing operation
 			`CP0_REG_COUNT:   regs_new.count = wr.wdata;
 			`CP0_REG_COMPARE: regs_new.compare = wr.wdata;
 			`CP0_REG_STATUS:  regs_new.status = wr.wdata;
 			`CP0_REG_CAUSE:   regs_new.cause = wr.wdata;
-		endcase
+			`CP0_REG_EPC:     regs_new.epc = wr.wdata;
+		endcase */
+	   regs_new[wr.waddr * `REG_DATA_WIDTH +: 32] = wr.wdata;
 	end
 
 	/* exception (MEM stage) */

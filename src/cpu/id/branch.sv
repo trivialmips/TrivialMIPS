@@ -38,9 +38,14 @@ begin
 		jump      = 1'b0;
 		jump_to   = `ZERO_WORD;
 	end else begin
-		is_branch = 1'b1;
-		jump_to = default_jump_i;
-		unique case(opcode)
+		case(opcode)
+			6'b000000: // SPECIAL
+			begin
+				// JR (001000), JALR (001001)
+				is_branch = (inst[5:1] == 5'b00100);
+				jump      = is_branch;
+				jump_to   = reg1;  // TODO: raise 'Address Error' when not aligned
+			end
 			6'b000001: // REGIMM
 			begin
 				/* In this case, only four jump instructions,
@@ -57,15 +62,15 @@ begin
 			// Note that in these two cases, reg2 = `ZERO_WORD
 			//    6'b000110: jump = (reg1[31] || (reg1 == `ZERO_WORD));
 			//    6'b000111: jump = (~reg1[31] && (reg1 != `ZERO_WORD));
-			6'b000100, 6'b000101, 6'b000110, 6'b000111:
+			6'b000100, 6'b000101, 6'b000110, 6'b000111: begin
+				is_branch = 1'b1;
 				jump = ((reg1[31] & opcode[1]) | reg_equal) ^ opcode[0];
+				jump_to = default_jump_i;
+			end
 			6'b000010, 6'b000011: begin // J, JAL
+				is_branch = 1'b1;
 				jump      = 1'b1;
 				jump_to   = default_jump_j;
-			end
-			6'b001000, 6'b001001: begin // JR, JALR
-				jump      = 1'b1;
-				jump_to   = reg1;  // TODO: raise 'Address Error' when not aligned
 			end
 			default: begin
 				is_branch = 1'b0;

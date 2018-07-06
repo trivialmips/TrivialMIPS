@@ -121,9 +121,6 @@ id_type_r id_type_r_instance(
 	.op(op_type_r)
 );
 
-assign reg1_o = safe_reg1;
-assign reg2_o = safe_reg2;
-
 Bit_t cond_move_not_taken, movz_not_taken, movn_not_taken;
 assign movn_not_taken = op_type_r == OP_MOVN && safe_reg2 == `ZERO_WORD;
 assign movz_not_taken = op_type_r == OP_MOVZ && safe_reg2 != `ZERO_WORD;
@@ -131,6 +128,9 @@ assign cond_move_not_taken = movn_not_taken | movz_not_taken;
 
 always_comb
 begin
+	reg1_o = safe_reg1;
+	reg2_o = safe_reg2;
+
 	if(op_type_i != OP_INVALID)
 	begin
 		op = op_type_i;
@@ -139,6 +139,9 @@ begin
 		reg_we     = reg_we_i;
 		reg_waddr  = reg_waddr_i;
 		imm_o  = unsigned_imm_type_i ? imm_zero_ext : imm_signed_ext;
+
+		if(op_type_i == OP_ADDI || op_type_i == OP_ADDIU)
+			reg2_o = imm_o;
 	end else if(op_type_j != OP_INVALID) begin
 		op = op_type_j;
 		reg_raddr1 = 5'b0;

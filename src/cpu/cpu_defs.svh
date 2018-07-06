@@ -103,7 +103,8 @@ typedef struct packed {
 } ExceptReq_t;
 
 /* cause register exc_code field */
-`define EXCCODE_TR  5'h0d  // trap exception
+`define EXCCODE_OV  5'h0c  // overflow
+`define EXCCODE_TR  5'h0d  // trap
 
 // operation
 typedef enum {
@@ -111,10 +112,12 @@ typedef enum {
 	OP_NOP, OP_SSNOP,
 
 	/* arithmetic instructions */
-	OP_ADD, OP_ADDI, OP_ADDUI, OP_ADDU, OP_CLO,
-	OP_CLZ, OP_DIV, OP_DIVU, OP_MADD, OP_MADDU,
-	OP_MSUB, OP_MSUBU, OP_MUL, OP_MULT, OP_MULTU,
-	OP_SLT, OP_SLTI, OP_SLTUI, OP_SLTU, OP_SUB, OP_SUBU,
+	OP_ADD, OP_ADDI, OP_ADDIU, OP_ADDU, OP_SUB, OP_SUBU,
+	OP_CLO, OP_CLZ,
+	OP_DIV, OP_DIVU,
+	OP_MADD, OP_MADDU, OP_MSUB, OP_MSUBU,
+	OP_MUL, OP_MULT, OP_MULTU,
+	OP_SLT, OP_SLTI, OP_SLTUI, OP_SLTU,
 
 	/* logical instructions */
 	OP_AND, OP_ANDI, OP_LUI, OP_NOR,

@@ -82,7 +82,7 @@ task unittest(
 			is_event = 0;
 		end
 
-		if(is_event && out != ans)
+		if(is_event && out != ans && ans != "skip")
 		begin
 			$display("[Error] Expected: %0s, Got: %0s", ans, out);
 			$stop;
@@ -99,10 +99,11 @@ begin
 	unittest("inst_logical");
 	unittest("inst_move");
 	unittest("inst_shift");
+	unittest("inst_except");
+	unittest("inst_arith");
 	unittest("inst_mem");
 	unittest("inst_jump");
 	unittest("inst_multicyc");
-	unittest("inst_except");
 	$display("[Done]");
 	$finish;
 end

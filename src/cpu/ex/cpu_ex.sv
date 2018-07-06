@@ -38,8 +38,17 @@ begin
 end
 
 // unsigned register arithmetic
+Word_t add_u, sub_u;
 DoubleWord_t mul_u;
 assign mul_u = reg1 * reg2;
+// for ADDI, ADDIU, reg2 = imm
+assign add_u = reg1 + reg2;
+assign sub_u = reg1 - reg2;
+
+// overflow checking
+Bit_t ov_add, ov_sub, is_overflow;
+assign ov_add = (reg1[31] & reg2[31]) & (reg1[31] ^ add_u[31]);
+assign ov_sub = (reg1[31] ^ reg2[31]) & (reg1[31] ^ sub_u[31]);
 
 // CP0 operation
 Word_t cp0_rdata_safe;
@@ -78,7 +87,7 @@ begin
 	end
 end
 
-// trap instructions
+// exception
 always_comb
 begin
 	if(rst == 1'b1)
@@ -92,6 +101,14 @@ begin
 		except.eret  = 1'b0;
 		case(op)
 		OP_TEQI: except.occur = (reg1 == imm);
+		OP_ADD, OP_ADDI: begin
+			except.occur = ov_add;
+			except.code  = `EXCCODE_OV;
+		end
+		OP_SUB: begin
+			except.occur = ov_sub;
+			except.code  = `EXCCODE_OV;
+		end
 		OP_ERET: begin
 			except.occur = 1'b1;
 			except.eret  = 1'b1;
@@ -143,6 +160,10 @@ begin
 		OP_OR:   ret = reg1 | reg2;
 		OP_XOR:  ret = reg1 ^ reg2;
 		OP_NOR:  ret = ~(reg1 | reg2);
+
+		/* add and subtract */
+		OP_ADD, OP_ADDI, OP_ADDIU, OP_ADDU: ret = add_u;
+		OP_SUB, OP_SUBU: ret = sub_u;
 
 		/* move instructions */
 		OP_MFHI: ret = hi;

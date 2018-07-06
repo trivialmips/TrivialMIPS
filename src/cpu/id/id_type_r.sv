@@ -70,6 +70,11 @@ begin
 				6'b000100: `INST_W(OP_SLLV, rs, rt, rd)
 				6'b000110: `INST_W(OP_SRLV, rs, rt, rd)
 				6'b000111: `INST_W(OP_SRAV, rs, rt, rd)
+				/* add and substract */
+				6'b100000: `INST_W(OP_ADD,  rs, rt, rd)
+				6'b100001: `INST_W(OP_ADDU, rs, rt, rd)
+				6'b100010: `INST_W(OP_SUB,  rs, rt, rd)
+				6'b100011: `INST_W(OP_SUBU, rs, rt, rd)
 				default: op = OP_INVALID;
 				endcase
 			end

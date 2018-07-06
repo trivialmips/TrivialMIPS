@@ -23,8 +23,12 @@ module id_type_i(
 	output Bit_t     unsigned_imm
 );
 
-// ANDI, ORI, XORI, LUI
-assign unsigned_imm = (opcode[5:3] == 6'b001);
+assign unsigned_imm = (
+	 opcode == 6'b001100  // ANDI
+  || opcode == 6'b001101  // ORI 
+  || opcode == 6'b001110  // XORI
+  || opcode == 6'b001111  // LUI
+);
 
 RegAddr_t rs, rt;
 assign rs = inst[25:21];
@@ -51,15 +55,19 @@ begin
 			default: op = OP_INVALID;
 			endcase
 		end
-		/* arithmetic */
+		/* logic */
 		6'b001100: `INST_W(OP_ANDI, rs, 5'b0, rt)
-		6'b001101: `INST_W(OP_ORI, rs, 5'b0, rt)
+		6'b001101: `INST_W(OP_ORI,  rs, 5'b0, rt)
 		6'b001110: `INST_W(OP_XORI, rs, 5'b0, rt)
-		6'b001111: `INST_W(OP_LUI, 5'b0, 5'b0, rt)
+		6'b001111: `INST_W(OP_LUI,  5'b0, 5'b0, rt)
+
+		/* add and substract */
+		6'b001000: `INST_W(OP_ADDI,  rs, 5'b0, rt)
+		6'b001001: `INST_W(OP_ADDIU, rs, 5'b0, rt)
 
 		/* jump */
-		6'b000100: `INST_R(OP_BEQ, rs, rt)
-		6'b000101: `INST_R(OP_BNE, rs, rt)
+		6'b000100: `INST_R(OP_BEQ,  rs, rt)
+		6'b000101: `INST_R(OP_BNE,  rs, rt)
 		6'b000110: `INST_R(OP_BLEZ, rs, 5'b0)  // rt = 0
 		6'b000111: `INST_R(OP_BGTZ, rs, 5'b0)  // rt = 0
 
