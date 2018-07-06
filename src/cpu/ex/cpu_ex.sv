@@ -151,7 +151,7 @@ begin
 		OP_MTLO: hilo_wr.hilo = { hi, reg1 };
 		OP_MOVZ, OP_MOVN: ret = reg1; // 'we' is set in ID stage.
 
-		OP_JAL: ret = pc + 32'd8;
+		OP_JAL, OP_BLTZAL, OP_BGEZAL, OP_JALR: ret = pc + 32'd8;
 		OP_MADDU: hilo_wr.hilo = multi_cyc_ret;
 		OP_MFC0: ret = cp0_rdata_safe;
 		default: begin

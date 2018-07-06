@@ -121,9 +121,11 @@ typedef enum {
 	OP_OR, OP_ORI, OP_XOR, OP_XORI,
 
 	/* branch and jump instructions */
-	OP_B, OP_BAL, OP_BEQ, OP_BGEZ, OP_BGEZAL,
+	OP_BEQ, OP_BGEZ, OP_BGEZAL,
 	OP_BGTZ, OP_BLEZ, OP_BLTZ, OP_BLTZAL, OP_BNE,
 	OP_J, OP_JAL, OP_JALR, OP_JR,
+	// OP_B,   the same as OP_BEQ with rs = rt = 0
+	// OP_BAL, the same as OP_BGEZAL with rs = 0
 
 	/* load, store, and memory control instructions */
 	OP_LB, OP_LBU, OP_LH, OP_LHU, OP_LL, OP_LW,

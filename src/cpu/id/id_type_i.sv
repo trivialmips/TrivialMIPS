@@ -42,13 +42,26 @@ begin
 			reg_we = 1'b0;
 			case(inst[20:16])
 			5'b01100: op = OP_TEQI;
+
+			/* jump */
+			5'b00000: `INST_R(OP_BLTZ, rs, 5'b0)
+			5'b00001: `INST_R(OP_BGEZ, rs, 5'b0)
+			5'b10000: `INST_W(OP_BLTZAL, rs, 5'b0, 5'd31)
+			5'b10001: `INST_W(OP_BGEZAL, rs, 5'b0, 5'd31)
 			default: op = OP_INVALID;
 			endcase
 		end
+		/* arithmetic */
 		6'b001100: `INST_W(OP_ANDI, rs, 5'b0, rt)
 		6'b001101: `INST_W(OP_ORI, rs, 5'b0, rt)
 		6'b001110: `INST_W(OP_XORI, rs, 5'b0, rt)
 		6'b001111: `INST_W(OP_LUI, 5'b0, 5'b0, rt)
+
+		/* jump */
+		6'b000100: `INST_R(OP_BEQ, rs, rt)
+		6'b000101: `INST_R(OP_BNE, rs, rt)
+		6'b000110: `INST_R(OP_BLEZ, rs, 5'b0)  // rt = 0
+		6'b000111: `INST_R(OP_BGTZ, rs, 5'b0)  // rt = 0
 
 		6'b101011: 
 		begin

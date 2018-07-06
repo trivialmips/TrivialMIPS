@@ -46,18 +46,22 @@ begin
 				`INST_R(OP_NOP, 5'b0, 5'b0)
 			end else begin
 				case(inst[5:0])
+				/* logical */
 				6'b100100: `INST_W(OP_AND, rs, rt, rd)
-				6'b100101: `INST_W(OP_OR, rs, rt, rd)
+				6'b100101: `INST_W(OP_OR,  rs, rt, rd)
 				6'b100110: `INST_W(OP_XOR, rs, rt, rd)
 				6'b100111: `INST_W(OP_NOR, rs, rt, rd)
-
+				/* move */
 				6'b010000: `INST_W(OP_MFHI, rs, rt, rd) // rs = rt      = 0
 				6'b010001: `INST_R(OP_MTHI, rs, rt)     //      rt = rd = 0
 				6'b010010: `INST_W(OP_MFLO, rs, rt, rd) // rs = rt = 0
 				6'b010011: `INST_R(OP_MTLO, rs, rt)     //      rt = rd = 0
-
+				/* conditional move */
 				6'b001011: `INST_W(OP_MOVN, rs, rt, rd)
 				6'b001010: `INST_W(OP_MOVZ, rs, rt, rd)
+				/* jump */
+				6'b001000: `INST_R(OP_JR,   rs, rt)     //      rt = rd = 0
+				6'b001001: `INST_W(OP_JALR, rs, rt, rd) //      rt      = 0
 				default: op = OP_INVALID;
 				endcase
 			end
