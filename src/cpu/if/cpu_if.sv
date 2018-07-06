@@ -7,8 +7,7 @@ module cpu_if(
 	output Bit_t         stall_req
 );
 
-// TODO: use the stall bit in inst_bus
-assign stall_req = 1'b0;
+assign stall_req = inst_bus.stall;
 
 assign inst_bus.data_wr = `ZERO_WORD;
 assign inst_bus.write   = `ZERO_BIT;

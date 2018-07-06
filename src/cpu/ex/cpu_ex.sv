@@ -133,13 +133,35 @@ begin
 		hilo_wr.we = we_hilo;
 		hilo_wr.hilo = hilo_safe;
 
-		case(op)
-		OP_ORI: ret = reg1 | imm;
-		OP_JAL: ret = pc + 32'd8;
+		unique case(op)
+		/* logical instructions */
+		OP_ORI:  ret = reg1 | imm;
+		OP_ANDI: ret = reg1 & imm;
+		OP_XORI: ret = reg1 ^ imm;
+		OP_LUI:  ret = { imm[15:0], 16'b0 };
+		OP_AND:  ret = reg1 & reg2;
+		OP_OR:   ret = reg1 | reg2;
+		OP_XOR:  ret = reg1 ^ reg2;
+		OP_NOR:  ret = ~(reg1 | reg2);
+
+		/* move instructions */
 		OP_MFHI: ret = hi;
 		OP_MFLO: ret = lo;
 		OP_MTHI: hilo_wr.hilo = { reg1, lo };
 		OP_MTLO: hilo_wr.hilo = { hi, reg1 };
+		OP_MOVZ, OP_MOVN: ret = reg1; // 'we' is set in ID stage.
+
+		/* jump instructions */
+		OP_JAL, OP_BLTZAL, OP_BGEZAL, OP_JALR: ret = pc + 32'd8;
+
+		/* shift instructions */
+		OP_SLL:  ret = reg2 << inst[10:6];
+		OP_SLLV: ret = reg2 << reg1[4:0];
+		OP_SRL:  ret = reg2 >> inst[10:6];
+		OP_SRLV: ret = reg2 >> reg1[4:0];
+		OP_SRA:  ret = $signed(reg2) >>> inst[10:6];
+		OP_SRAV: ret = $signed(reg2) >>> reg1[4:0];
+
 		OP_MADDU: hilo_wr.hilo = multi_cyc_ret;
 		OP_MFC0: ret = cp0_rdata_safe;
 		default: begin

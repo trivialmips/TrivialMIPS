@@ -14,15 +14,21 @@ module branch(
 
 logic [5:0] opcode;
 logic [25:0] instr_index;
+logic [15:0] offset;
 
 assign opcode = inst[31:26];
 assign instr_index = inst[25:0];
+assign offset = inst[15:0];
 
 InstAddr_t pc_plus4, pc_plus8;
-InstAddr_t default_jump;
+InstAddr_t default_jump_j, default_jump_i;
 assign pc_plus4     = pc + 32'd4;
 assign pc_plus8     = pc + 32'd8;
-assign default_jump = { pc_plus4[31:28], instr_index, 2'b0 };
+assign default_jump_i = pc + { {14{offset[15]}}, offset, 2'b0 };
+assign default_jump_j = { pc_plus4[31:28], instr_index, 2'b0 };
+
+Bit_t reg_equal;
+assign reg_equal = (reg1 == reg2);
 
 always_comb
 begin
@@ -32,12 +38,34 @@ begin
 		jump      = 1'b0;
 		jump_to   = `ZERO_WORD;
 	end else begin
-		case(opcode)
-			6'b000010,       // J
-			6'b000011: begin // JAL
-				is_branch = 1'b1;
+		is_branch = 1'b1;
+		jump_to = default_jump_i;
+		unique case(opcode)
+			6'b000001: // REGIMM
+			begin
+				/* In this case, only four jump instructions,
+				 * BLTZ (00000), BGEZ (00001), BLTZAL (10000), BGEZAL(10001)
+				 * the instructions are determined by inst[20:16].
+				 * Whether to jump can be determined by only the sign bit */
+				is_branch = (inst[19:17] == 3'b0);
+				jump = (reg1[31] ^ inst[16]) & is_branch;
+			end
+			// BEQ (000100), BNE (000101)
+			//    6'b000100: jump = (reg1 == reg2);
+			//    6'b000101: jump = (reg1 != reg2);
+			// BLEZ (000110), BGTZ (000111),
+			// Note that in these two cases, reg2 = `ZERO_WORD
+			//    6'b000110: jump = (reg1[31] || (reg1 == `ZERO_WORD));
+			//    6'b000111: jump = (~reg1[31] && (reg1 != `ZERO_WORD));
+			6'b000100, 6'b000101, 6'b000110, 6'b000111:
+				jump = ((reg1[31] & opcode[1]) | reg_equal) ^ opcode[0];
+			6'b000010, 6'b000011: begin // J, JAL
 				jump      = 1'b1;
-				jump_to   = default_jump;
+				jump_to   = default_jump_j;
+			end
+			6'b001000, 6'b001001: begin // JR, JALR
+				jump      = 1'b1;
+				jump_to   = reg1;  // TODO: raise 'Address Error' when not aligned
 			end
 			default: begin
 				is_branch = 1'b0;

@@ -124,6 +124,11 @@ id_type_r id_type_r_instance(
 assign reg1_o = safe_reg1;
 assign reg2_o = safe_reg2;
 
+Bit_t cond_move_not_taken, movz_not_taken, movn_not_taken;
+assign movn_not_taken = op_type_r == OP_MOVN && safe_reg2 == `ZERO_WORD;
+assign movz_not_taken = op_type_r == OP_MOVZ && safe_reg2 != `ZERO_WORD;
+assign cond_move_not_taken = movn_not_taken | movz_not_taken;
+
 always_comb
 begin
 	if(op_type_i != OP_INVALID)
@@ -150,7 +155,7 @@ begin
 		reg_raddr1 = reg_raddr1_r;
 		reg_raddr2 = reg_raddr2_r;
 		imm_o      = `ZERO_WORD;
-		reg_we     = reg_we_r;
+		reg_we     = reg_we_r & ~cond_move_not_taken;
 		reg_waddr  = reg_waddr_r;
 	end else begin
 		op = OP_INVALID;

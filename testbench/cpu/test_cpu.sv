@@ -96,10 +96,14 @@ endtask
 initial
 begin
 	unittest("inst_ori");
+	unittest("inst_logical");
+	unittest("inst_move");
+	unittest("inst_shift");
 	unittest("inst_mem");
 	unittest("inst_jump");
 	unittest("inst_multicyc");
 	unittest("inst_except");
+	$display("[Done]");
 	$finish;
 end
 

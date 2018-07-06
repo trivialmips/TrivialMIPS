@@ -13,6 +13,9 @@ module if_id(
 	input  Bit_t      flush
 );
 
+// TODO: Solve the case when 'sw' writes to the address to be read in IF
+// stage.
+
 always @(posedge clk)
 begin
 	if(rst || flush || (stall.stall_if && ~stall.stall_id))

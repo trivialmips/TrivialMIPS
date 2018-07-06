@@ -13,8 +13,7 @@ module cpu_mem(
 	output ExceptInfo_t  except
 );
 
-// TODO: use the stall bit in data_bus
-assign stall_req = 1'b0;
+assign stall_req = data_bus.stall;
 assign except.occur = 1'b0;
 
 always_comb
