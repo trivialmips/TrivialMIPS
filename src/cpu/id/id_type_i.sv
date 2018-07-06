@@ -24,10 +24,9 @@ module id_type_i(
 );
 
 assign unsigned_imm = (
-	 opcode == 6'b001100  // ANDI
-  || opcode == 6'b001101  // ORI 
-  || opcode == 6'b001110  // XORI
-  || opcode == 6'b001111  // LUI
+	opcode == 6'b001100 ||  // ANDI
+	opcode == 6'b001101 ||  // ORI 
+	opcode == 6'b001110     // XORI
 );
 
 RegAddr_t rs, rt;

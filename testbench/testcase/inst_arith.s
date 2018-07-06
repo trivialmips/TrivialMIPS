@@ -63,11 +63,13 @@ _start:
 	slt   $2, $1, $0     # ans: $2=0x00000001
 	slt   $2, $1, $1     # ans: $2=0x00000000
 	sltu  $2, $1, $0     # ans: $2=0x00000000
-	slti  $2, $1, 0x8000 # ans: $2=0x00000001
-	sltiu $2, $1, 0x8000 # ans: $2=0x00000001
+	slti  $2, $1, 0x8001 # ans: $2=0x00000001
+	sltiu $2, $1, 0x8001 # ans: $2=0x00000001
+	ori   $1, $1, 0xf000 # ans: $1=0xfffff000
+	sltiu $2, $1, 0x8001 # ans: $2=0x00000000
 
 .org 0x180
-    # exception handler
+	# exception handler
 	# return to next instruction
 	mfc0 $30, $14
 	addi $30, $30, 0x4
