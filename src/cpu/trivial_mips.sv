@@ -81,14 +81,10 @@ reg_pc pc_instance(
 	.hold_pc(stall.hold_pc)
 );
 
-assign inst_bus.write = `ZERO_BIT;
-assign inst_bus.mask = 4'b1111;
-assign inst_bus.data_wr = `ZERO_WORD:
-
 cpu_if stage_if(
 	.rst,
 	.pc(if_pc),
-	.inst_bus
+	.inst_bus,
 	.stall_req(stall_from_if)
 );
 
@@ -247,7 +243,7 @@ cpu_mem stage_mem(
 	.wr_i(mem_reg_wr),
 	.wr_o(memwb_reg_wr),
 	.memory_req(mem_memory_req),
-	.data_bus
+	.data_bus,
 	.stall_req(stall_from_mem),
 	.except(mem_except)
 );

@@ -55,7 +55,7 @@ begin
 
 			wr_o.we    = 1'b1;
 			wr_o.waddr = wr_i.waddr;
-			wr_o.wdata = dbus_res.data;
+			wr_o.wdata = data_bus.data_rd;
 		end
 	end else begin
 		wr_o = wr_i;

@@ -11,18 +11,17 @@ module cpu_if(
 assign stall_req = 1'b0;
 
 assign inst_bus.data_wr = `ZERO_WORD;
+assign inst_bus.write   = `ZERO_BIT;
 
 always_comb
 begin
 	if(rst == 1'b1)
 	begin
 		inst_bus.read    = `ZERO_BIT;
-		inst_bus.write   = `ZERO_BIT;
 		inst_bus.address = `ZERO_WORD;
 		inst_bus.mask    = 4'b0000;
 	end else begin
-		inst_bus.read    = `ZERO_BIT;
-		inst_bus.write   = `ZERO_BIT;
+		inst_bus.read    = 1'b1;
 		inst_bus.address = pc;
 		inst_bus.mask    = 4'b1111;
 	end
