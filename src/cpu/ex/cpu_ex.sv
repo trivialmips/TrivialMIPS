@@ -113,12 +113,12 @@ begin
 	OP_LB, OP_LBU, OP_SB:
 	begin
 		memory_req.sel = 4'b0001 << mem_addr[1:0];
-		memory_req.wdata = reg2;
+		memory_req.wdata = reg2 << (mem_addr[1:0] * 8);
 	end
 	OP_LH, OP_LHU, OP_SH:
 	begin
 		memory_req.sel = mem_addr[1] ? 4'b1100 : 4'b0011;
-		memory_req.wdata = reg2;
+		memory_req.wdata = mem_addr[1] ? (reg2 << 16) : reg2;
 	end
 	OP_LWL:
 	begin
