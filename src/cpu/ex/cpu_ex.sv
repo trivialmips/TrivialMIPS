@@ -17,9 +17,13 @@ module cpu_ex(
 	output RegAddr_t      cp0_raddr,
 	output MemAccessReq_t memory_req,
 	output Word_t         ret,
+	output Bit_t          llbit_set,
 	output Bit_t          stall_req,
 	output ExceptInfo_t   except
 );
+
+// set llbit
+assign llbit_set = (op == OP_LL);
 
 // safe HILO
 DoubleWord_t hilo_safe;
@@ -87,20 +91,67 @@ assign cp0_reg_wr.waddr = inst[15:11];
 // memory operation
 Bit_t is_load_memory_inst;
 Bit_t is_save_memory_inst;
-assign is_load_memory_inst = (op == OP_LW);
-assign is_save_memory_inst = (op == OP_SW);
+MemAddr_t mem_addr;
+assign mem_addr = reg1 + imm;
+assign is_load_memory_inst = (
+	op == OP_LB  || op == OP_LBU || op == OP_LH  || op == OP_LL ||
+	op == OP_LHU || op == OP_LW  || op == OP_LWL || op == OP_LWR);
+assign is_save_memory_inst = (
+	op == OP_SB  || op == OP_SH  || op == OP_SW ||
+	op == OP_SWL || op == OP_SWR || op == OP_SC);
 assign memory_req.ce = is_load_memory_inst | is_save_memory_inst;
 assign memory_req.we = is_save_memory_inst;
-assign memory_req.addr = reg1 + imm;
-assign memory_req.wdata = reg2;
+assign memory_req.addr = { mem_addr[31:2], 2'b0 };
 always_comb
 begin
-	if(op == OP_LW || op == OP_SW)
+	unique case(op)
+	OP_LW, OP_LL, OP_SW, OP_SC:
 	begin
 		memory_req.sel = 4'b1111;
-	end else begin
-		memory_req.sel = 4'b0000;
+		memory_req.wdata = reg2;
 	end
+	OP_LB, OP_LBU, OP_SB:
+	begin
+		memory_req.sel = 4'b0001 << mem_addr[1:0];
+		memory_req.wdata = reg2;
+	end
+	OP_LH, OP_LHU, OP_SH:
+	begin
+		memory_req.sel = mem_addr[1] ? 4'b1100 : 4'b0011;
+		memory_req.wdata = reg2;
+	end
+	OP_LWL, OP_SWL:
+	begin
+		unique case(mem_addr[1:0])
+		2'd0: memory_req.sel = 4'b0001;
+		2'd1: memory_req.sel = 4'b0011;
+		2'd2: memory_req.sel = 4'b0111;
+		2'd3: memory_req.sel = 4'b1111;
+		endcase
+		if(op == OP_LWL)
+		begin
+			memory_req.wdata = reg2;
+		end else begin
+			memory_req.wdata = reg2 >> ((3 - mem_addr[1:0]) * 8);
+		end
+	end
+	OP_LWR, OP_SWR:
+	begin
+		unique case(mem_addr[1:0])
+		2'd0: memory_req.sel = 4'b1111;
+		2'd1: memory_req.sel = 4'b1110;
+		2'd2: memory_req.sel = 4'b1100;
+		2'd3: memory_req.sel = 4'b1000;
+		endcase
+		if(op == OP_SWR)
+		begin
+			memory_req.wdata = reg2;
+		end else begin
+			memory_req.wdata = reg2 << (mem_addr[1:0] * 8);
+		end
+	end
+	default: memory_req.sel = 4'b0000;
+	endcase
 end
 
 // exception
@@ -122,6 +173,24 @@ begin
 		OP_TLT: except.occur = signed_lt;
 		OP_TGEU: except.occur = ~unsigned_lt;
 		OP_TLTU: except.occur = unsigned_lt;
+		OP_LW, OP_LL, OP_SW: begin
+			except.occur = mem_addr[0] | mem_addr[1];
+			except.code  = (op == OP_SW) ? `EXCCODE_ADES : `EXCCODE_ADEL;
+			except.extra = mem_addr;
+		end
+		OP_LH, OP_LHU, OP_SH: begin
+			except.occur = mem_addr[0];
+			except.code  = (op == OP_SH) ? `EXCCODE_ADES : `EXCCODE_ADEL;
+			except.extra = mem_addr;
+		end
+		OP_BREAK: begin
+			except.occur = 1'b1;
+			except.code  = `EXCCODE_BP;
+		end
+		OP_SYSCALL: begin
+			except.occur = 1'b1;
+			except.code  = `EXCCODE_SYS;
+		end
 		OP_ADD: begin
 			except.occur = ov_add;
 			except.code  = `EXCCODE_OV;

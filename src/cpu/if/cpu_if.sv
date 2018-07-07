@@ -7,6 +7,8 @@ module cpu_if(
 	output Bit_t         stall_req
 );
 
+// TODO: check AddressError
+
 assign stall_req = inst_bus.stall;
 
 assign inst_bus.data_wr = `ZERO_WORD;

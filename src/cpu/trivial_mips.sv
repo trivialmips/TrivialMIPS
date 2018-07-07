@@ -6,6 +6,8 @@ module trivial_mips(
 	Bus_if.master data_bus 
 );
 
+Bit_t flush;
+
 // general registers
 RegAddr_t reg_raddr1, reg_raddr2;
 Word_t    reg_rdata1, reg_rdata2;
@@ -31,6 +33,17 @@ hilo hilo_instance(
 	.hilo(reg_hilo)
 );
 
+// LLbit register
+RegWriteReq_t llbit_wr;
+Bit_t reg_llbit;
+ll_bit_reg ll_bit_instance(
+	.clk,
+	.rst(rst),
+	.flush,
+	.wr(llbit_wr),
+	.ll_bit(reg_llbit)
+);
+
 // coprocesser 0
 ExceptReq_t except_req;
 CP0Regs_t cp0_regs;
@@ -49,7 +62,6 @@ cp0 cp0_instance(
 
 // stall control
 Stall_t stall;
-Bit_t flush;
 Bit_t stall_from_if;
 Bit_t stall_from_id;
 Bit_t stall_from_mem;
@@ -186,6 +198,7 @@ HiloWriteReq_t ex_hilo_wr;
 HiloWriteReq_t memwb_hilo_wr;
 RegWriteReq_t mem_cp0_reg_wr;
 RegWriteReq_t ex_cp0_reg_wr;
+Bit_t ex_llbit_set;
 ExceptInfo_t ex_except;
 cpu_ex stage_ex(
 	.clk,
@@ -201,6 +214,7 @@ cpu_ex stage_ex(
 	.cp0_reg_wr(ex_cp0_reg_wr),
 	.cp0_rdata_unsafe(cp0_rdata),
 	.cp0_raddr(cp0_raddr),
+	.llbit_set(ex_llbit_set),
 	.memory_req(ex_memory_req),
 	.ret(ex_reg_wr.wdata),
 	.stall_req(stall_from_ex),
@@ -210,8 +224,10 @@ cpu_ex stage_ex(
 );
 
 Bit_t mem_delayslot;
+Oper_t mem_op;
 InstAddr_t mem_pc;
 RegWriteReq_t mem_reg_wr;
+Bit_t mem_llbit_set;
 HiloWriteReq_t mem_hilo_wr;
 MemAccessReq_t mem_memory_req;
 ExceptInfo_t exmem_except;
@@ -219,14 +235,18 @@ ex_mem stage_ex_mem(
 	.clk,
 	.rst,
 	.ex_pc,
+	.ex_op,
 	.ex_reg_wr,
 	.ex_cp0_reg_wr,
+	.ex_llbit_set,
 	.ex_hilo_wr,
 	.ex_memory_req,
 	.ex_delayslot,
 	.ex_except(idex_except.occur ? idex_except : ex_except),
 	.mem_pc,
+	.mem_op,
 	.mem_reg_wr,
+	.mem_llbit_set,
 	.mem_hilo_wr,
 	.mem_cp0_reg_wr,
 	.mem_memory_req,
@@ -242,8 +262,10 @@ cpu_mem stage_mem(
 	.rst,
 	.wr_i(mem_reg_wr),
 	.wr_o(memwb_reg_wr),
+	.op(mem_op),
 	.memory_req(mem_memory_req),
 	.data_bus,
+	.llbit_reset(mem_llbit_reset),
 	.stall_req(stall_from_mem),
 	.except(mem_except)
 );
@@ -258,6 +280,8 @@ except except_handler(
 );
 
 assign memwb_hilo_wr = mem_hilo_wr;
+assign llbit_wr.we    = mem_llbit_set | mem_llbit_reset;
+assign llbit_wr.wdata = { 30'b0, mem_llbit_set };
 
 RegWriteReq_t wb_reg_wr;
 mem_wb stage_mem_wb(

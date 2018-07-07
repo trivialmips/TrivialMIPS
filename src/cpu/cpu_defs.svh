@@ -94,15 +94,21 @@ typedef struct packed {
 typedef struct packed {
 	Bit_t occur, eret;
 	logic [4:0] code;
+	Word_t extra;
 } ExceptInfo_t;
 
 typedef struct packed {
 	Bit_t flush, delayslot, eret;
 	logic [4:0] code;
 	InstAddr_t cur_pc, jump_pc;
+	Word_t extra;
 } ExceptReq_t;
 
 /* cause register exc_code field */
+`define EXCCODE_ADEL  5'h04  // address exception (load or instruction fetch)
+`define EXCCODE_ADES  5'h05  // address exception (store)
+`define EXCCODE_SYS 5'h08  // syscall
+`define EXCCODE_BP  5'h09  // breakpoint
 `define EXCCODE_OV  5'h0c  // overflow
 `define EXCCODE_TR  5'h0d  // trap
 
@@ -130,9 +136,11 @@ typedef enum {
 	// OP_BAL, the same as OP_BGEZAL with rs = 0
 
 	/* load, store, and memory control instructions */
-	OP_LB, OP_LBU, OP_LH, OP_LHU, OP_LL, OP_LW,
-	OP_LWL, OP_LWR, OP_PREF, OP_SB, OP_SC, OP_SD,
-	OP_SH, OP_SW, OP_SWL, OP_SWR, OP_SYNC, 
+	OP_LB, OP_LBU, OP_LH, OP_LHU,
+	OP_LW, OP_LWL, OP_LWR, OP_SB,
+	OP_SH, OP_SW, OP_SWL, OP_SWR,
+	OP_LL, OP_SC,
+	// OP_PERF, OP_SYNC, regarded as OP_NOP
 
 	/* move instructions */
 	OP_MFHI, OP_MFLO, OP_MTHI, OP_MTLO,

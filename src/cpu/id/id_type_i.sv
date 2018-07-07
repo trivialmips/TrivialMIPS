@@ -80,20 +80,28 @@ begin
 		6'b000110: `INST_R(OP_BLEZ, rs, 5'b0)  // rt = 0
 		6'b000111: `INST_R(OP_BGTZ, rs, 5'b0)  // rt = 0
 
-		6'b101011: 
-		begin
-			op = OP_SW;
-			reg_we = 1'b0;
-			reg_raddr1 = rs;
-			reg_raddr2 = rt;
-		end
-		6'b100011:
-		begin
-			op = OP_LW;
-			reg_we = 1'b1;
-			reg_raddr1 = rs;
-			reg_raddr2 = rt;
-		end
+		/* store data */
+		6'b101000: `INST_R(OP_SB,  rs, rt)
+		6'b101001: `INST_R(OP_SH,  rs, rt)
+		6'b101010: `INST_R(OP_SWL, rs, rt)
+		6'b101011: `INST_R(OP_SW,  rs, rt)
+		6'b101110: `INST_R(OP_SWR, rs, rt)
+
+		/* load data */
+		6'b100000: `INST_W(OP_LB,  rs, 5'b0, rt)
+		6'b100001: `INST_W(OP_LH,  rs, 5'b0, rt)
+		6'b100010: `INST_W(OP_LWL, rs, rt,   rt)
+		6'b100011: `INST_W(OP_LW,  rs, 5'b0, rt)
+		6'b100100: `INST_W(OP_LBU, rs, 5'b0, rt)
+		6'b100101: `INST_W(OP_LHU, rs, 5'b0, rt)
+		6'b100110: `INST_W(OP_LWR, rs, rt,   rt)
+
+		/* conditional load/store */
+		6'b110000: `INST_W(OP_LL,  rs, 5'b0, rt)
+		6'b111000: `INST_W(OP_SC,  rs, rt,   rt)
+
+		/* perfetch */
+		6'b110011: `INST_R(OP_NOP, 5'b0, 5'b0)
 		default: op = OP_INVALID;
 	endcase
 end

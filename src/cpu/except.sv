@@ -20,11 +20,13 @@ begin
 		except_req.eret    = 1'b0;
 		except_req.cur_pc  = `ZERO_WORD;
 		except_req.jump_pc = `ZERO_WORD;
+		except_req.extra   = `ZERO_WORD;
 	end else begin
 		except_req.flush  = 1'b1;
 		except_req.code   = except.code;
 		except_req.cur_pc = pc;
 		except_req.eret   = except.eret;
+		except_req.extra  = except.extra;
 		if(except.eret)
 		begin
 			if(cp0_regs.status.erl)

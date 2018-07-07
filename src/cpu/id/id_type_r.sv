@@ -88,6 +88,11 @@ begin
 				6'b110011: `INST_R(OP_TLTU, rs, rt)
 				6'b110100: `INST_R(OP_TEQ,  rs, rt)
 				6'b110110: `INST_R(OP_TNE,  rs, rt)
+				/* breakpoint and syscall */
+				6'b001100: `INST_R(OP_SYSCALL, 5'b0, 5'b0)
+				6'b001101: `INST_R(OP_BREAK,   5'b0, 5'b0)
+				/* sync */
+				6'b001111: `INST_R(OP_NOP, 5'b0, 5'b0)
 				default: op = OP_INVALID;
 				endcase
 			end

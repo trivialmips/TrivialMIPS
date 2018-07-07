@@ -71,6 +71,9 @@ begin
 			regs_new.status.exl = 1'b1;
 			regs_new.cause.ce   = 2'b0;  // TODO: not sure
 			regs_new.cause.exc_code = except_req.code;
+
+			if(except_req.code == `EXCCODE_ADEL || except_req.code == `EXCCODE_ADES)
+				regs_new.bad_vaddr = except_req.extra;
 		end
 	end
 end
