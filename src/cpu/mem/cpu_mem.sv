@@ -20,22 +20,34 @@ assign stall_req = data_bus.stall;
 assign llbit_reset = 1'b0;
 assign except.occur = 1'b0;
 
-Word_t data_rd, ext_sel;
+logic [1:0] addr_offset;
+Word_t aligned_data_rd, unaligned_data_rd, ext_sel;
 Word_t signed_ext_byte, signed_ext_half_word;
 Word_t zero_ext_byte, zero_ext_half_word;
-Word_t unaigned_word;
-assign data_rd = data_bus.data_rd;
+Word_t unaligned_word;
+assign aligned_data_rd = data_bus.data_rd >> (addr_offset * 8);
 assign ext_sel = {
 	{8{memory_req.sel[3]}},
 	{8{memory_req.sel[2]}},
 	{8{memory_req.sel[1]}},
 	{8{memory_req.sel[0]}}
 };
-assign signed_ext_byte      = { {24{data_rd[7]}},  data_rd[7:0] };
-assign signed_ext_half_word = { {16{data_rd[15]}}, data_rd[15:0] };
-assign zero_ext_byte      = { 24'b0, data_rd[7:0] };
-assign zero_ext_half_word = { 16'b0, data_rd[15:0] };
-assign unaligned_word = (wr_o.wdata & ~ext_sel) | (data_rd & ext_sel);
+assign addr_offset = memory_req.addr[1:0];
+assign signed_ext_byte      = { {24{aligned_data_rd[7]}}, aligned_data_rd[7:0] };
+assign signed_ext_half_word = { {16{aligned_data_rd[15]}}, aligned_data_rd[15:0] };
+assign zero_ext_byte      = { 24'b0, aligned_data_rd[7:0] };
+assign zero_ext_half_word = { 16'b0, aligned_data_rd[15:0] };
+// for LWL/LWR, memory_req.wdata = reg2
+assign unaligned_word = (memory_req.wdata & ~ext_sel) | (unaligned_data_rd & ext_sel);
+always_comb
+begin
+	if(op == OP_LWL)
+	begin
+		unaligned_data_rd = data_bus.data_rd << ((3 - addr_offset) * 8);
+	end else begin
+		unaligned_data_rd = data_bus.data_rd >> (addr_offset * 8);
+	end
+end
 
 always_comb
 begin
@@ -56,7 +68,7 @@ begin
 		if(memory_req.we)
 		begin
 			// write memory
-			data_bus.address = memory_req.addr;
+			data_bus.address = { memory_req.addr[31:2], 2'b0 };
 			data_bus.read    = `ZERO_BIT;
 			data_bus.write   = 1'b1;
 			data_bus.data_wr = memory_req.wdata;
@@ -75,7 +87,7 @@ begin
 			end
 		end else begin
 			// read memory
-			data_bus.address = memory_req.addr;
+			data_bus.address = { memory_req.addr[31:2], 2'b0 };
 			data_bus.read    = 1'b1;
 			data_bus.write   = `ZERO_BIT;
 			data_bus.data_wr = `ZERO_WORD;
@@ -89,7 +101,7 @@ begin
 				OP_LBU:  wr_o.wdata = zero_ext_byte;
 				OP_LHU:  wr_o.wdata = zero_ext_half_word;
 				OP_LWL, OP_LWR: wr_o.wdata = unaligned_word;
-				default: wr_o.wdata = data_rd;
+				default: wr_o.wdata = aligned_data_rd;
 			endcase
 		end
 	end else begin

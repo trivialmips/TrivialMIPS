@@ -117,6 +117,7 @@ begin
 	unittest("inst_trap");
 	unittest("inst_arith");
 	unittest("inst_mem");
+	unittest("inst_mem_unaligned");
 	unittest("inst_llsc");
 	unittest("inst_jump");
 	unittest("inst_multicyc");
