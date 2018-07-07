@@ -7,8 +7,8 @@ module instruction_bus(
 );
 
     // instructions are read-only, and do not need masks
-    assign bootrom.address = cpu.address[`BOOTROM_ADDRESS_WIDTH - 1:0];
-    assign ram.address = cpu.address[`RAM_ADDRESS_WIDTH - 1:0];
+    assign bootrom.address = cpu.address[2 + :`BOOTROM_ADDRESS_WIDTH];
+    assign ram.address = cpu.address[2 + :`RAM_ADDRESS_WIDTH];
 
     always_comb begin
         ram.read      = `ZERO_BIT;
