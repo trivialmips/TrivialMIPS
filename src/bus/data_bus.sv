@@ -7,7 +7,7 @@ module data_bus(
     Bus_if.master uart,
     Bus_if.master timer,
     Bus_if.master graphics,
-    Bus_if.master ethernet
+    Bus_if.master ethernet,
     Bus_if.master gpio
 );
 
@@ -36,7 +36,7 @@ module data_bus(
     assign ethernet.address = cpu.address[2 +: `ETHERNET_ADDRESS_WIDTH];
 
     assign gpio.data_wr = cpu.data_wr;
-    assign gpio.address = cpu.address[2 +: `GPIO_ADDRESS_WIDTH]
+    assign gpio.address = cpu.address[2 +: `GPIO_ADDRESS_WIDTH];
     assign gpio.mask    = cpu.mask;
 
     always_comb begin
