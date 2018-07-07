@@ -6,7 +6,7 @@ _start:
 	ori  $2, $0, 0x0001 # ans: $2=0x00000001
 	ori  $4, $0, 0x1004 # ans: $4=0x00001004
 	ori  $1, $0, 0xff00 # ans: $1=0x0000ff00
-	sw   $1, 0x4($3)
+	sw   $1, 0x4($3)    # ans: [0x1004]=0x0000ff00
 
 	# not-load-related
 	lw   $2, 0x4($4)    # ans: $2=0x00000000
@@ -17,5 +17,5 @@ _start:
 
 	# load-related
 	lw   $1, 0x4($3)    # ans: $1=0x0000ff00
-	sw   $1, 0x8($3) 
+	sw   $1, 0x8($3)    # ans: [0x1008]=0x0000ff00
 	lw   $3, 0x8($3)    # ans: $3=0x0000ff00

@@ -114,6 +114,7 @@ begin
 	unittest("inst_move");
 	unittest("inst_shift");
 	unittest("inst_except");
+	unittest("inst_trap");
 	unittest("inst_arith");
 	unittest("inst_mem");
 	unittest("inst_llsc");
