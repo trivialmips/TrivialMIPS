@@ -9,18 +9,23 @@ module trivial_mips(
 Bit_t flush;
 
 // general registers
-RegAddr_t reg_raddr1, reg_raddr2;
-Word_t    reg_rdata1, reg_rdata2;
-RegWriteReq_t reg_wr;
+RegAddr_t reg_raddr1, reg_raddr2, reg_raddr3, reg_raddr4;
+Word_t    reg_rdata1, reg_rdata2, reg_rdata3, reg_rdata4;
+RegWriteReq_t reg_wr1, reg_wr2;
 
 regs general_regs_instance(
 	.clk,
 	.rst,
-	.wr(reg_wr),
+	.wr1(reg_wr1),
+	.wr2(reg_wr2),
 	.raddr1(reg_raddr1),
 	.raddr2(reg_raddr2),
 	.rdata1(reg_rdata1),
-	.rdata2(reg_rdata2)
+	.rdata2(reg_rdata2),
+	.raddr3(reg_raddr3),
+	.raddr4(reg_raddr4),
+	.rdata3(reg_rdata3),
+	.rdata4(reg_rdata4)
 );
 
 // HILO registers
@@ -304,7 +309,7 @@ mem_wb stage_mem_wb(
 cpu_wb stage_wb(
 	.rst,
 	.wr_i(wb_reg_wr),
-	.wr_o(reg_wr),
+	.wr_o(reg_wr1),
 	.stall_req(stall_from_wb)
 );
 
