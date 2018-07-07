@@ -263,6 +263,7 @@ cpu_mem stage_mem(
 	.wr_i(mem_reg_wr),
 	.wr_o(memwb_reg_wr),
 	.op(mem_op),
+	.ll_bit(reg_llbit),
 	.memory_req(mem_memory_req),
 	.data_bus,
 	.llbit_reset(mem_llbit_reset),

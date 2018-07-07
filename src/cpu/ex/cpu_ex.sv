@@ -150,7 +150,11 @@ begin
 			memory_req.wdata = reg2 << (mem_addr[1:0] * 8);
 		end
 	end
-	default: memory_req.sel = 4'b0000;
+	default:
+	begin
+		memory_req.wdata = `ZERO_WORD;
+		memory_req.sel = 4'b0000;
+	end
 	endcase
 end
 
@@ -162,10 +166,12 @@ begin
 		except.occur = 1'b0;
 		except.code  = 5'b0;
 		except.eret  = 1'b0;
+		except.extra = `ZERO_WORD;
 	end else begin
 		except.occur = 1'b0;
 		except.code  = `EXCCODE_TR;
 		except.eret  = 1'b0;
+		except.extra = `ZERO_WORD;
 		case(op)
 		OP_TEQ: except.occur = (reg1 == reg2);
 		OP_TNE: except.occur = (reg1 != reg2);
@@ -202,6 +208,12 @@ begin
 		OP_ERET: begin
 			except.occur = 1'b1;
 			except.eret  = 1'b1;
+		end
+		default: begin
+			except.occur = 1'b0;
+			except.code  = 5'b0;
+			except.eret  = 1'b0;
+			except.extra = `ZERO_WORD;
 		end
 		endcase
 	end
@@ -241,6 +253,7 @@ begin
 		hilo_wr.we = 1'b0;
 		hilo_wr.hilo = `ZERO_DWORD;
 	end else begin
+		ret = `ZERO_WORD;
 		hilo_wr.we = we_hilo;
 		hilo_wr.hilo = hilo_safe;
 

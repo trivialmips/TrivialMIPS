@@ -67,26 +67,40 @@ task unittest(
 	while(!$feof(fans))
 	begin @(negedge clk50M);
 		cycle = cycle + 1;
+
 		if(reg_wr.we && reg_wr.waddr)
 		begin
 			$fscanf(fans, "%s\n", ans);
 			$sformat(out, "$%0d=0x%x", reg_wr.waddr, reg_wr.wdata);
 			$display("[%0d] %s", cycle, out);
-			is_event = 1;
-		end else if(hilo_wr.we) begin
+			if(out != ans && ans != "skip")
+			begin
+				$display("[Error] Expected: %0s, Got: %0s", ans, out);
+				$stop;
+			end
+		end 
+
+		if(hilo_wr.we) begin
 			$fscanf(fans, "%s\n", ans);
 			$sformat(out, "$hilo=0x%x", hilo_wr.hilo);
 			$display("[%0d] %s", cycle, out);
-			is_event = 1;
-		end else begin
-			is_event = 0;
-		end
+			if(out != ans && ans != "skip")
+			begin
+				$display("[Error] Expected: %0s, Got: %0s", ans, out);
+				$stop;
+			end
+		end 
 
-		if(is_event && out != ans && ans != "skip")
-		begin
-			$display("[Error] Expected: %0s, Got: %0s", ans, out);
-			$stop;
-		end
+		if(fake_data_bus_instance.data_bus.write) begin
+			$fscanf(fans, "%s\n", ans);
+			$sformat(out, "[0x%x]=0x%x", fake_data_bus_instance.data_bus.address[15:0], fake_data_bus_instance.data_w);
+			$display("[%0d] %s", cycle, out);
+			if(out != ans && ans != "skip")
+			begin
+				$display("[Error] Expected: %0s, Got: %0s", ans, out);
+				$stop;
+			end
+		end 
 	end
 
 	$display("[OK] %0s\n", name);
@@ -102,6 +116,7 @@ begin
 	unittest("inst_except");
 	unittest("inst_arith");
 	unittest("inst_mem");
+	unittest("inst_llsc");
 	unittest("inst_jump");
 	unittest("inst_multicyc");
 	$display("[Done]");

@@ -3,6 +3,7 @@
 module cpu_mem(
 	input  rst,
 
+	input  Bit_t          ll_bit,
 	input  Oper_t         op,
 	input  MemAccessReq_t memory_req,
 	input  RegWriteReq_t  wr_i,
@@ -61,9 +62,17 @@ begin
 			data_bus.data_wr = memory_req.wdata;
 			data_bus.mask    = memory_req.sel;
 
-			wr_o.we    = 1'b0;
-			wr_o.waddr = `ZERO_WORD;
-			wr_o.wdata = `ZERO_WORD;
+			if(op == OP_SC)
+			begin
+				data_bus.write = ll_bit;
+				wr_o.we        = wr_i.we;
+				wr_o.wdata     = { 30'b0, ll_bit };
+				wr_o.waddr     = wr_i.waddr;
+			end else begin
+				wr_o.we    = 1'b0;
+				wr_o.waddr = `ZERO_WORD;
+				wr_o.wdata = `ZERO_WORD;
+			end
 		end else begin
 			// read memory
 			data_bus.address = memory_req.addr;
