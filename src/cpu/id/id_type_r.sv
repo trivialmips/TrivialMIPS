@@ -75,9 +75,11 @@ begin
 				6'b100001: `INST_W(OP_ADDU, rs, rt, rd)
 				6'b100010: `INST_W(OP_SUB,  rs, rt, rd)
 				6'b100011: `INST_W(OP_SUBU, rs, rt, rd)
-				/* multiplication */
+				/* multiplication and division */
 				6'b011000: `INST_R(OP_MULT,  rs, rt)    //           rd = 0
 				6'b011001: `INST_R(OP_MULTU, rs, rt)    //           rd = 0
+				6'b011010: `INST_R(OP_DIV,   rs, rt)    //           rd = 0
+				6'b011011: `INST_R(OP_DIVU,  rs, rt)    //           rd = 0
 				/* compare and set */
 				6'b101010: `INST_W(OP_SLT,  rs, rt, rd)
 				6'b101011: `INST_W(OP_SLTU, rs, rt, rd)

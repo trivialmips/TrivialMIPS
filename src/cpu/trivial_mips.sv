@@ -205,6 +205,7 @@ cpu_ex stage_ex(
 	.rst,
 	.op(ex_op),
 	.pc(ex_pc),
+	.flush,
 	.inst(ex_inst),
 	.reg1(ex_reg1),
 	.reg2(ex_reg2),

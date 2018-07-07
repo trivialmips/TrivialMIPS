@@ -2,6 +2,7 @@
 
 module cpu_ex(
 	input  clk, rst,
+	input  Bit_t          flush,
 	input  Oper_t         op,
 	input  InstAddr_t     pc,
 	input  Inst_t         inst,
@@ -232,20 +233,18 @@ end
 // whether to write hilo
 Bit_t we_hilo;
 assign we_hilo = (
-	op == OP_MTHI  ||
-	op == OP_MTLO  ||
-	op == OP_MADDU ||
-	op == OP_MSUBU ||
-	op == OP_MADD  ||
-	op == OP_MSUB  ||
-	op == OP_MULT  ||
-	op == OP_MULTU
+	op == OP_MTHI  || op == OP_MTLO  ||
+	op == OP_MADDU || op == OP_MSUBU ||
+	op == OP_MADD  || op == OP_MSUB  ||
+	op == OP_MULT  || op == OP_MULTU ||
+	op == OP_DIV   || op == OP_DIVU
 );
 
 DoubleWord_t multi_cyc_ret;
 ex_multi_cyc multi_cyc_instance(
 	.clk,
 	.rst,
+	.flush,
 	.op,
 	.reg1,
 	.reg2,
@@ -308,7 +307,8 @@ begin
 
 		/* multiplication */
 		OP_MUL: ret = multi_cyc_ret[31:0];
-		OP_MADDU, OP_MADD, OP_MSUBU, OP_MSUB, OP_MULT, OP_MULTU:
+		OP_MADDU, OP_MADD, OP_MSUBU, OP_MSUB,
+		OP_MULT, OP_MULTU, OP_DIV, OP_DIVU:
 		begin
 			hilo_wr.hilo = multi_cyc_ret;
 			ret = `ZERO_WORD;
