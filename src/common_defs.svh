@@ -40,27 +40,28 @@ typedef Word_t  MemAddr_t;
 `define SRAM_ADDRESS_WIDTH 20
 
 // address prefixes
-`define RAM_ADDRESS_PREFIX 8'h00
-`define FLASH_ADDRESS_PREFIX 8'h01
-`define BOOTROM_ADDRESS_PREFIX 8'h02
-`define GRAPHICS_ADDRESS_PREFIX 8'h03
-`define UART_ADDRESS_PREFIX 8'h04
-`define TIMER_ADDRESS_PREFIX 8'h05
-`define ETHERNET_ADDRESS_PREFIX 8'h06
-`define GPIO_ADDRESS_PREFIX 8'h07
+`define RAM_ADDRESS_PREFIX      8'h00
+`define FLASH_ADDRESS_PREFIX    8'h01
+`define GRAPHICS_ADDRESS_PREFIX 8'h02
+`define UART_ADDRESS_PREFIX     8'h03
+`define TIMER_ADDRESS_PREFIX    8'h04
+`define ETHERNET_ADDRESS_PREFIX 8'h05
+`define GPIO_ADDRESS_PREFIX     8'h06
+`define USB_ADDRESS_PREFIX      8'h07
+`define BOOTROM_ADDRESS_PREFIX  12'h1FC
 
 // actual address widths
 // the last two bits are always not used in order to align in 4 bytes
 //  ADDRESS  | NOT USED
 // 22 ... 2  | 1     0
-`define BOOTROM_ADDRESS_WIDTH 10 // 4 KB
-`define RAM_ADDRESS_WIDTH 21 // 8 MB
-`define FLASH_ADDRESS_WIDTH 21 // 8 MB
-`define UART_ADDRESS_WIDTH 1 // 2 address
-`define TIMER_ADDRESS_WIDTH 1 // 1 address
+`define BOOTROM_ADDRESS_WIDTH  10 // 4 KB
+`define RAM_ADDRESS_WIDTH      21 // 8 MB
+`define FLASH_ADDRESS_WIDTH    21 // 8 MB
+`define UART_ADDRESS_WIDTH     1 // 2 address
+`define TIMER_ADDRESS_WIDTH    1 // 1 address
 `define GRAPHICS_ADDRESS_WIDTH 16 // 256 KB, use 240004 Byte
 `define ETHERNET_ADDRESS_WIDTH 1 // 2 addresses
-`define GPIO_ADDRESS_WIDTH 1 // 2 addresses 
+`define GPIO_ADDRESS_WIDTH     1 // 2 addresses 
 
 `define MATCH_PREFIX(a, b) (a[($bits(Word_t) - 1) -: $bits(b)] == b)
 
