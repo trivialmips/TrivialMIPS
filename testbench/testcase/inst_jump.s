@@ -14,7 +14,7 @@ j1:
 	.org 0x20
 	ori $1, $1, 0x0010  # ans: $1=0x0000ff10
 	ori $3, $0, 0x0005  # ans: $3=0x00000005
-	jal j_with_link31   # ans: $31=0x00000030
+	jal j_with_link31   # ans: skip
 	nop
 	jr  $5
 	nop

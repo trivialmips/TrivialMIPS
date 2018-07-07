@@ -61,7 +61,7 @@ _start:
 	# ans: skip
 	# ans: skip
 
-.org 0x180
+.org 0x380
 	# exception handler
 	mfc0 $30, $14
 	addi $30, $30, 0x4

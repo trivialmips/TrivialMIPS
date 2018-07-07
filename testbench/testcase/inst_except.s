@@ -20,7 +20,7 @@ _start:
 _jump:
 	ori $1, 0x0f00
 
-	.org 0x180    # exception handler
+	.org 0x380    # exception handler
 	ori $1, $1, 0x000f
 	eret
 

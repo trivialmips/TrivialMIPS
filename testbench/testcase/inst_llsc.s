@@ -35,7 +35,7 @@ _start:
 	sc  $1, 0x0($5)       # ans: $1=0x00000000
 	lw  $1, 0x0($5)       # ans: $1=0x00001235
 
-.org 0x180
+.org 0x380
 	# exception handler
 	mfc0 $30, $14
 	addi $30, $30, 0x4

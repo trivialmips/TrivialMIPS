@@ -68,7 +68,7 @@ _start:
 	ori   $1, $1, 0xf000 # ans: $1=0xfffff000
 	sltiu $2, $1, 0x8001 # ans: $2=0x00000000
 
-.org 0x180
+.org 0x380
 	# exception handler
 	# return to next instruction
 	mfc0 $30, $14

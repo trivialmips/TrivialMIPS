@@ -105,6 +105,9 @@ typedef struct packed {
 } ExceptReq_t;
 
 /* cause register exc_code field */
+`define EXCCODE_INT   5'h00  // interrupt
+`define EXCCODE_TLBL  5'h02  // TLB exception (load or instruction fetch)
+`define EXCCODE_TLBS  5'h03  // TLB exception (store)
 `define EXCCODE_ADEL  5'h04  // address exception (load or instruction fetch)
 `define EXCCODE_ADES  5'h05  // address exception (store)
 `define EXCCODE_SYS 5'h08  // syscall

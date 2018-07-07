@@ -32,12 +32,25 @@ begin
 			if(cp0_regs.status.erl)
 				except_req.jump_pc = cp0_regs.error_epc;
 			else except_req.jump_pc = cp0_regs.epc;
-			// TODO: Reset LLbit
-		end else if(cp0_regs.status.exl == 1'b0) begin
-			// TODO: Add MMU, update the jump_pc to virtual addr.
-			except_req.jump_pc = 32'h180;
 		end else begin
-			except_req.jump_pc = 32'h180;
+			HalfWord_t offset;
+			if(cp0_regs.status.exl == 1'b0)
+			begin
+				if(except.code == `EXCCODE_TLBL || except.code == `EXCCODE_TLBS)
+				begin
+					offset = 16'h000;
+				end else if(except.code == `EXCCODE_INT && cp0_regs.cause.iv) begin
+					offset = 16'h200;
+				end else begin
+					offset = 16'h180;
+				end
+			end else begin
+				offset = 16'h180;
+			end
+
+			if(cp0_regs.status.bev)
+				except_req.jump_pc = 32'hbfc00200 + offset;
+			else except_req.jump_pc = 32'h80000000 + offset;
 		end
 	end
 end

@@ -22,5 +22,5 @@ _start:
 	teqi  $0, 0x0000
 	div   $zero, $5, $4
 
-.org 0x180
+.org 0x380
 	ori   $1, $0, 0xabcd  # ans: $1=0x0000abcd
