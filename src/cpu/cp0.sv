@@ -21,7 +21,7 @@ begin
 		// TODO: the initial value of registers
 		regs_inner.count <= `ZERO_WORD;
 		regs_inner.cause <= `ZERO_WORD;
-		regs_inner.status <= 32'b00010000000000000000000000000000;
+		regs_inner.status <= 32'b0001_0000_0100_0000_0000_0000_0000_0000;
 	end else begin
 		regs_inner <= regs_new;
 	end
