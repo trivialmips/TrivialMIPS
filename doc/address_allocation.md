@@ -19,8 +19,8 @@ This section describes the allocation of physical addresses that used in instruc
 
 | Name     | Start        | End          | Size  | Valid Data Size   |
 | -------- | ------------ | ------------ | ----- | ----------------- |
-| RAM      | `0x00000000` | `0x00FFFFFF` | 16 MB | All               |
-| Flash    | `0x01000000` | `0x01FFFFFF` | 16 MB | All               |
+| RAM      | `0x00000000` | `0x00FFFFFF` | 16 MB | First 8 MB        |
+| Flash    | `0x01000000` | `0x01FFFFFF` | 16 MB | First 8 MB        |
 | Bootrom  | `0x02000000` | `0x02FFFFFF` | 16 MB | First 4KB         |
 | Graphics | `0x03000000` | `0x03FFFFFF` | 16 MB | First 240004 Byte |
 | UART     | `0x04000000` | `0x04FFFFFF` | 16 MB | First 2 Addresses |
@@ -28,7 +28,7 @@ This section describes the allocation of physical addresses that used in instruc
 | Ethernet | `0x06000000` | `0x06FFFFFF` | 16 MB | First 2 Addresses |
 | GPIO     | `0x07000000` | `0x07FFFFFF` | 16 MB | First 2 Addresses |
 
-## MMIO Address Allocation
+## MMIO Address Mapping
 
 This section describes the allocation of virtual addresses in `kseg1` segment, which is NOT mapped and NOT cached. They are mapped directly and linearly to physical address from `0x03000000` to `0x07FFFFFF`.
 
