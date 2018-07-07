@@ -101,7 +101,7 @@ assign is_save_memory_inst = (
 	op == OP_SWL || op == OP_SWR || op == OP_SC);
 assign memory_req.ce = is_load_memory_inst | is_save_memory_inst;
 assign memory_req.we = is_save_memory_inst;
-assign memory_req.addr = { mem_addr[31:2], 2'b0 };
+assign memory_req.addr = mem_addr;
 always_comb
 begin
 	unique case(op)
@@ -120,35 +120,45 @@ begin
 		memory_req.sel = mem_addr[1] ? 4'b1100 : 4'b0011;
 		memory_req.wdata = reg2;
 	end
-	OP_LWL, OP_SWL:
+	OP_LWL:
 	begin
 		unique case(mem_addr[1:0])
-		2'd0: memory_req.sel = 4'b0001;
-		2'd1: memory_req.sel = 4'b0011;
-		2'd2: memory_req.sel = 4'b0111;
-		2'd3: memory_req.sel = 4'b1111;
+			2'd0: memory_req.sel = 4'b1000;
+			2'd1: memory_req.sel = 4'b1100;
+			2'd2: memory_req.sel = 4'b1110;
+			2'd3: memory_req.sel = 4'b1111;
 		endcase
-		if(op == OP_LWL)
-		begin
-			memory_req.wdata = reg2;
-		end else begin
-			memory_req.wdata = reg2 >> ((3 - mem_addr[1:0]) * 8);
-		end
+		memory_req.wdata = reg2;
 	end
-	OP_LWR, OP_SWR:
+	OP_LWR:
 	begin
 		unique case(mem_addr[1:0])
-		2'd0: memory_req.sel = 4'b1111;
-		2'd1: memory_req.sel = 4'b1110;
-		2'd2: memory_req.sel = 4'b1100;
-		2'd3: memory_req.sel = 4'b1000;
+			2'd0: memory_req.sel = 4'b1111;
+			2'd1: memory_req.sel = 4'b0111;
+			2'd2: memory_req.sel = 4'b0011;
+			2'd3: memory_req.sel = 4'b0001;
 		endcase
-		if(op == OP_SWR)
-		begin
-			memory_req.wdata = reg2;
-		end else begin
-			memory_req.wdata = reg2 << (mem_addr[1:0] * 8);
-		end
+		memory_req.wdata = reg2;
+	end
+	OP_SWL:
+	begin
+		unique case(mem_addr[1:0])
+			2'd0: memory_req.sel = 4'b0001;
+			2'd1: memory_req.sel = 4'b0011;
+			2'd2: memory_req.sel = 4'b0111;
+			2'd3: memory_req.sel = 4'b1111;
+		endcase
+		memory_req.wdata = reg2 >> ((3 - mem_addr[1:0]) * 8);
+	end
+	OP_SWR:
+	begin
+		unique case(mem_addr[1:0])
+			2'd0: memory_req.sel = 4'b1111;
+			2'd1: memory_req.sel = 4'b1110;
+			2'd2: memory_req.sel = 4'b1100;
+			2'd3: memory_req.sel = 4'b1000;
+		endcase
+		memory_req.wdata = reg2 << (mem_addr[1:0] * 8);
 	end
 	default:
 	begin
