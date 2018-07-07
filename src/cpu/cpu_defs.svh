@@ -112,16 +112,15 @@ typedef enum {
 	OP_NOP, OP_SSNOP,
 
 	/* arithmetic instructions */
-	OP_ADD, OP_ADDI, OP_ADDIU, OP_ADDU, OP_SUB, OP_SUBU,
+	OP_ADD, OP_ADDU, OP_SUB, OP_SUBU,
 	OP_CLO, OP_CLZ,
 	OP_DIV, OP_DIVU,
 	OP_MADD, OP_MADDU, OP_MSUB, OP_MSUBU,
 	OP_MUL, OP_MULT, OP_MULTU,
-	OP_SLT, OP_SLTI, OP_SLTIU, OP_SLTU,
+	OP_SLT, OP_SLTU,
 
 	/* logical instructions */
-	OP_AND, OP_ANDI, OP_LUI, OP_NOR,
-	OP_OR, OP_ORI, OP_XOR, OP_XORI,
+	OP_AND, OP_LUI, OP_NOR, OP_OR, OP_XOR, 
 
 	/* branch and jump instructions */
 	OP_BEQ, OP_BGEZ, OP_BGEZAL,
@@ -144,9 +143,8 @@ typedef enum {
 	OP_SLL, OP_SLLV, OP_SRA, OP_SRAV, OP_SRL, OP_SRLV, 
 
 	/* trap instructions */
-	OP_BREAK, OP_SYSCALL, OP_TEQ, OP_TEQI,
-	OP_TGE, OP_TGEI, OP_TGEIU, OP_TGEU, OP_TNE,
-	OP_TLT, OP_TLTI, OP_TLTIU, OP_TLTU, OP_TNEI,
+	OP_BREAK, OP_SYSCALL, OP_TEQ, OP_TNE,
+	OP_TGEU, OP_TGE, OP_TLTU, OP_TLT, 
 
 	/* privileged instructions */
 	OP_CACHE, OP_ERET, OP_MFC0, OP_MTC0,

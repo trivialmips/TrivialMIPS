@@ -44,7 +44,13 @@ begin
 		begin
 			reg_we = 1'b0;
 			unique case(inst[20:16])
-			5'b01100: op = OP_TEQI;
+			/* trap */
+			5'b01000: `INST_R(OP_TGE,  rs, 5'b0)
+			5'b01001: `INST_R(OP_TGEU, rs, 5'b0)
+			5'b01010: `INST_R(OP_TLT,  rs, 5'b0)
+			5'b01011: `INST_R(OP_TLTU, rs, 5'b0)
+			5'b01100: `INST_R(OP_TEQ,  rs, 5'b0)
+			5'b01110: `INST_R(OP_TNE,  rs, 5'b0)
 
 			/* jump */
 			5'b00000: `INST_R(OP_BLTZ, rs, 5'b0)
@@ -55,18 +61,18 @@ begin
 			endcase
 		end
 		/* logic */
-		6'b001100: `INST_W(OP_ANDI, rs, 5'b0, rt)
-		6'b001101: `INST_W(OP_ORI,  rs, 5'b0, rt)
-		6'b001110: `INST_W(OP_XORI, rs, 5'b0, rt)
-		6'b001111: `INST_W(OP_LUI,  5'b0, 5'b0, rt)
+		6'b001100: `INST_W(OP_AND, rs, 5'b0, rt)
+		6'b001101: `INST_W(OP_OR,  rs, 5'b0, rt)
+		6'b001110: `INST_W(OP_XOR, rs, 5'b0, rt)
+		6'b001111: `INST_W(OP_LUI, 5'b0, 5'b0, rt)
 
 		/* add and substract */
-		6'b001000: `INST_W(OP_ADDI,  rs, 5'b0, rt)
-		6'b001001: `INST_W(OP_ADDIU, rs, 5'b0, rt)
+		6'b001000: `INST_W(OP_ADD,  rs, 5'b0, rt)
+		6'b001001: `INST_W(OP_ADDU, rs, 5'b0, rt)
 
 		/* compare and set */
-		6'b001010: `INST_W(OP_SLTI,  rs, 5'b0, rt)
-		6'b001011: `INST_W(OP_SLTIU, rs, 5'b0, rt)
+		6'b001010: `INST_W(OP_SLT,  rs, 5'b0, rt)
+		6'b001011: `INST_W(OP_SLTU, rs, 5'b0, rt)
 
 		/* jump */
 		6'b000100: `INST_R(OP_BEQ,  rs, rt)

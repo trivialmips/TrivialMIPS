@@ -81,6 +81,13 @@ begin
 				/* compare and set */
 				6'b101010: `INST_W(OP_SLT,  rs, rt, rd)
 				6'b101011: `INST_W(OP_SLTU, rs, rt, rd)
+				/* trap */
+				6'b110000: `INST_R(OP_TGE,  rs, rt)
+				6'b110001: `INST_R(OP_TGEU, rs, rt)
+				6'b110010: `INST_R(OP_TLT,  rs, rt)
+				6'b110011: `INST_R(OP_TLTU, rs, rt)
+				6'b110100: `INST_R(OP_TEQ,  rs, rt)
+				6'b110110: `INST_R(OP_TNE,  rs, rt)
 				default: op = OP_INVALID;
 				endcase
 			end

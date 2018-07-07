@@ -140,7 +140,14 @@ begin
 		reg_waddr  = reg_waddr_i;
 		imm_o  = unsigned_imm_type_i ? imm_zero_ext : imm_signed_ext;
 
-		if(op == OP_ADDI || op == OP_ADDIU || op == OP_SLTI || op == OP_SLTIU)
+		/* We do not distinguish the following instructions
+		 * bwteen their register versions and immediate versions
+		 *   ADDI, ADDIU, SLTI, SLTIU, ANDI, ORI, XORI 
+		 *   REGIMM (TGEI, TGEIU, TLTI, TLTIU, TEQI, TNEI)
+		 * As for the following instructions, 'reg2' is not used,
+		 * but we also set it to be equal to 'imm'
+		 *   LUI, REGIMM (BLTZ, BGEZ, BLTZAL, BGEZAL) */
+		if(opcode[5:3] == 3'b001 || opcode == 6'b000001)
 			reg2_o = imm_o;
 	end else if(op_type_j != OP_INVALID) begin
 		op = op_type_j;

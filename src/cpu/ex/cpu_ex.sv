@@ -42,6 +42,11 @@ Word_t add_u, sub_u;
 assign add_u = reg1 + reg2;  // for ADDI, ADDIU, reg2 = imm
 assign sub_u = reg1 - reg2;
 
+// comparsion
+Bit_t signed_lt, unsigned_lt;
+assign signed_lt = (reg1[31] != reg2[31]) ? reg1[31] : sub_u[31];
+assign unsigned_lt = (reg1 < reg2);
+
 // count leading bits
 Word_t clz_cnt, clo_cnt;
 ex_count_bit count_clz(
@@ -111,8 +116,13 @@ begin
 		except.code  = `EXCCODE_TR;
 		except.eret  = 1'b0;
 		case(op)
-		OP_TEQI: except.occur = (reg1 == imm);
-		OP_ADD, OP_ADDI: begin
+		OP_TEQ: except.occur = (reg1 == reg2);
+		OP_TNE: except.occur = (reg1 != reg2);
+		OP_TGE: except.occur = ~signed_lt;
+		OP_TLT: except.occur = signed_lt;
+		OP_TGEU: except.occur = ~unsigned_lt;
+		OP_TLTU: except.occur = unsigned_lt;
+		OP_ADD: begin
 			except.occur = ov_add;
 			except.code  = `EXCCODE_OV;
 		end
@@ -167,9 +177,6 @@ begin
 
 		unique case(op)
 		/* logical instructions */
-		OP_ORI:  ret = reg1 | imm;
-		OP_ANDI: ret = reg1 & imm;
-		OP_XORI: ret = reg1 ^ imm;
 		OP_LUI:  ret = { imm[15:0], 16'b0 };
 		OP_AND:  ret = reg1 & reg2;
 		OP_OR:   ret = reg1 | reg2;
@@ -177,7 +184,7 @@ begin
 		OP_NOR:  ret = ~(reg1 | reg2);
 
 		/* add and subtract */
-		OP_ADD, OP_ADDI, OP_ADDIU, OP_ADDU: ret = add_u;
+		OP_ADD, OP_ADDU: ret = add_u;
 		OP_SUB, OP_SUBU: ret = sub_u;
 
 		/* bits counting */
@@ -203,12 +210,9 @@ begin
 		OP_SRA:  ret = $signed(reg2) >>> inst[10:6];
 		OP_SRAV: ret = $signed(reg2) >>> reg1[4:0];
 
-		/* compare and set
-		 *   for SLTIU and SLTI, reg2 = imm */
-		OP_SLTU, OP_SLTIU:
-			ret = (reg1 < reg2);
-		OP_SLT, OP_SLTI:
-			ret = (reg1[31] != reg2[31]) ? reg1[31] : sub_u[31];
+		/* compare and set */
+		OP_SLTU: ret = unsigned_lt;
+		OP_SLT:  ret = signed_lt;
 
 		/* multiplication */
 		OP_MUL: ret = multi_cyc_ret[31:0];
