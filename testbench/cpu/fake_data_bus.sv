@@ -23,7 +23,7 @@ begin
 	begin
 		data_bus.data_rd = `ZERO_WORD;
 	end else begin
-		data_bus.data_rd = inst_ram[data_bus.address[15:2]];
+		data_bus.data_rd = inst_ram[data_bus.address[13:0]];
 	end
 end
 
@@ -31,7 +31,7 @@ always_comb
 begin
 	if(data_bus.write)
 	begin
-		data_w = inst_ram[data_bus.address[15:2]];
+		data_w = inst_ram[data_bus.address[13:0]];
 		if(data_bus.mask[0]) data_w[7:0]   = data_bus.data_wr[7:0];
 		if(data_bus.mask[1]) data_w[15:8]  = data_bus.data_wr[15:8];
 		if(data_bus.mask[2]) data_w[23:16] = data_bus.data_wr[23:16];
@@ -42,7 +42,7 @@ end
 always @(posedge clk)
 begin
 	if(data_bus.write) begin
-		inst_ram[data_bus.address[15:2]] <= data_w;
+		inst_ram[data_bus.address[13:0]] <= data_w;
 	end
 end
 

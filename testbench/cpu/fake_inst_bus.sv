@@ -13,7 +13,7 @@ begin
 	begin
 		inst_bus.data_rd = `ZERO_WORD;
 	end else begin
-		Word_t data = inst_mem[inst_bus.address[11:2]];
+		Word_t data = inst_mem[inst_bus.address[9:0]];
 		// TODO: implement 64-bit read at once
 		inst_bus.data_rd[31:24] = data[7:0];
 		inst_bus.data_rd[23:16] = data[15:8];

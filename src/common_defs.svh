@@ -37,29 +37,30 @@ typedef logic [`REG_ADDR_WIDTH - 1:0] RegAddr_t;
 // memory
 typedef Word_t  MemAddr_t;
 
-// address prefixes for MMIO
-// TODO: to be re-arranged
-`define RAM_ADDRESS_PREFIX 8'h00
-`define FLASH_ADDRESS_PREFIX 8'h1e
-`define BOOTROM_ADDRESS_PREFIX 12'h1fc
-`define GRAPHICS_ADDRESS_PREFIX 8'h1b
-`define UART_ADDRESS_PREFIX 28'h1fd003f
-`define TIMER_ADDRESS_PREFIX 28'h1fd0005
-`define ETHERNET_ADDRESS_PREFIX 28'hffffff // TODO: determine the real prefix
-
-// address widths for MMIO peripherals
-// TODO: to be checked
-`define BOOTROM_ADDRESS_WIDTH 13
 `define SRAM_ADDRESS_WIDTH 20
-// CE | SRAM ADDR | DROPPED
-// 22 | 21 ... 2  | 1 0
-// the last two bits are dropped in order to align in 4 bytes
-`define RAM_ADDRESS_WIDTH 23
-`define FLASH_ADDRESS_WIDTH 16
-`define UART_ADDRESS_WIDTH 4
-`define TIMER_ADDRESS_WIDTH 8
-`define GRAPHICS_ADDRESS_WIDTH 24
-`define ETHERNET_ADDRESS_WIDTH 8 // TODO: determinethe real width
+
+// address prefixes
+`define RAM_ADDRESS_PREFIX 8'h00
+`define FLASH_ADDRESS_PREFIX 8'h01
+`define BOOTROM_ADDRESS_PREFIX 8'h02
+`define GRAPHICS_ADDRESS_PREFIX 8'h03
+`define UART_ADDRESS_PREFIX 8'h04
+`define TIMER_ADDRESS_PREFIX 8'h05
+`define ETHERNET_ADDRESS_PREFIX 8'h06
+`define GPIO_ADDRESS_PREFIX 8'h07
+
+// actual address widths
+// the last two bits are always not used in order to align in 4 bytes
+//  ADDRESS  | NOT USED
+// 22 ... 2  | 1     0
+`define BOOTROM_ADDRESS_WIDTH 10 // 4 KB
+`define RAM_ADDRESS_WIDTH 21 // 8 MB
+`define FLASH_ADDRESS_WIDTH 21 // 8 MB
+`define UART_ADDRESS_WIDTH 1 // 2 address
+`define TIMER_ADDRESS_WIDTH 1 // 1 address
+`define GRAPHICS_ADDRESS_WIDTH 16 // 256 KB, use 240004 Byte
+`define ETHERNET_ADDRESS_WIDTH 1 // 2 addresses
+`define GPIO_ADDRESS_WIDTH 1 // 2 addresses 
 
 `define MATCH_PREFIX(a, b) (a[($bits(Word_t) - 1) -: $bits(b)] == b)
 
