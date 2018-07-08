@@ -62,6 +62,7 @@ j6:
 	# ans: $2=0x00000000
 	lui $3, 0xffff # ans: $3=0xffff0000
 # [END]
+	nop
 
 j3:
 	lui $2, 0x8000

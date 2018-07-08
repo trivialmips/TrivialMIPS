@@ -182,7 +182,7 @@ cpu_id stage_id_b(
 	.rst,
 	.pc(id_pc + 32'h4),
 	.inst(id_inst_pair.inst2),
-	.delayslot(is_branch & inst_pair_forward.inst2_taken),
+	.delayslot(1'b0),    // both jump and delayslot will be in pipe-a.
 	.reg1_i(reg_rdata3),
 	.reg2_i(reg_rdata4),
 	.reg_raddr1(reg_raddr3),
@@ -312,7 +312,7 @@ ex_mem stage_ex_mem(
 // MEM stage
 ExceptInfo_t mem_except_tmp;
 Bit_t mem_llbit_reset, mem_alpha_taken;
-cpu_mem stage_mem_a(
+cpu_mem stage_mem(
 	.rst,
 	.wr_a_i(req_exmem_a.reg_wr),
 	.wr_b_i(req_exmem_b.reg_wr),
@@ -324,7 +324,7 @@ cpu_mem stage_mem_a(
 	.memory_req_a(req_mem_a.memory_req),
 	.memory_req_b(req_mem_b.memory_req),
 	.data_bus,
-	.llbit_reset(mem_llbit_reset_a),
+	.llbit_reset(mem_llbit_reset),
 	.stall_req(stall_from_mem),
 	.alpha_taken(mem_alpha_taken),
 	.except(mem_except_tmp)

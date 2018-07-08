@@ -29,7 +29,7 @@ RegWriteReq_t wr_i, wr_o;
 always_comb
 begin
 	// Only one of pipe-a and pipe-b may access memory
-	if(memory_req_b.we)
+	if(memory_req_b.ce)
 	begin
 		alpha_taken = 1'b0;
 		memory_req = memory_req_b;

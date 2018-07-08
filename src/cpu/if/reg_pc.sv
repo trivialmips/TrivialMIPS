@@ -42,6 +42,7 @@ begin
 			ST_HARD_SET: next_status = ST_MATCH;
 			ST_MATCH: next_status = inst2_taken ? ST_MATCH : ST_AHEAD;
 			ST_AHEAD: next_status = ST_AHEAD;
+			default: next_status = ST_HARD_SET;
 		endcase
 	end
 end

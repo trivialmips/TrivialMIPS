@@ -13,7 +13,7 @@ module mem_wb(
 	input  Bit_t        flush_caused_by_alpha
 );
 
-`define RST_REQ(q) \
+`define RST_REQ_MEMWB(q) \
 	q.reg_wr.we    <= 1'b0;        \
 	q.reg_wr.waddr <= `ZERO_WORD;  \
 	q.reg_wr.wdata <= `ZERO_WORD;  \
@@ -27,14 +27,14 @@ always @(posedge clk)
 begin
 	if(rst || (stall.stall_mem && ~stall.stall_wb))
 	begin
-		`RST_REQ(wb_req_a)
-		`RST_REQ(wb_req_b)
+		`RST_REQ_MEMWB(wb_req_a)
+		`RST_REQ_MEMWB(wb_req_b)
 	end else if(flush) begin
-		`RST_REQ(wb_req_b)
+		`RST_REQ_MEMWB(wb_req_b)
 
 		if(flush_caused_by_alpha)
 		begin
-			`RST_REQ(wb_req_a)
+			`RST_REQ_MEMWB(wb_req_a)
 		end else begin
 			wb_req_a <= mem_req_a;
 		end

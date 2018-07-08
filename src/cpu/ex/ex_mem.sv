@@ -16,7 +16,7 @@ module ex_mem(
 	input  Bit_t   flush
 );
 
-`define RST_REQ(q) \
+`define RST_REQ_EXMEM(q) \
 	q.reg_wr.we        <= 1'b0;           \
 	q.reg_wr.waddr     <= `ZERO_WORD;     \
 	q.reg_wr.wdata     <= `ZERO_WORD;     \
@@ -32,7 +32,7 @@ module ex_mem(
 	q.except.occur     <= 1'b0;           \
 	q.llbit_set        <= 1'b0;
 
-`define RST_DATA(d) \
+`define RST_DATA_EXMEM(d) \
 	d.pc         <= `ZERO_WORD; \
 	d.op         <= OP_NOP;     \
 	d.delayslot  <= 1'b0;
@@ -41,10 +41,10 @@ always @(posedge clk)
 begin
 	if(rst || flush || (stall.stall_ex && ~stall.stall_mem))
 	begin
-		`RST_DATA(mem_data_a)
-		`RST_DATA(mem_data_b)
-		`RST_REQ(mem_req_a)
-		`RST_REQ(mem_req_b)
+		`RST_DATA_EXMEM(mem_data_a)
+		`RST_DATA_EXMEM(mem_data_b)
+		`RST_REQ_EXMEM(mem_req_a)
+		`RST_REQ_EXMEM(mem_req_b)
 	end else if(~stall.stall_ex) begin
 		mem_data_a <= ex_data_a;
 		mem_data_b <= ex_data_b;

@@ -35,17 +35,40 @@ trivial_mips trivial_cpu_instance(
 );
 
 RegWriteReq_t reg_wr1, reg_wr2;
-HiloWriteReq_t hilo_wr;
+HiloWriteReq_t hilo_wr1, hilo_wr2;
+Bit_t mem_access_path1;
 assign reg_wr1 = trivial_cpu_instance.reg_wr1;
 assign reg_wr2 = trivial_cpu_instance.reg_wr2;
-assign hilo_wr = trivial_cpu_instance.hilo_wr;
+assign hilo_wr1 = trivial_cpu_instance.stage_wb.req_a.hilo_wr;
+assign hilo_wr2 = trivial_cpu_instance.stage_wb.req_b.hilo_wr;
+assign mem_access_path1 = trivial_cpu_instance.stage_mem.memory_req_a.ce;
+
+task judge(input integer fans, input string out);
+	string ans;
+	$fscanf(fans, "%s\n", ans);
+	if(out != ans && ans != "skip")
+	begin
+		$display("[Error] Expected: %0s, Got: %0s", ans, out);
+		$stop;
+	end
+endtask
+
+Bit_t dbus_we_delay;
+logic [15:0] dbus_addr_delay;
+logic [31:0] dbus_data_delay;
+always @(negedge clk50M)
+begin
+	dbus_we_delay <= fake_data_bus_instance.data_bus.write;
+	dbus_addr_delay <= fake_data_bus_instance.data_bus.address;
+	dbus_data_delay <= fake_data_bus_instance.data_w;
+end
 
 task unittest(
 	input [128 * 8 - 1:0] name
 );
-
 	integer i, fans, cycle = 0, is_event = 0;
 	string ans, out, info;
+
 	for(i = 0; i < $size(fake_inst_bus_instance.inst_mem); i = i + 1)
 	fake_inst_bus_instance.inst_mem[i] = 32'h0;
 
@@ -68,50 +91,42 @@ task unittest(
 	begin @(negedge clk50M);
 		cycle = cycle + 1;
 
+		if(dbus_we_delay && mem_access_path1) begin
+			$sformat(out, "[0x%x]=0x%x", dbus_addr_delay[15:0], dbus_data_delay);
+			$display("[%0d] %s", cycle, out);
+			judge(fans, out);
+		end 
+
 		if(reg_wr1.we && reg_wr1.waddr)
 		begin
-			$fscanf(fans, "%s\n", ans);
 			$sformat(out, "$%0d=0x%x", reg_wr1.waddr, reg_wr1.wdata);
 			$display("[%0d] %s", cycle, out);
-			if(out != ans && ans != "skip")
-			begin
-				$display("[Error] Expected: %0s, Got: %0s", ans, out);
-				$stop;
-			end
+			judge(fans, out);
+		end 
+
+		if(hilo_wr1.we) begin
+			$sformat(out, "$hilo=0x%x", hilo_wr1.hilo);
+			$display("[%0d] %s", cycle, out);
+			judge(fans, out);
+		end 
+
+		if(dbus_we_delay && ~mem_access_path1) begin
+			$sformat(out, "[0x%x]=0x%x", dbus_addr_delay[15:0], dbus_data_delay);
+			$display("[%0d] %s", cycle, out);
+			judge(fans, out);
 		end 
 
 		if(reg_wr2.we && reg_wr2.waddr)
 		begin
-			$fscanf(fans, "%s\n", ans);
 			$sformat(out, "$%0d=0x%x", reg_wr2.waddr, reg_wr2.wdata);
 			$display("[%0d] %s", cycle, out);
-			if(out != ans && ans != "skip")
-			begin
-				$display("[Error] Expected: %0s, Got: %0s", ans, out);
-				$stop;
-			end
+			judge(fans, out);
 		end 
 
-		if(hilo_wr.we) begin
-			$fscanf(fans, "%s\n", ans);
-			$sformat(out, "$hilo=0x%x", hilo_wr.hilo);
+		if(hilo_wr2.we) begin
+			$sformat(out, "$hilo=0x%x", hilo_wr2.hilo);
 			$display("[%0d] %s", cycle, out);
-			if(out != ans && ans != "skip")
-			begin
-				$display("[Error] Expected: %0s, Got: %0s", ans, out);
-				$stop;
-			end
-		end 
-
-		if(fake_data_bus_instance.data_bus.write) begin
-			$fscanf(fans, "%s\n", ans);
-			$sformat(out, "[0x%x]=0x%x", fake_data_bus_instance.data_bus.address[15:0], fake_data_bus_instance.data_w);
-			$display("[%0d] %s", cycle, out);
-			if(out != ans && ans != "skip")
-			begin
-				$display("[Error] Expected: %0s, Got: %0s", ans, out);
-				$stop;
-			end
+			judge(fans, out);
 		end 
 	end
 
