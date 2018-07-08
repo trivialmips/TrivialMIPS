@@ -183,4 +183,10 @@ typedef struct packed {
 	Bit_t llbit_set;            // EX, MEM
 } PipelineReq_t;
 
+// superscalar
+typedef struct packed {
+	Inst_t inst1, inst2;
+	Bit_t inst2_taken;
+} InstPair_t;
+
 `endif

@@ -3,7 +3,7 @@
 module cpu_id(
 	input  rst,
 	input  InstAddr_t pc,
-	input  Inst_t     inst,
+	input  InstPair_t inst_pair,
 	input  Bit_t      delayslot,
 
 	input  Word_t     reg1_i,
@@ -15,20 +15,26 @@ module cpu_id(
 	output PipelineData_t data_id,
 	output PipelineReq_t  req_id,
 
-	output Bit_t        stall_req,
+	output Bit_t    inst_taken,
+	output Bit_t    stall_req,
 
 	input  MemAccessReq_t ex_memory_req,
 	input  RegWriteReq_t  ex_wr,
 	input  RegWriteReq_t  mem_wr
 );
 
+parameter module_ord = 0;
+
+assign inst_taken = 1'b1;
 assign except.occur = 1'b0;
 
 Oper_t op;
+Inst_t inst;
 Word_t reg1_o, reg2_o, imm_o;
 Bit_t reg_we;
 RegAddr_t reg_waddr;
 ExceptInfo_t except;
+assign inst = (module_ord == 0) ? inst_pair.inst1 : inst_pair.inst2;
 assign data_id.op = op;
 assign data_id.pc = pc;
 assign data_id.inst = inst;

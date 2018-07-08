@@ -91,16 +91,22 @@ ctrl ctrl_instance(
 );
 
 // IF stage
+InstPair_t if_inst_pair;
+InstPair_t inst_pair_forward;
 InstAddr_t if_pc, jump_to;
 Bit_t is_branch, jump;
+Bit_t is_pc_ahead, is_pc_hard_reset;
 
 reg_pc pc_instance(
 	.clk,
 	.rst,
 	.pc(if_pc),
+	.inst2_taken(inst_pair_forward.inst2_taken),
 	.jump,
 	.jump_to,
 	.except_req,
+	.is_ahead(is_pc_ahead),
+	.is_hard_reset(is_pc_hard_reset),
 	.hold_pc(stall.hold_pc)
 );
 
@@ -111,7 +117,10 @@ cpu_if stage_if(
 	.stall_req(stall_from_if)
 );
 
-Inst_t     id_inst;
+assign if_inst_pair.inst1 = inst_bus.data_rd;
+assign if_inst_pair.inst2 = inst_bus.data_rd_2;
+
+InstPair_t id_inst_pair;
 InstAddr_t id_pc;
 Bit_t      id_delayslot;
 if_id stage_if_id(
@@ -119,19 +128,26 @@ if_id stage_if_id(
 	.rst,
 	.if_pc,
 	.if_delayslot(is_branch),
-	.if_inst(inst_bus.data_rd), // TODO: use inst_bus.data_rd_2 for the second instruction
+	.if_inst_pair,
 	.id_pc,
-	.id_inst,
+	.id_inst_pair,
 	.id_delayslot,
+	.inst_pair_forward,
+	.is_ahead(is_pc_ahead),
+	.is_hard_reset(is_pc_hard_reset),
 	.stall,
 	.flush
 );
+
+assign inst_pair_forward.inst1 = id_inst_pair.inst1;
+assign inst_pair_forward.inst2 = id_inst_pair.inst2;
+assign inst_pair_forward.inst2_taken = 1'b0;
 
 // ID stage
 cpu_id stage_id(
 	.rst,
 	.pc(id_pc),
-	.inst(id_inst),
+	.inst_pair(id_inst_pair),
 	.delayslot(id_delayslot),
 	.reg1_i(reg_rdata1),
 	.reg2_i(reg_rdata2),
