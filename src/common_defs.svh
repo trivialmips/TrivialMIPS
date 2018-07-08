@@ -38,6 +38,7 @@ typedef logic [`REG_ADDR_WIDTH - 1:0] RegAddr_t;
 typedef Word_t  MemAddr_t;
 
 `define SRAM_ADDRESS_WIDTH 20
+`define SRAM_ADDRESS_WIDTH 23
 
 // address prefixes
 `define RAM_ADDRESS_PREFIX      8'h00
@@ -67,7 +68,7 @@ typedef Word_t  MemAddr_t;
 
 typedef logic [3:0] ByteMask_t;
 
-// bus
+// interface for bus
 
 interface Bus_if ();
     Word_t address;
@@ -89,5 +90,95 @@ interface Bus_if ();
 endinterface
 
 
+// interfaces for peripherals
+
+interface Sram_if();
+    wire Word_t data;
+    wire[0 +: `SRAM_ADDRESS_WIDTH] address;
+    wire[3:0] be_n;
+    wire ce_n, oe_n, we_n;
+
+    modport master(
+        output address, be_n, ce_n, oe_n, we_n,
+        inout  data
+    );
+
+endinterface
+
+
+interface Flash_if();
+    wire [0 +: `FLASH_ADDRESS_WIDTH] address;
+    wire HalfWord_t data;
+    wire rp_n, vpen, ce_n, oe_n, we_n, byte_n;
+
+    modport master(
+        output address, rp_n, vpen, ce_n, oe_n, we_n, byte_n,
+        inout  data
+    );
+
+endinterface
+
+
+interface Uart_if();
+    wire txd, rxd;
+
+    modport master(
+        output txd,
+        input  rxd
+    );
+
+endinterface
+
+
+interface USB_if();
+    wire a0;
+    wire Byte_t data;
+    wire wr_n, rd_n, cs_n, rst_n, dack_n, intrq, drq_n;
+
+    modport master(
+        output a0, wr_n, rd_n, cs_n, rst_n, dack_n,
+        input  intrq, drq_n,
+        inout  data
+    );
+
+endinterface
+
+
+interface Ethernet_if();
+    wire cmd;
+    wire HalfWord_t sd;
+    wire iow_n, ior_n, cs_n, pwrst_n, intr;
+
+    modport master(
+        output cmd, iow_n, ior_n, cs_n, pwrst_n,
+        input  intr,
+        inout  sd
+    );
+
+endinterface
+
+
+interface VGA_if();
+    wire[2:0] red, green, blue;
+    wire hsync, vsync, clk, de;
+
+    modport master(
+        output red, green, blue, hsync, vsync, clk, de
+    );
+
+endinterface
+
+
+interface GPIO_if();
+    wire [31:0] dip_sw;
+    wire [15:0] leds;
+    wire [7:0]  dpy0, dpy1;
+
+    modport master(
+        input  dip_sw,
+        output leds, dpy0, dpy1
+    );
+
+endinterface
 
 `endif
