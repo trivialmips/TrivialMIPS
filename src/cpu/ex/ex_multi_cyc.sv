@@ -8,6 +8,7 @@ module ex_multi_cyc(
 	input  Word_t         reg2,
 	input  DoubleWord_t   hilo,
 	output DoubleWord_t   ret,
+	output Word_t         mult_word,
 	output Bit_t          is_busy
 );
 
@@ -65,6 +66,7 @@ assign abs_reg2 = (is_signed && reg2[31]) ? -reg2 : reg2;
 DoubleWord_t mul_abs, mul_result;
 assign mul_abs = abs_reg1 * abs_reg2;
 assign mul_result = negate_result ? -mul_abs : mul_abs;
+assign mult_word = mul_result[31:0];
 
 /* division */
 Word_t abs_quotient, abs_remainder;
