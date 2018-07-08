@@ -1,7 +1,7 @@
 -- Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2018.1 (win64) Build 2188600 Wed Apr  4 18:40:38 MDT 2018
--- Date        : Sun Jul  8 20:17:52 2018
+-- Date        : Sun Jul  8 21:12:05 2018
 -- Host        : Harry-XPS running 64-bit major release  (build 9200)
 -- Command     : write_vhdl -force -mode funcsim {c:/Users/Harry
 --               Chen/Documents/Workspace/TrivialMIPS/vivado/TrivialMIPS.srcs/ip/top_clk_wiz/top_clk_wiz_sim_netlist.vhdl}
@@ -102,9 +102,9 @@ mmcm_adv_inst: unisim.vcomponents.MMCME2_ADV
       CLKOUT0_DUTY_CYCLE => 0.500000,
       CLKOUT0_PHASE => 0.000000,
       CLKOUT0_USE_FINE_PS => false,
-      CLKOUT1_DIVIDE => 20,
+      CLKOUT1_DIVIDE => 40,
       CLKOUT1_DUTY_CYCLE => 0.500000,
-      CLKOUT1_PHASE => 180.000000,
+      CLKOUT1_PHASE => 0.000000,
       CLKOUT1_USE_FINE_PS => false,
       CLKOUT2_DIVIDE => 100,
       CLKOUT2_DUTY_CYCLE => 0.500000,
