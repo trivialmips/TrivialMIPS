@@ -4,17 +4,48 @@ module cpu_mem(
 	input  rst,
 
 	input  Bit_t          ll_bit,
-	input  Oper_t         op,
-	input  MemAccessReq_t memory_req,
-	input  RegWriteReq_t  wr_i,
-	output RegWriteReq_t  wr_o,
+	input  Oper_t         op_a,
+	input  Oper_t         op_b,
+	input  MemAccessReq_t memory_req_a,
+	input  MemAccessReq_t memory_req_b,
+
+	input  RegWriteReq_t  wr_a_i,
+	input  RegWriteReq_t  wr_b_i,
+	output RegWriteReq_t  wr_a_o,
+	output RegWriteReq_t  wr_b_o,
 
 	Bus_if.master         data_bus,
 
+	output Bit_t         alpha_taken,
 	output Bit_t         llbit_reset,
 	output Bit_t         stall_req,
 	output ExceptInfo_t  except
 );
+
+Oper_t op;
+MemAccessReq_t memory_req;
+RegWriteReq_t wr_i, wr_o;
+
+always_comb
+begin
+	// Only one of pipe-a and pipe-b may access memory
+	if(memory_req_b.we)
+	begin
+		alpha_taken = 1'b0;
+		memory_req = memory_req_b;
+		op = op_b;
+		wr_i = wr_b_i;
+		wr_b_o = wr_o;
+		wr_a_o = wr_a_i;
+	end else begin
+		alpha_taken = 1'b1;
+		memory_req = memory_req_a;
+		op = op_a;
+		wr_i = wr_a_i;
+		wr_a_o = wr_o;
+		wr_b_o = wr_b_i;
+	end
+end
 
 assign stall_req = data_bus.stall;
 assign llbit_reset = 1'b0;

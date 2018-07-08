@@ -34,9 +34,10 @@ trivial_mips trivial_cpu_instance(
 	.data_bus(data_bus_if.master)
 );
 
-RegWriteReq_t reg_wr;
+RegWriteReq_t reg_wr1, reg_wr2;
 HiloWriteReq_t hilo_wr;
-assign reg_wr = trivial_cpu_instance.reg_wr1;
+assign reg_wr1 = trivial_cpu_instance.reg_wr1;
+assign reg_wr2 = trivial_cpu_instance.reg_wr2;
 assign hilo_wr = trivial_cpu_instance.hilo_wr;
 
 task unittest(
@@ -67,10 +68,22 @@ task unittest(
 	begin @(negedge clk50M);
 		cycle = cycle + 1;
 
-		if(reg_wr.we && reg_wr.waddr)
+		if(reg_wr1.we && reg_wr1.waddr)
 		begin
 			$fscanf(fans, "%s\n", ans);
-			$sformat(out, "$%0d=0x%x", reg_wr.waddr, reg_wr.wdata);
+			$sformat(out, "$%0d=0x%x", reg_wr1.waddr, reg_wr1.wdata);
+			$display("[%0d] %s", cycle, out);
+			if(out != ans && ans != "skip")
+			begin
+				$display("[Error] Expected: %0s, Got: %0s", ans, out);
+				$stop;
+			end
+		end 
+
+		if(reg_wr2.we && reg_wr2.waddr)
+		begin
+			$fscanf(fans, "%s\n", ans);
+			$sformat(out, "$%0d=0x%x", reg_wr2.waddr, reg_wr2.wdata);
 			$display("[%0d] %s", cycle, out);
 			if(out != ans && ans != "skip")
 			begin

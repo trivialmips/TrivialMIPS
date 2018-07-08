@@ -101,6 +101,7 @@ typedef struct packed {
 
 typedef struct packed {
 	Bit_t flush, delayslot, eret;
+	Bit_t alpha_taken;
 	logic [4:0] code;
 	InstAddr_t cur_pc, jump_pc;
 	Word_t extra;
@@ -173,6 +174,7 @@ typedef struct packed {
 	InstAddr_t pc;           // ID, EX, MEM
 	Inst_t inst;             // ID, EX
 	Word_t reg1, reg2, imm;  // ID, EX
+	RegAddr_t reg_addr1, reg_addr2;  // ID, EX
 	Bit_t delayslot;         // IF, ID, EX, MEM
 } PipelineData_t;
 

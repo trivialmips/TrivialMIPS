@@ -41,7 +41,7 @@ begin
 		case(cur_status)
 			ST_HARD_SET: next_status = ST_MATCH;
 			ST_MATCH: next_status = inst2_taken ? ST_MATCH : ST_AHEAD;
-			ST_AHEAD: next_status = inst2_taken ? ST_MATCH : ST_AHEAD;
+			ST_AHEAD: next_status = ST_AHEAD;
 		endcase
 	end
 end
@@ -67,7 +67,7 @@ begin
 		if(jump)
 		begin
 			pc <= jump_to;
-		end else if(cur_status == ST_HARD_SET || (cur_status == ST_MATCH && inst2_taken)) begin
+		end else if(cur_status == ST_HARD_SET || inst2_taken) begin
 			pc <= pc + 32'h8;
 		end else begin
 			pc <= pc + 32'h4;

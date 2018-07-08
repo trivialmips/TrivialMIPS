@@ -3,22 +3,38 @@
 module cpu_wb(
 	input  rst,
 
-	input  RegWriteReq_t wr_i,
-	output RegWriteReq_t wr_o,
+	input  PipelineReq_t  req_a,
+	input  PipelineReq_t  req_b,
+
+	output RegWriteReq_t  reg_wr1,
+	output RegWriteReq_t  reg_wr2,
+	output HiloWriteReq_t hilo_wr,
+	output RegWriteReq_t  cp0_reg_wr,
+
 	output Bit_t         stall_req
 );
 
 assign stall_req = 1'b0;
 
+`define RST_REG_WR(w) \
+	w.we    = 1'b0; \
+	w.waddr = `ZERO_WORD; \
+	w.wdata = `ZERO_WORD;
+
 always_comb
 begin
 	if(rst == 1'b1)
 	begin
-		wr_o.we    = 1'b0;
-		wr_o.waddr = `ZERO_WORD;
-		wr_o.wdata = `ZERO_WORD;
+		`RST_REG_WR(reg_wr1)
+		`RST_REG_WR(reg_wr2)
+		`RST_REG_WR(cp0_reg_wr)
+		hilo_wr.we   = 1'b0;
+		hilo_wr.hilo = `ZERO_DWORD;
 	end else begin
-		wr_o = wr_i;
+		reg_wr1 = req_a.reg_wr;
+		reg_wr2 = req_b.reg_wr;
+		hilo_wr = req_b.hilo_wr.we ? req_b.hilo_wr : req_a.hilo_wr;
+		cp0_reg_wr = req_b.cp0_reg_wr.we ? req_b.cp0_reg_wr : req_a.cp0_reg_wr;
 	end
 end
 

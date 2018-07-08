@@ -3,39 +3,53 @@
 module ex_mem(
 	input  clk, rst,
 
-	input  PipelineData_t  ex_data,
-	input  PipelineReq_t   ex_req,
-	output PipelineData_t  mem_data,
-	output PipelineReq_t   mem_req,
+	input  PipelineData_t  ex_data_a,
+	input  PipelineData_t  ex_data_b,
+	input  PipelineReq_t   ex_req_a,
+	input  PipelineReq_t   ex_req_b,
+	output PipelineData_t  mem_data_a,
+	output PipelineData_t  mem_data_b,
+	output PipelineReq_t   mem_req_a,
+	output PipelineReq_t   mem_req_b,
 
 	input  Stall_t stall,
 	input  Bit_t   flush
 );
 
+`define RST_REQ(q) \
+	q.reg_wr.we        <= 1'b0;           \
+	q.reg_wr.waddr     <= `ZERO_WORD;     \
+	q.reg_wr.wdata     <= `ZERO_WORD;     \
+	q.cp0_reg_wr.we    <= 1'b0;           \
+	q.cp0_reg_wr.waddr <= `ZERO_WORD;     \
+	q.cp0_reg_wr.wdata <= `ZERO_WORD;     \
+	q.hilo_wr.we       <= 1'b0;           \
+	q.hilo_wr.hilo     <= `ZERO_DWORD;    \
+	q.memory_req.ce    <= 1'b0;           \
+	q.memory_req.we    <= 1'b0;           \
+	q.memory_req.addr  <= `ZERO_WORD;     \
+	q.memory_req.wdata <= `ZERO_WORD;     \
+	q.except.occur     <= 1'b0;           \
+	q.llbit_set        <= 1'b0;
+
+`define RST_DATA(d) \
+	d.pc         <= `ZERO_WORD; \
+	d.op         <= OP_NOP;     \
+	d.delayslot  <= 1'b0;
+
 always @(posedge clk)
 begin
 	if(rst || flush || (stall.stall_ex && ~stall.stall_mem))
 	begin
-		mem_data.delayslot       <= 1'b0;
-		mem_data.pc              <= `ZERO_WORD;
-		mem_data.op              <= OP_NOP;
-		mem_req.reg_wr.we        <= 1'b0;
-		mem_req.reg_wr.waddr     <= `ZERO_WORD;
-		mem_req.reg_wr.wdata     <= `ZERO_WORD;
-		mem_req.cp0_reg_wr.we    <= 1'b0;
-		mem_req.cp0_reg_wr.waddr <= `ZERO_WORD;
-		mem_req.cp0_reg_wr.wdata <= `ZERO_WORD;
-		mem_req.hilo_wr.we       <= 1'b0;
-		mem_req.hilo_wr.hilo     <= `ZERO_DWORD;
-		mem_req.memory_req.ce    <= 1'b0;
-		mem_req.memory_req.we    <= 1'b0;
-		mem_req.memory_req.addr  <= `ZERO_WORD;
-		mem_req.memory_req.wdata <= `ZERO_WORD;
-		mem_req.except.occur     <= 1'b0;
-		mem_req.llbit_set        <= 1'b0;
+		`RST_DATA(mem_data_a)
+		`RST_DATA(mem_data_b)
+		`RST_REQ(mem_req_a)
+		`RST_REQ(mem_req_b)
 	end else if(~stall.stall_ex) begin
-		mem_data <= ex_data;
-		mem_req  <= ex_req;
+		mem_data_a <= ex_data_a;
+		mem_data_b <= ex_data_b;
+		mem_req_a  <= ex_req_a;
+		mem_req_b  <= ex_req_b;
 	end
 end
 

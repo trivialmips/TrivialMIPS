@@ -2,14 +2,33 @@
 
 module except(
 	input  rst,
-	input  InstAddr_t    pc,
-	input  Bit_t         delayslot,
+	input  InstAddr_t    pc_a,
+	input  InstAddr_t    pc_b,
+	input  Bit_t         delayslot_a,
+	input  Bit_t         delayslot_b,
+	input  ExceptInfo_t  except_a,
+	input  ExceptInfo_t  except_b,
 	input  CP0Regs_t     cp0_regs,
-	input  ExceptInfo_t  except,
 	output ExceptReq_t   except_req
 );
 
-assign except_req.delayslot = delayslot;
+InstAddr_t pc;
+ExceptInfo_t except;
+always_comb
+begin
+	if(except_a.occur)
+	begin
+		pc = pc_a;
+		except = except_a;
+		except_req.alpha_taken = 1'b1;
+		except_req.delayslot = delayslot_a;
+	end else begin
+		pc = pc_b;
+		except = except_b;
+		except_req.alpha_taken = 1'b0;
+		except_req.delayslot = delayslot_b;
+	end
+end
 
 always_comb
 begin

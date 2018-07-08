@@ -10,12 +10,19 @@ assign clk = inst_bus.clk._50M;
 assign rst = inst_bus.clk.rst;
 
 Bit_t flush;
-PipelineData_t data_id, data_idex;
-PipelineData_t data_ex, data_exmem;
-PipelineData_t data_mem;
-PipelineReq_t req_id, req_idex;
-PipelineReq_t req_ex, req_exmem;
-PipelineReq_t req_mem, req_memwb;
+PipelineData_t data_id_a, data_idex_a;
+PipelineData_t data_ex_a, data_exmem_a;
+PipelineData_t data_mem_a;
+PipelineReq_t req_id_a, req_idex_a;
+PipelineReq_t req_ex_a, req_exmem_a;
+PipelineReq_t req_mem_a, req_memwb_a;
+
+PipelineData_t data_id_b, data_idex_b;
+PipelineData_t data_ex_b, data_exmem_b;
+PipelineData_t data_mem_b;
+PipelineReq_t req_id_b, req_idex_b;
+PipelineReq_t req_ex_b, req_exmem_b;
+PipelineReq_t req_mem_b, req_memwb_b;
 
 // general registers
 RegAddr_t reg_raddr1, reg_raddr2, reg_raddr3, reg_raddr4;
@@ -61,21 +68,24 @@ ll_bit_reg ll_bit_instance(
 // coprocesser 0
 ExceptReq_t except_req;
 CP0Regs_t cp0_regs;
-RegAddr_t cp0_raddr;
+RegAddr_t cp0_raddr1, cp0_raddr2;
 RegWriteReq_t cp0_reg_wr;
-Word_t cp0_rdata;
+Word_t cp0_rdata1, cp0_rdata2;
 cp0 cp0_instance(
 	.clk,
 	.rst,
-	.raddr(cp0_raddr),
+	.raddr1(cp0_raddr1),
+	.raddr2(cp0_raddr2),
 	.wr(cp0_reg_wr),
 	.except_req,
-	.rdata(cp0_rdata),
+	.rdata1(cp0_rdata1),
+	.rdata2(cp0_rdata2),
 	.regs(cp0_regs)
 );
 
 // stall control
 Stall_t stall;
+Bit_t flush_caused_by_alpha;
 Bit_t stall_from_if;
 Bit_t stall_from_id;
 Bit_t stall_from_mem;
@@ -90,7 +100,8 @@ ctrl ctrl_instance(
 	.stall_from_wb,
 	.stall,
 	.except_req,
-	.flush
+	.flush,
+	.flush_caused_by_alpha
 );
 
 // IF stage
@@ -130,7 +141,7 @@ if_id stage_if_id(
 	.clk,
 	.rst,
 	.if_pc,
-	.if_delayslot(is_branch),
+	.if_delayslot(is_branch & ~inst_pair_forward.inst2_taken),
 	.if_inst_pair,
 	.id_pc,
 	.id_inst_pair,
@@ -142,134 +153,246 @@ if_id stage_if_id(
 	.flush
 );
 
-assign inst_pair_forward.inst1 = id_inst_pair.inst1;
-assign inst_pair_forward.inst2 = id_inst_pair.inst2;
-assign inst_pair_forward.inst2_taken = 1'b0;
+Bit_t stall_from_id_a, stall_from_id_b;
+assign stall_from_id = stall_from_id_a | stall_from_id_b;
 
 // ID stage
-cpu_id stage_id(
+cpu_id stage_id_a(
 	.rst,
 	.pc(id_pc),
-	.inst_pair(id_inst_pair),
+	.inst(id_inst_pair.inst1),
 	.delayslot(id_delayslot),
 	.reg1_i(reg_rdata1),
 	.reg2_i(reg_rdata2),
 	.reg_raddr1(reg_raddr1),
 	.reg_raddr2(reg_raddr2),
-	.stall_req(stall_from_id),
-	.data_id,
-	.req_id,
+	.stall_req(stall_from_id_a),
+	.data_id(data_id_a),
+	.req_id(req_id_a),
 	// data forward
-	.ex_memory_req(req_ex.memory_req),
-	.mem_wr(req_mem.reg_wr),
-	.ex_wr(req_ex.reg_wr)
+	.ex_memory_req_a(req_ex_a.memory_req),
+	.ex_memory_req_b(req_ex_b.memory_req),
+	.mem_wr_a(req_mem_a.reg_wr),
+	.mem_wr_b(req_mem_b.reg_wr),
+	.ex_wr_a(req_ex_a.reg_wr),
+	.ex_wr_b(req_ex_b.reg_wr)
 );
 
+cpu_id stage_id_b(
+	.rst,
+	.pc(id_pc + 32'h4),
+	.inst(id_inst_pair.inst2),
+	.delayslot(is_branch & inst_pair_forward.inst2_taken),
+	.reg1_i(reg_rdata3),
+	.reg2_i(reg_rdata4),
+	.reg_raddr1(reg_raddr3),
+	.reg_raddr2(reg_raddr4),
+	.stall_req(stall_from_id_b),
+	.data_id(data_id_b),
+	.req_id(req_id_b),
+	// data forward
+	.ex_memory_req_a(req_ex_a.memory_req),
+	.ex_memory_req_b(req_ex_b.memory_req),
+	.mem_wr_a(req_mem_a.reg_wr),
+	.mem_wr_b(req_mem_b.reg_wr),
+	.ex_wr_a(req_ex_a.reg_wr),
+	.ex_wr_b(req_ex_b.reg_wr)
+);
+
+// Only pipe-alpha can have jump instructions
 branch branch_instance(
 	.rst,
-	.data_id,
+	.data_id(data_id_a),
 	.is_branch,
 	.jump,
 	.jump_to
 );
 
+assign inst_pair_forward.inst1 = id_inst_pair.inst1;
+assign inst_pair_forward.inst2 = id_inst_pair.inst2;
+superscalar_ctrl superscalar_ctrl_instance(
+	.rst,
+	.ena(1'b1),
+	.data_a(data_id_a),
+	.data_b(data_id_b),
+	.req_a(req_id_a),
+	.req_b(req_id_b),
+	.inst2_taken(inst_pair_forward.inst2_taken)
+);
+
 id_ex stage_id_ex(
 	.clk,
 	.rst,
-	.id_data(data_id),
-	.id_req(req_id),
-	.ex_data(data_idex),
-	.ex_req(req_idex),
+	.id_data_a(data_id_a),
+	.id_data_b(data_id_b),
+	.id_req_a(req_id_a),
+	.id_req_b(req_id_b),
+	.ex_data_a(data_idex_a),
+	.ex_data_b(data_idex_b),
+	.ex_req_a(req_idex_a),
+	.ex_req_b(req_idex_b),
+	.inst2_taken(inst_pair_forward.inst2_taken),
 	.stall,
 	.flush
 );
 
 // EX stage
-cpu_ex stage_ex(
+Bit_t stall_from_ex_a, stall_from_ex_b;
+assign stall_from_ex = stall_from_ex_a | stall_from_ex_b;
+
+RegWriteReq_t empty_reg_wr;
+HiloWriteReq_t empty_hilo_wr;
+assign empty_hilo_wr.we   = 1'b0;
+assign empty_hilo_wr.hilo = 'b0;
+assign empty_reg_wr.we    = 1'b0;
+assign empty_reg_wr.waddr = 'b0;
+assign empty_reg_wr.wdata = 'b0;
+
+cpu_ex stage_ex_a(
 	.clk,
 	.rst,
 	.flush,
 	.hilo_unsafe(reg_hilo),
-	.cp0_rdata_unsafe(cp0_rdata),
-	.cp0_raddr(cp0_raddr),
-	.stall_req(stall_from_ex),
-	.mem_hilo_wr(req_mem.hilo_wr),
-	.mem_cp0_reg_wr(req_mem.cp0_reg_wr),
+	.cp0_rdata_unsafe(cp0_rdata1),
+	.cp0_raddr(cp0_raddr1),
+	.stall_req(stall_from_ex_a),
 
-	.data_idex(data_idex),
-	.data_ex(data_ex),
-	.req_idex(req_idex),
-	.req_ex(req_ex)
+	.data_idex(data_idex_a),
+	.data_ex(data_ex_a),
+	.req_idex(req_idex_a),
+	.req_ex(req_ex_a),
+
+	.mem_hilo_wr_a(req_mem_a.hilo_wr),
+	.mem_hilo_wr_b(req_mem_b.hilo_wr),
+	.mem_cp0_reg_wr_a(req_mem_a.cp0_reg_wr),
+	.mem_cp0_reg_wr_b(req_mem_b.cp0_reg_wr),
+
+	.ex_hilo_wr_a(empty_hilo_wr),
+	.ex_reg_wr_a(empty_reg_wr)
+);
+
+cpu_ex stage_ex_b(
+	.clk,
+	.rst,
+	.flush,
+	.hilo_unsafe(reg_hilo),
+	.cp0_rdata_unsafe(cp0_rdata2),
+	.cp0_raddr(cp0_raddr2),
+	.stall_req(stall_from_ex_b),
+
+	.data_idex(data_idex_b),
+	.data_ex(data_ex_b),
+	.req_idex(req_idex_b),
+	.req_ex(req_ex_b),
+
+	.mem_hilo_wr_a(req_mem_a.hilo_wr),
+	.mem_hilo_wr_b(req_mem_b.hilo_wr),
+	.mem_cp0_reg_wr_a(req_mem_a.cp0_reg_wr),
+	.mem_cp0_reg_wr_b(req_mem_b.cp0_reg_wr),
+
+	.ex_hilo_wr_a(req_ex_a.hilo_wr),
+	.ex_reg_wr_a(req_ex_a.reg_wr)
 );
 
 ex_mem stage_ex_mem(
 	.clk,
 	.rst,
-	.ex_data(data_ex),
-	.ex_req(req_ex),
-	.mem_data(data_exmem),
-	.mem_req(req_exmem),
+	.ex_data_a(data_ex_a),
+	.ex_data_b(data_ex_b),
+	.ex_req_a(req_ex_a),
+	.ex_req_b(req_ex_b),
+	.mem_data_a(data_exmem_a),
+	.mem_data_b(data_exmem_b),
+	.mem_req_a(req_exmem_a),
+	.mem_req_b(req_exmem_b),
 	.stall,
 	.flush
 );
 
 // MEM stage
 ExceptInfo_t mem_except_tmp;
-Bit_t mem_llbit_reset;
-cpu_mem stage_mem(
+Bit_t mem_llbit_reset, mem_alpha_taken;
+cpu_mem stage_mem_a(
 	.rst,
-	.wr_i(req_exmem.reg_wr),
-	.wr_o(req_mem.reg_wr),
-	.op(data_exmem.op),
+	.wr_a_i(req_exmem_a.reg_wr),
+	.wr_b_i(req_exmem_b.reg_wr),
+	.wr_a_o(req_mem_a.reg_wr),
+	.wr_b_o(req_mem_b.reg_wr),
+	.op_a(data_exmem_a.op),
+	.op_b(data_exmem_b.op),
 	.ll_bit(reg_llbit),
-	.memory_req(req_mem.memory_req),
+	.memory_req_a(req_mem_a.memory_req),
+	.memory_req_b(req_mem_b.memory_req),
 	.data_bus,
-	.llbit_reset(mem_llbit_reset),
+	.llbit_reset(mem_llbit_reset_a),
 	.stall_req(stall_from_mem),
+	.alpha_taken(mem_alpha_taken),
 	.except(mem_except_tmp)
 );
 
-assign data_mem = data_exmem;
-assign req_mem.llbit_set = req_exmem.llbit_set;
-assign req_mem.memory_req = req_exmem.memory_req;
-assign req_mem.hilo_wr = req_exmem.hilo_wr;
-assign req_mem.cp0_reg_wr = req_exmem.cp0_reg_wr;
-assign req_mem.except = req_exmem.except.occur ? req_exmem.except : mem_except_tmp;
+assign data_mem_a = data_exmem_a;
+assign data_mem_b = data_exmem_b;
+
+assign req_mem_a.llbit_set  = req_exmem_a.llbit_set;
+assign req_mem_a.memory_req = req_exmem_a.memory_req;
+assign req_mem_a.hilo_wr    = req_exmem_a.hilo_wr;
+assign req_mem_a.cp0_reg_wr = req_exmem_a.cp0_reg_wr;
+
+assign req_mem_b.llbit_set  = req_exmem_b.llbit_set;
+assign req_mem_b.memory_req = req_exmem_b.memory_req;
+assign req_mem_b.hilo_wr    = req_exmem_b.hilo_wr;
+assign req_mem_b.cp0_reg_wr = req_exmem_b.cp0_reg_wr;
+
+always_comb
+begin
+	if(mem_alpha_taken)
+	begin
+		req_mem_b.except = req_exmem_b.except;
+		req_mem_a.except = req_exmem_a.except.occur ? req_exmem_a.except : mem_except_tmp;
+	end else begin
+		req_mem_a.except = req_exmem_a.except;
+		req_mem_b.except = req_exmem_b.except.occur ? req_exmem_b.except : mem_except_tmp;
+	end
+end
 
 except except_handler(
 	.rst,
-	.pc(data_mem.pc),
-	.delayslot(data_mem.delayslot),
-	.except(req_mem.except),
+	.pc_a(data_mem_a.pc),
+	.pc_b(data_mem_b.pc),
+	.delayslot_a(data_mem_a.delayslot),
+	.delayslot_b(data_mem_b.delayslot),
+	.except_a(req_mem_a.except),
+	.except_b(req_mem_b.except),
 	.except_req,
 	.cp0_regs
 );
 
-assign llbit_wr.we    = req_mem.llbit_set | mem_llbit_reset;
-assign llbit_wr.wdata = { 30'b0, req_mem.llbit_set };
+assign llbit_wr.we = req_mem_a.llbit_set | req_mem_b.llbit_set | mem_llbit_reset;
+assign llbit_wr.wdata = { 30'b0, req_mem_a.llbit_set | req_mem_b.llbit_set };
 
 mem_wb stage_mem_wb(
 	.clk,
 	.rst,
-	.mem_pc(data_mem.pc),
-	.mem_cp0_reg_wr(req_mem.cp0_reg_wr),
-	.mem_reg_wr(req_mem.reg_wr),
-	.mem_hilo_wr(req_mem.hilo_wr),
-	.wb_reg_wr(req_memwb.reg_wr),
-	.wb_hilo_wr(req_memwb.hilo_wr),
-	.wb_cp0_reg_wr(req_memwb.cp0_reg_wr),
+	.mem_req_a(req_mem_a),
+	.mem_req_b(req_mem_b),
+	.wb_req_a(req_memwb_a),
+	.wb_req_b(req_memwb_b),
 	.stall,
-	.flush
+	.flush,
+	.flush_caused_by_alpha
 );
-
-assign hilo_wr = req_memwb.hilo_wr;
-assign cp0_reg_wr = req_memwb.cp0_reg_wr;
 
 // WB stage
 cpu_wb stage_wb(
 	.rst,
-	.wr_i(req_memwb.reg_wr),
-	.wr_o(reg_wr1),
+	.req_a(req_memwb_a),
+	.req_b(req_memwb_b),
+
+	.reg_wr1,
+	.reg_wr2,
+	.hilo_wr,
+	.cp0_reg_wr,
+
 	.stall_req(stall_from_wb)
 );
 

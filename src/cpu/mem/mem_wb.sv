@@ -3,35 +3,44 @@
 module mem_wb(
 	input  clk, rst,
 
-	input  InstAddr_t     mem_pc,
-	input  RegWriteReq_t  mem_reg_wr,
-	input  RegWriteReq_t  mem_cp0_reg_wr,
-	input  HiloWriteReq_t mem_hilo_wr,
-
-	output RegWriteReq_t  wb_reg_wr,
-	output RegWriteReq_t  wb_cp0_reg_wr,
-	output HiloWriteReq_t wb_hilo_wr,
+	input  PipelineReq_t  mem_req_a,
+	input  PipelineReq_t  mem_req_b,
+	output PipelineReq_t  wb_req_a,
+	output PipelineReq_t  wb_req_b,
 
 	input  Stall_t      stall,
-	input  Bit_t        flush
+	input  Bit_t        flush,
+	input  Bit_t        flush_caused_by_alpha
 );
+
+`define RST_REQ(q) \
+	q.reg_wr.we    <= 1'b0;        \
+	q.reg_wr.waddr <= `ZERO_WORD;  \
+	q.reg_wr.wdata <= `ZERO_WORD;  \
+	q.hilo_wr.we    <= 1'b0;        \
+	q.hilo_wr.hilo  <= `ZERO_DWORD; \
+	q.cp0_reg_wr.we    <= 1'b0;        \
+	q.cp0_reg_wr.waddr <= `ZERO_WORD;  \
+	q.cp0_reg_wr.wdata <= `ZERO_WORD;
 
 always @(posedge clk)
 begin
-	if(rst || flush || (stall.stall_mem && ~stall.stall_wb))
+	if(rst || (stall.stall_mem && ~stall.stall_wb))
 	begin
-		wb_reg_wr.we        <= 1'b0;
-		wb_reg_wr.waddr     <= `ZERO_WORD;
-		wb_reg_wr.wdata     <= `ZERO_WORD;
-		wb_hilo_wr.we       <= 1'b0;
-		wb_hilo_wr.hilo     <= `ZERO_DWORD;
-		wb_cp0_reg_wr.we    <= 1'b0;
-		wb_cp0_reg_wr.waddr <= `ZERO_WORD;
-		wb_cp0_reg_wr.wdata <= `ZERO_WORD;
+		`RST_REQ(wb_req_a)
+		`RST_REQ(wb_req_b)
+	end else if(flush) begin
+		`RST_REQ(wb_req_b)
+
+		if(flush_caused_by_alpha)
+		begin
+			`RST_REQ(wb_req_a)
+		end else begin
+			wb_req_a <= mem_req_a;
+		end
 	end else if(~stall.stall_mem) begin
-		wb_reg_wr     <= mem_reg_wr;
-		wb_hilo_wr    <= mem_hilo_wr;
-		wb_cp0_reg_wr <= mem_cp0_reg_wr;
+		wb_req_a <= mem_req_a;
+		wb_req_b <= mem_req_b;
 	end
 end
 

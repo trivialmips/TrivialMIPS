@@ -5,15 +5,23 @@ module cpu_ex(
 	input  Bit_t          flush,
 	input  Word_t         cp0_rdata_unsafe,
 	input  DoubleWord_t   hilo_unsafe,
-	input  RegWriteReq_t  mem_cp0_reg_wr,
-	input  HiloWriteReq_t mem_hilo_wr,
 	output RegAddr_t      cp0_raddr,
 	output Bit_t          stall_req,
 
 	input  PipelineData_t  data_idex,
 	input  PipelineReq_t   req_idex,
 	output PipelineData_t  data_ex,
-	output PipelineReq_t   req_ex
+	output PipelineReq_t   req_ex,
+
+	// data forward
+	input  RegWriteReq_t  mem_cp0_reg_wr_a,
+	input  RegWriteReq_t  mem_cp0_reg_wr_b,
+	input  HiloWriteReq_t mem_hilo_wr_a,
+	input  HiloWriteReq_t mem_hilo_wr_b,
+
+	// data downward
+	input  HiloWriteReq_t ex_hilo_wr_a,
+	input  RegWriteReq_t  ex_reg_wr_a
 );
 
 // setup data and request
@@ -26,12 +34,26 @@ RegWriteReq_t  cp0_reg_wr;
 MemAccessReq_t memory_req;
 Word_t         ret;
 ExceptInfo_t   except;
+always_comb
+begin
+	if(ex_reg_wr_a.we && ex_reg_wr_a.waddr == data_idex.reg_addr1)
+	begin
+		reg1 = ex_reg_wr_a.wdata;
+	end else begin
+		reg1 = data_idex.reg1;
+	end
+
+	if(ex_reg_wr_a.we && ex_reg_wr_a.waddr == data_idex.reg_addr2)
+	begin
+		reg2 = ex_reg_wr_a.wdata;
+	end else begin
+		reg2 = data_idex.reg2;
+	end
+end
 
 assign op = data_idex.op;
 assign pc = data_idex.pc;
 assign inst = data_idex.inst;
-assign reg1 = data_idex.reg1;
-assign reg2 = data_idex.reg2;
 assign imm = data_idex.imm;
 assign data_ex = data_idex;
 assign req_ex.hilo_wr = hilo_wr;
@@ -52,8 +74,12 @@ begin
 	if(rst)
 	begin
 		hilo_safe = `ZERO_DWORD;
-	end else if(mem_hilo_wr.we) begin
-		hilo_safe = mem_hilo_wr.hilo;
+	end else if(ex_hilo_wr_a.we) begin
+		hilo_safe = ex_hilo_wr_a.hilo;
+	end else if(mem_hilo_wr_b.we) begin
+		hilo_safe = mem_hilo_wr_b.hilo;
+	end else if(mem_hilo_wr_a.we) begin
+		hilo_safe = mem_hilo_wr_a.hilo;
 	end else begin
 		hilo_safe = hilo_unsafe;
 	end
@@ -95,8 +121,10 @@ begin
 	if(rst)
 	begin
 		cp0_rdata_safe = `ZERO_DWORD;
-	end else if(mem_cp0_reg_wr.we && mem_cp0_reg_wr.waddr == cp0_raddr) begin
-		cp0_rdata_safe = mem_cp0_reg_wr.wdata;
+	end else if(mem_cp0_reg_wr_b.we && mem_cp0_reg_wr_b.waddr == cp0_raddr) begin
+		cp0_rdata_safe = mem_cp0_reg_wr_b.wdata;
+	end else if(mem_cp0_reg_wr_a.we && mem_cp0_reg_wr_a.waddr == cp0_raddr) begin
+		cp0_rdata_safe = mem_cp0_reg_wr_a.wdata;
 	end else begin
 		cp0_rdata_safe = cp0_rdata_unsafe;
 	end

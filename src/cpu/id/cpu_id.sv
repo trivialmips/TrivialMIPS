@@ -3,7 +3,7 @@
 module cpu_id(
 	input  rst,
 	input  InstAddr_t pc,
-	input  InstPair_t inst_pair,
+	input  Inst_t     inst,
 	input  Bit_t      delayslot,
 
 	input  Word_t     reg1_i,
@@ -18,28 +18,28 @@ module cpu_id(
 	output Bit_t    inst_taken,
 	output Bit_t    stall_req,
 
-	input  MemAccessReq_t ex_memory_req,
-	input  RegWriteReq_t  ex_wr,
-	input  RegWriteReq_t  mem_wr
+	input  MemAccessReq_t ex_memory_req_a,
+	input  MemAccessReq_t ex_memory_req_b,
+	input  RegWriteReq_t  ex_wr_a,
+	input  RegWriteReq_t  ex_wr_b,
+	input  RegWriteReq_t  mem_wr_a,
+	input  RegWriteReq_t  mem_wr_b
 );
 
-parameter module_ord = 0;
-
-assign inst_taken = 1'b1;
 assign except.occur = 1'b0;
 
 Oper_t op;
-Inst_t inst;
 Word_t reg1_o, reg2_o, imm_o;
 Bit_t reg_we;
 RegAddr_t reg_waddr;
 ExceptInfo_t except;
-assign inst = (module_ord == 0) ? inst_pair.inst1 : inst_pair.inst2;
 assign data_id.op = op;
 assign data_id.pc = pc;
 assign data_id.inst = inst;
 assign data_id.reg1 = reg1_o;
 assign data_id.reg2 = reg2_o;
+assign data_id.reg_addr1 = reg_raddr1;
+assign data_id.reg_addr2 = reg_raddr2;
 assign data_id.imm  = imm_o;
 assign data_id.delayslot  = delayslot;
 assign req_id.reg_wr.we    = reg_we;
@@ -64,10 +64,14 @@ assign instr_index = inst[25:0];
 
 // load related stalling
 Bit_t is_ex_load_inst;
-assign is_ex_load_inst = ex_memory_req.ce && ~ex_memory_req.we;
+assign is_ex_load_inst = (
+	ex_memory_req_a.ce && ~ex_memory_req_a.we ||
+	ex_memory_req_b.ce && ~ex_memory_req_b.we);
 assign stall_req = is_ex_load_inst && 
-	(ex_wr.waddr == reg_raddr1 && reg_raddr1 != 5'b0 ||
-	 ex_wr.waddr == reg_raddr2 && reg_raddr2 != 5'b0);
+	(ex_wr_a.waddr == reg_raddr1 && reg_raddr1 != 5'b0 ||
+	 ex_wr_a.waddr == reg_raddr2 && reg_raddr2 != 5'b0 ||
+	 ex_wr_b.waddr == reg_raddr1 && reg_raddr1 != 5'b0 ||
+	 ex_wr_b.waddr == reg_raddr2 && reg_raddr2 != 5'b0);
 
 // the zero-extended/signed-extended immediate
 Word_t imm_zero_ext, imm_signed_ext;
@@ -81,10 +85,14 @@ begin
 	if(rst == 1'b1 || reg_raddr1 == 5'b0)
 	begin
 		safe_reg1 = `ZERO_WORD;
-	end else if(ex_wr.we && ex_wr.waddr == reg_raddr1) begin
-		safe_reg1 = ex_wr.wdata;
-	end else if(mem_wr.we && mem_wr.waddr == reg_raddr1) begin
-		safe_reg1 = mem_wr.wdata;
+	end else if(ex_wr_b.we && ex_wr_b.waddr == reg_raddr1) begin
+		safe_reg1 = ex_wr_b.wdata;
+	end else if(ex_wr_a.we && ex_wr_a.waddr == reg_raddr1) begin
+		safe_reg1 = ex_wr_a.wdata;
+	end else if(mem_wr_b.we && mem_wr_b.waddr == reg_raddr1) begin
+		safe_reg1 = mem_wr_b.wdata;
+	end else if(mem_wr_a.we && mem_wr_a.waddr == reg_raddr1) begin
+		safe_reg1 = mem_wr_a.wdata;
 	end else begin
 		safe_reg1 = reg1_i;
 	end
@@ -92,10 +100,14 @@ begin
 	if(rst == 1'b1 || reg_raddr2 == 5'b0)
 	begin
 		safe_reg2 = `ZERO_WORD;
-	end else if(ex_wr.we && ex_wr.waddr == reg_raddr2) begin
-		safe_reg2 = ex_wr.wdata;
-	end else if(mem_wr.we && mem_wr.waddr == reg_raddr2) begin
-		safe_reg2 = mem_wr.wdata;
+	end else if(ex_wr_b.we && ex_wr_b.waddr == reg_raddr2) begin
+		safe_reg2 = ex_wr_b.wdata;
+	end else if(ex_wr_a.we && ex_wr_a.waddr == reg_raddr2) begin
+		safe_reg2 = ex_wr_a.wdata;
+	end else if(mem_wr_b.we && mem_wr_b.waddr == reg_raddr2) begin
+		safe_reg2 = mem_wr_b.wdata;
+	end else if(mem_wr_a.we && mem_wr_a.waddr == reg_raddr2) begin
+		safe_reg2 = mem_wr_a.wdata;
 	end else begin
 		safe_reg2 = reg2_i;
 	end

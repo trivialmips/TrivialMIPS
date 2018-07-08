@@ -3,16 +3,19 @@
 module cp0(
 	input  clk, rst,
 
-	input  RegAddr_t     raddr,
+	input  RegAddr_t     raddr1,
+	input  RegAddr_t     raddr2,
 	input  RegWriteReq_t wr,
 	input  ExceptReq_t   except_req,
-	output Word_t        rdata,
+	output Word_t        rdata1,
+	output Word_t        rdata2,
 	output CP0Regs_t     regs
 );
 
 CP0Regs_t regs_new, regs_inner;
 assign regs  = regs_new;
-assign rdata = regs_new[raddr * `REG_DATA_WIDTH +: 32];
+assign rdata1 = regs_new[raddr1 * `REG_DATA_WIDTH +: 32];
+assign rdata2 = regs_new[raddr2 * `REG_DATA_WIDTH +: 32];
 
 always @(posedge clk)
 begin
