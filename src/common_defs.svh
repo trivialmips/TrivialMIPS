@@ -37,8 +37,8 @@ typedef logic [`REG_ADDR_WIDTH - 1:0] RegAddr_t;
 // memory
 typedef Word_t  MemAddr_t;
 
-`define SRAM_ADDRESS_WIDTH 20
-`define SRAM_ADDRESS_WIDTH 23
+`define SRAM_CHIP_ADDRESS_WIDTH 20
+`define FLASH_CHIP_ADDRESS_WIDTH 23
 
 // address prefixes
 `define RAM_ADDRESS_PREFIX      8'h00
@@ -68,9 +68,17 @@ typedef Word_t  MemAddr_t;
 
 typedef logic [3:0] ByteMask_t;
 
+
+typedef struct packed {
+    logic _100M, _50M, _25M, _11M0592, _10M;
+    logic rst;
+} Clock_t;
+
 // interface for bus
 
-interface Bus_if ();
+interface Bus_if (
+    input Clock_t clk
+);
     Word_t address;
     Bit_t  read, write;
     Bit_t  stall;
@@ -79,12 +87,14 @@ interface Bus_if ();
 
     modport master (
         output address, read, write, data_wr, mask,
-        input  stall, data_rd, data_rd_2
+        input  stall, data_rd, data_rd_2,
+        input  clk
     );
 
     modport slave (
         output stall, data_rd, data_rd_2,
-        input  address, read, write, data_wr, mask
+        input  address, read, write, data_wr, mask,
+        input  clk
     );
 
 endinterface
@@ -94,7 +104,7 @@ endinterface
 
 interface Sram_if();
     wire Word_t data;
-    wire[0 +: `SRAM_ADDRESS_WIDTH] address;
+    wire[`SRAM_CHIP_ADDRESS_WIDTH - 1:0] address;
     wire[3:0] be_n;
     wire ce_n, oe_n, we_n;
 
@@ -107,7 +117,7 @@ endinterface
 
 
 interface Flash_if();
-    wire [0 +: `FLASH_ADDRESS_WIDTH] address;
+    wire [`FLASH_CHIP_ADDRESS_WIDTH - 1:0] address;
     wire HalfWord_t data;
     wire rp_n, vpen, ce_n, oe_n, we_n, byte_n;
 
@@ -180,5 +190,6 @@ interface GPIO_if();
     );
 
 endinterface
+
 
 `endif

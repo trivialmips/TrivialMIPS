@@ -1,10 +1,13 @@
 `include "cpu_defs.svh"
 
 module trivial_mips(
-	input  clk, rst,
 	Bus_if.master inst_bus,
 	Bus_if.master data_bus 
 );
+
+wire clk, rst;
+assign clk = inst_bus.clk._50M;
+assign rst = inst_bus.clk.rst;
 
 Bit_t flush;
 

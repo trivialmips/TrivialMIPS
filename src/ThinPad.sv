@@ -27,28 +27,42 @@ module ThinPad(
 );
 
 
-Bus_if cpu_data_if();
-Bus_if cpu_inst_if();
+Clock_t clk;
+wire rst_n;
+assign clk.rst = ~rst_n;
+assign clk.50M = clk_50M;
+assign clk.11M0592 = clk_11M0592;
+
+top_clk_wiz clk_wiz_instance(
+    .clk_out1(clk.100M),
+    .clk_out2(clk.25M),
+    .clk_out3(clk.10M),            
+    .reset(reset_btn), 
+    .locked(rst_n),
+    .clk_in1(clk.50M)
+);
+
+
+Bus_if cpu_data_if(.clk);
+Bus_if cpu_inst_if(.clk);
 
 
 // cpu
 trivial_mips cpu(
-    .clk(clk_50M),
-    .rst(reset_btn),
 	.inst_bus(cpu_data_if.master),
 	.data_bus(cpu_inst_if.master) 
 );
 
 
 // data and instruction bus
-Bus_if ram_data_if();
-Bus_if ram_inst_if();
-Bus_if bootrom_if();
-Bus_if flash_if();
-Bus_if uart_if();
-Bus_if timer_if();
-Bus_if graphics_if();
-Bus_if ethernet_if();
+Bus_if ram_data_if(.clk);
+Bus_if ram_inst_if(.clk);
+Bus_if bootrom_if(.clk);
+Bus_if flash_if(.clk);
+Bus_if uart_if(.clk);
+Bus_if timer_if(.clk);
+Bus_if graphics_if(.clk);
+Bus_if ethernet_if(.clk);
 
 data_bus data_bus_instance(
     .cpu(cpu_data_if.slave),

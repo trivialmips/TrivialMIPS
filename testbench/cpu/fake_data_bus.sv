@@ -1,9 +1,12 @@
 `include "cpu_defs.svh"
 
 module fake_data_bus(
-	input  clk, rst,
 	Bus_if.slave data_bus
 );
+
+wire clk, rst;
+assign clk = data_bus.clk._50M;
+assign rst = data_bus.clk.rst;
 
 `define MEM_SIZE 8192
 reg [31:0] inst_ram[`MEM_SIZE - 1:0];
