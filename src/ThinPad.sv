@@ -23,23 +23,23 @@ module ThinPad(
     output wire uart_wrn, // write
     input wire uart_dataready,
     input wire uart_tbre, // busy sending
-    input wire uart_tsre, // send done
+    input wire uart_tsre  // send done
 );
 
 
 Clock_t clk;
 wire rst_n;
 assign clk.rst = ~rst_n;
-assign clk.50M = clk_50M;
-assign clk.11M0592 = clk_11M0592;
+assign clk._50M = clk_50M;
+assign clk._11M0592 = clk_11M0592;
 
 top_clk_wiz clk_wiz_instance(
-    .clk_out1(clk.100M),
-    .clk_out2(clk.25M),
-    .clk_out3(clk.10M),            
+    .clk_out1(clk._100M),
+    .clk_out2(clk._25M),
+    .clk_out3(clk._10M),            
     .reset(reset_btn), 
     .locked(rst_n),
-    .clk_in1(clk.50M)
+    .clk_in1(clk._50M)
 );
 
 
@@ -63,6 +63,7 @@ Bus_if uart_if(.clk);
 Bus_if timer_if(.clk);
 Bus_if graphics_if(.clk);
 Bus_if ethernet_if(.clk);
+Bus_if gpio_if(clk);
 
 data_bus data_bus_instance(
     .cpu(cpu_data_if.slave),
@@ -71,7 +72,8 @@ data_bus data_bus_instance(
     .uart(uart_if.master),
     .timer(timer_if.master),
     .graphics(graphics_if.master),
-    .ethernet(ethernet_if.master)
+    .ethernet(ethernet_if.master),
+    .gpio(gpio_if.master)
 );
 
 instruction_bus instruction_bus_instance(
@@ -80,8 +82,11 @@ instruction_bus instruction_bus_instance(
     .bootrom(bootrom_if.master)
 );
 
-
 // pheripheral
+
+bootrom bootrom_instance(
+    .inst_bus(bootrom_if.slave)
+);
 
 sram_controller sram_controller_instance(
     .inst_bus(ram_inst_if.slave),
