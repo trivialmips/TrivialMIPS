@@ -58,9 +58,9 @@ end
 
 always @(posedge clk)
 begin
-	if(ce == 1'b0)
+	if (ce == 1'b0)
 	begin
-		pc <= 32'hbfc00000;
+		pc <= `PC_RESET_VECTOR;
 	end else if(except_req.flush) begin
 		pc <= except_req.jump_pc;
 	end else if(~hold_pc) begin

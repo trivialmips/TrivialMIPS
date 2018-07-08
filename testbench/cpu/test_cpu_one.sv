@@ -13,23 +13,23 @@ end
 
 always #10 clk50M = ~clk50M;
 
-Bus_if data_bus_if();
-Bus_if inst_bus_if();
+Clock_t clk;
+assign clk._50M = clk50M;
+assign clk.rst = rst;
+
+
+Bus_if data_bus_if(.clk);
+Bus_if inst_bus_if(.clk);
 
 fake_inst_bus fake_inst_bus_instance(
-	.rst,
 	.inst_bus(inst_bus_if.slave)
 );
 
 fake_data_bus fake_data_bus_instance(
-	.clk(clk50M),
-	.rst,
 	.data_bus(data_bus_if.slave)
 );
 
 trivial_mips trivial_cpu_instance(
-	.clk(clk50M),
-	.rst,
 	.inst_bus(inst_bus_if.master),
 	.data_bus(data_bus_if.master)
 );

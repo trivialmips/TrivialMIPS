@@ -1,7 +1,6 @@
 `include "cpu_defs.svh"
 
 module fake_inst_bus(
-	input  rst,
 	Bus_if.slave inst_bus
 );
 
@@ -9,7 +8,7 @@ reg [`INST_WIDTH - 1:0] inst_mem[1023:0];
 
 always_comb
 begin
-	if(rst == 1'b1 || inst_bus.read == 1'b0)
+	if(inst_bus.clk.rst == 1'b1 || inst_bus.read == 1'b0)
 	begin
 		inst_bus.data_rd   = `ZERO_WORD;
 		inst_bus.data_rd_2 = `ZERO_WORD;

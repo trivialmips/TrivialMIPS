@@ -9,6 +9,8 @@
 `include "common_defs.svh"
 
 
+`define PC_RESET_VECTOR 32'hbfc00000
+
 // register access
 typedef struct packed {
 	Bit_t     we;

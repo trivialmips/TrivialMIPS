@@ -257,6 +257,7 @@ assign we_hilo = (
 	op == OP_DIV   || op == OP_DIVU
 );
 
+Word_t mult_word;
 DoubleWord_t multi_cyc_ret;
 ex_multi_cyc multi_cyc_instance(
 	.clk,
@@ -267,6 +268,7 @@ ex_multi_cyc multi_cyc_instance(
 	.reg2,
 	.hilo(hilo_safe),
 	.ret(multi_cyc_ret),
+	.mult_word,
 	.is_busy(stall_req)
 );
 
@@ -323,7 +325,7 @@ begin
 		OP_SLT:  ret = signed_lt;
 
 		/* multiplication */
-		OP_MUL: ret = multi_cyc_ret[31:0];
+		OP_MUL: ret = mult_word;
 		OP_MADDU, OP_MADD, OP_MSUBU, OP_MSUB,
 		OP_MULT, OP_MULTU, OP_DIV, OP_DIVU:
 		begin
