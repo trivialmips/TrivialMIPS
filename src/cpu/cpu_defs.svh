@@ -165,4 +165,22 @@ typedef enum {
 	OP_INVALID
 } Oper_t;
 
+// pipeline
+typedef struct packed {
+	Oper_t op;               // ID, EX, MEM
+	InstAddr_t pc;           // ID, EX, MEM
+	Inst_t inst;             // ID, EX
+	Word_t reg1, reg2, imm;  // ID, EX
+	Bit_t delayslot;         // IF, ID, EX, MEM
+} PipelineData_t;
+
+typedef struct packed {
+	HiloWriteReq_t hilo_wr;     // EX, MEM, WB
+	RegWriteReq_t cp0_reg_wr;   // EX, MEM, WB
+	MemAccessReq_t memory_req;  // EX, MEM
+	RegWriteReq_t reg_wr;       // ID, EX, MEM, WB
+	ExceptInfo_t except;        // ID, EX, MEM
+	Bit_t llbit_set;            // EX, MEM
+} PipelineReq_t;
+
 `endif

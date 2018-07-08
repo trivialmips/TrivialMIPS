@@ -37,7 +37,7 @@ trivial_mips trivial_cpu_instance(
 
 RegWriteReq_t reg_wr;
 HiloWriteReq_t hilo_wr;
-assign reg_wr = trivial_cpu_instance.reg_wr;
+assign reg_wr = trivial_cpu_instance.reg_wr1;
 assign hilo_wr = trivial_cpu_instance.hilo_wr;
 
 task unittest(

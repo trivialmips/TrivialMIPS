@@ -4,6 +4,7 @@ module cpu_id(
 	input  rst,
 	input  InstAddr_t pc,
 	input  Inst_t     inst,
+	input  Bit_t      delayslot,
 
 	input  Word_t     reg1_i,
 	input  Word_t     reg2_i,
@@ -11,16 +12,10 @@ module cpu_id(
 	output RegAddr_t  reg_raddr1,
 	output RegAddr_t  reg_raddr2,
 
-	output Oper_t     op,
-	output Word_t     reg1_o,
-	output Word_t     reg2_o,
-	output Word_t     imm_o,
-	// whether to write register
-	output Bit_t      reg_we,
-	// the address of register to be written
-	output RegAddr_t  reg_waddr,
-	output Bit_t      stall_req,
-	output ExceptInfo_t except,
+	output PipelineData_t data_id,
+	output PipelineReq_t  req_id,
+
+	output Bit_t        stall_req,
 
 	input  MemAccessReq_t ex_memory_req,
 	input  RegWriteReq_t  ex_wr,
@@ -28,6 +23,22 @@ module cpu_id(
 );
 
 assign except.occur = 1'b0;
+
+Oper_t op;
+Word_t reg1_o, reg2_o, imm_o;
+Bit_t reg_we;
+RegAddr_t reg_waddr;
+ExceptInfo_t except;
+assign data_id.op = op;
+assign data_id.pc = pc;
+assign data_id.inst = inst;
+assign data_id.reg1 = reg1_o;
+assign data_id.reg2 = reg2_o;
+assign data_id.imm  = imm_o;
+assign data_id.delayslot  = delayslot;
+assign req_id.reg_wr.we    = reg_we;
+assign req_id.reg_wr.waddr = reg_waddr;
+assign req_id.except = except;
 
 // 6-bit primary operation code
 logic [5:0] opcode;

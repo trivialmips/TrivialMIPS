@@ -3,24 +3,10 @@
 module ex_mem(
 	input  clk, rst,
 
-	input  InstAddr_t     ex_pc,
-	input  Oper_t         ex_op,
-	input  Bit_t          ex_delayslot,
-	input  Bit_t          ex_llbit_set,
-	input  RegWriteReq_t  ex_reg_wr,
-	input  RegWriteReq_t  ex_cp0_reg_wr,
-	input  HiloWriteReq_t ex_hilo_wr,
-	input  MemAccessReq_t ex_memory_req,
-	input  ExceptInfo_t   ex_except,
-	output InstAddr_t     mem_pc,
-	output Oper_t         mem_op,
-	output Bit_t          mem_delayslot,
-	output Bit_t          mem_llbit_set,
-	output RegWriteReq_t  mem_reg_wr,
-	output RegWriteReq_t  mem_cp0_reg_wr,
-	output HiloWriteReq_t mem_hilo_wr,
-	output MemAccessReq_t mem_memory_req,
-	output ExceptInfo_t   mem_except,
+	input  PipelineData_t  ex_data,
+	input  PipelineReq_t   ex_req,
+	output PipelineData_t  mem_data,
+	output PipelineReq_t   mem_req,
 
 	input  Stall_t stall,
 	input  Bit_t   flush
@@ -30,33 +16,26 @@ always @(posedge clk)
 begin
 	if(rst || flush || (stall.stall_ex && ~stall.stall_mem))
 	begin
-		mem_pc               <= `ZERO_WORD;
-		mem_op               <= OP_NOP;
-		mem_reg_wr.we        <= 1'b0;
-		mem_reg_wr.waddr     <= `ZERO_WORD;
-		mem_reg_wr.wdata     <= `ZERO_WORD;
-		mem_cp0_reg_wr.we    <= 1'b0;
-		mem_cp0_reg_wr.waddr <= `ZERO_WORD;
-		mem_cp0_reg_wr.wdata <= `ZERO_WORD;
-		mem_hilo_wr.we       <= 1'b0;
-		mem_hilo_wr.hilo     <= `ZERO_DWORD;
-		mem_memory_req.ce    <= 1'b0;
-		mem_memory_req.we    <= 1'b0;
-		mem_memory_req.addr  <= `ZERO_WORD;
-		mem_memory_req.wdata <= `ZERO_WORD;
-		mem_except.occur     <= 1'b0;
-		mem_delayslot        <= 1'b0;
-		mem_llbit_set        <= 1'b0;
+		mem_data.delayslot       <= 1'b0;
+		mem_data.pc              <= `ZERO_WORD;
+		mem_data.op              <= OP_NOP;
+		mem_req.reg_wr.we        <= 1'b0;
+		mem_req.reg_wr.waddr     <= `ZERO_WORD;
+		mem_req.reg_wr.wdata     <= `ZERO_WORD;
+		mem_req.cp0_reg_wr.we    <= 1'b0;
+		mem_req.cp0_reg_wr.waddr <= `ZERO_WORD;
+		mem_req.cp0_reg_wr.wdata <= `ZERO_WORD;
+		mem_req.hilo_wr.we       <= 1'b0;
+		mem_req.hilo_wr.hilo     <= `ZERO_DWORD;
+		mem_req.memory_req.ce    <= 1'b0;
+		mem_req.memory_req.we    <= 1'b0;
+		mem_req.memory_req.addr  <= `ZERO_WORD;
+		mem_req.memory_req.wdata <= `ZERO_WORD;
+		mem_req.except.occur     <= 1'b0;
+		mem_req.llbit_set        <= 1'b0;
 	end else if(~stall.stall_ex) begin
-		mem_pc         <= ex_pc;
-		mem_op         <= ex_op;
-		mem_reg_wr     <= ex_reg_wr;
-		mem_cp0_reg_wr <= ex_cp0_reg_wr;
-		mem_llbit_set  <= ex_llbit_set;
-		mem_hilo_wr    <= ex_hilo_wr;
-		mem_memory_req <= ex_memory_req;
-		mem_except     <= ex_except;
-		mem_delayslot  <= ex_delayslot;
+		mem_data <= ex_data;
+		mem_req  <= ex_req;
 	end
 end
 

@@ -7,6 +7,12 @@ module trivial_mips(
 );
 
 Bit_t flush;
+PipelineData_t data_id, data_idex;
+PipelineData_t data_ex, data_exmem;
+PipelineData_t data_mem;
+PipelineReq_t req_id, req_idex;
+PipelineReq_t req_ex, req_exmem;
+PipelineReq_t req_mem, req_memwb;
 
 // general registers
 RegAddr_t reg_raddr1, reg_raddr2, reg_raddr3, reg_raddr4;
@@ -107,6 +113,7 @@ cpu_if stage_if(
 
 Inst_t     id_inst;
 InstAddr_t id_pc;
+Bit_t      id_delayslot;
 if_id stage_if_id(
 	.clk,
 	.rst,
@@ -121,194 +128,128 @@ if_id stage_if_id(
 );
 
 // ID stage
-Oper_t id_op;
-Word_t id_reg1, id_reg2, id_imm;
-Bit_t id_delayslot;
-Bit_t id_reg_we;
-RegAddr_t id_reg_waddr;
-RegWriteReq_t ex_reg_wr;
-RegWriteReq_t memwb_reg_wr;
-MemAccessReq_t ex_memory_req;
-ExceptInfo_t id_except;
-
 cpu_id stage_id(
 	.rst,
 	.pc(id_pc),
 	.inst(id_inst),
+	.delayslot(id_delayslot),
 	.reg1_i(reg_rdata1),
 	.reg2_i(reg_rdata2),
-	.reg_raddr1,
-	.reg_raddr2,
-	.op(id_op),
-	.reg1_o(id_reg1),
-	.reg2_o(id_reg2),
-	.imm_o(id_imm),
-	.reg_we(id_reg_we),
-	.reg_waddr(id_reg_waddr),
+	.reg_raddr1(reg_raddr1),
+	.reg_raddr2(reg_raddr2),
 	.stall_req(stall_from_id),
-	.except(id_except),
+	.data_id,
+	.req_id,
 	// data forward
-	.ex_memory_req,
-	.mem_wr(memwb_reg_wr),
-	.ex_wr(ex_reg_wr)
+	.ex_memory_req(req_ex.memory_req),
+	.mem_wr(req_mem.reg_wr),
+	.ex_wr(req_ex.reg_wr)
 );
 
 branch branch_instance(
 	.rst,
-	.pc(id_pc),
-	.inst(id_inst),
-	.reg1(id_reg1),
-	.reg2(id_reg2),
+	.data_id,
 	.is_branch,
 	.jump,
 	.jump_to
 );
 
-Bit_t  ex_delayslot;
-Oper_t ex_op;
-Word_t ex_reg1, ex_reg2, ex_imm;
-Inst_t ex_inst;
-InstAddr_t ex_pc;
-ExceptInfo_t idex_except;
-
 id_ex stage_id_ex(
 	.clk,
 	.rst,
-	.id_op,
-	.id_pc,
-	.id_inst,
-	.id_reg1,
-	.id_reg2,
-	.id_imm,
-	.id_reg_we,
-	.id_reg_waddr,
-	.id_delayslot,
-	.id_except,
-	.ex_op,
-	.ex_pc,
-	.ex_inst,
-	.ex_reg1,
-	.ex_reg2,
-	.ex_imm,
-	.ex_delayslot,
-	.ex_reg_we(ex_reg_wr.we),
-	.ex_reg_waddr(ex_reg_wr.waddr),
-	.ex_except(idex_except),
+	.id_data(data_id),
+	.id_req(req_id),
+	.ex_data(data_idex),
+	.ex_req(req_idex),
 	.stall,
 	.flush
 );
 
 // EX stage
-HiloWriteReq_t ex_hilo_wr;
-HiloWriteReq_t memwb_hilo_wr;
-RegWriteReq_t mem_cp0_reg_wr;
-RegWriteReq_t ex_cp0_reg_wr;
-Bit_t ex_llbit_set;
-ExceptInfo_t ex_except;
 cpu_ex stage_ex(
 	.clk,
 	.rst,
-	.op(ex_op),
-	.pc(ex_pc),
 	.flush,
-	.inst(ex_inst),
-	.reg1(ex_reg1),
-	.reg2(ex_reg2),
-	.imm(ex_imm),
 	.hilo_unsafe(reg_hilo),
-	.hilo_wr(ex_hilo_wr),
-	.cp0_reg_wr(ex_cp0_reg_wr),
 	.cp0_rdata_unsafe(cp0_rdata),
 	.cp0_raddr(cp0_raddr),
-	.llbit_set(ex_llbit_set),
-	.memory_req(ex_memory_req),
-	.ret(ex_reg_wr.wdata),
 	.stall_req(stall_from_ex),
-	.except(ex_except),
-	.mem_hilo_wr(memwb_hilo_wr),
-	.mem_cp0_reg_wr(mem_cp0_reg_wr)
+	.mem_hilo_wr(req_mem.hilo_wr),
+	.mem_cp0_reg_wr(req_mem.cp0_reg_wr),
+
+	.data_idex(data_idex),
+	.data_ex(data_ex),
+	.req_idex(req_idex),
+	.req_ex(req_ex)
 );
 
-Bit_t mem_delayslot;
-Oper_t mem_op;
-InstAddr_t mem_pc;
-RegWriteReq_t mem_reg_wr;
-Bit_t mem_llbit_set;
-HiloWriteReq_t mem_hilo_wr;
-MemAccessReq_t mem_memory_req;
-ExceptInfo_t exmem_except;
 ex_mem stage_ex_mem(
 	.clk,
 	.rst,
-	.ex_pc,
-	.ex_op,
-	.ex_reg_wr,
-	.ex_cp0_reg_wr,
-	.ex_llbit_set,
-	.ex_hilo_wr,
-	.ex_memory_req,
-	.ex_delayslot,
-	.ex_except(idex_except.occur ? idex_except : ex_except),
-	.mem_pc,
-	.mem_op,
-	.mem_reg_wr,
-	.mem_llbit_set,
-	.mem_hilo_wr,
-	.mem_cp0_reg_wr,
-	.mem_memory_req,
-	.mem_delayslot,
-	.mem_except(exmem_except),
+	.ex_data(data_ex),
+	.ex_req(req_ex),
+	.mem_data(data_exmem),
+	.mem_req(req_exmem),
 	.stall,
 	.flush
 );
 
 // MEM stage
-ExceptInfo_t mem_except;
+ExceptInfo_t mem_except_tmp;
+Bit_t mem_llbit_reset;
 cpu_mem stage_mem(
 	.rst,
-	.wr_i(mem_reg_wr),
-	.wr_o(memwb_reg_wr),
-	.op(mem_op),
+	.wr_i(req_exmem.reg_wr),
+	.wr_o(req_mem.reg_wr),
+	.op(data_exmem.op),
 	.ll_bit(reg_llbit),
-	.memory_req(mem_memory_req),
+	.memory_req(req_mem.memory_req),
 	.data_bus,
 	.llbit_reset(mem_llbit_reset),
 	.stall_req(stall_from_mem),
-	.except(mem_except)
+	.except(mem_except_tmp)
 );
+
+assign data_mem = data_exmem;
+assign req_mem.llbit_set = req_exmem.llbit_set;
+assign req_mem.memory_req = req_exmem.memory_req;
+assign req_mem.hilo_wr = req_exmem.hilo_wr;
+assign req_mem.cp0_reg_wr = req_exmem.cp0_reg_wr;
+assign req_mem.except = req_exmem.except.occur ? req_exmem.except : mem_except_tmp;
 
 except except_handler(
 	.rst,
-	.pc(mem_pc),
-	.delayslot(mem_delayslot),
-	.except(exmem_except.occur ? exmem_except : mem_except),
+	.pc(data_mem.pc),
+	.delayslot(data_mem.delayslot),
+	.except(req_mem.except),
 	.except_req,
 	.cp0_regs
 );
 
-assign memwb_hilo_wr = mem_hilo_wr;
-assign llbit_wr.we    = mem_llbit_set | mem_llbit_reset;
-assign llbit_wr.wdata = { 30'b0, mem_llbit_set };
+assign llbit_wr.we    = req_mem.llbit_set | mem_llbit_reset;
+assign llbit_wr.wdata = { 30'b0, req_mem.llbit_set };
 
-RegWriteReq_t wb_reg_wr;
 mem_wb stage_mem_wb(
 	.clk,
 	.rst,
-	.mem_pc,
-	.mem_cp0_reg_wr,
-	.mem_reg_wr(memwb_reg_wr),
-	.mem_hilo_wr(memwb_hilo_wr),
-	.wb_reg_wr,
-	.wb_hilo_wr(hilo_wr),
-	.wb_cp0_reg_wr(cp0_reg_wr),
+	.mem_pc(data_mem.pc),
+	.mem_cp0_reg_wr(req_mem.cp0_reg_wr),
+	.mem_reg_wr(req_mem.reg_wr),
+	.mem_hilo_wr(req_mem.hilo_wr),
+	.wb_reg_wr(req_memwb.reg_wr),
+	.wb_hilo_wr(req_memwb.hilo_wr),
+	.wb_cp0_reg_wr(req_memwb.cp0_reg_wr),
 	.stall,
 	.flush
 );
 
+assign hilo_wr = req_memwb.hilo_wr;
+assign cp0_reg_wr = req_memwb.cp0_reg_wr;
+
 // WB stage
 cpu_wb stage_wb(
 	.rst,
-	.wr_i(wb_reg_wr),
+	.wr_i(req_memwb.reg_wr),
 	.wr_o(reg_wr1),
 	.stall_req(stall_from_wb)
 );

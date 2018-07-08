@@ -3,28 +3,45 @@
 module cpu_ex(
 	input  clk, rst,
 	input  Bit_t          flush,
-	input  Oper_t         op,
-	input  InstAddr_t     pc,
-	input  Inst_t         inst,
-	input  Word_t         reg1,
-	input  Word_t         reg2,
-	input  Word_t         imm,
 	input  Word_t         cp0_rdata_unsafe,
 	input  DoubleWord_t   hilo_unsafe,
 	input  RegWriteReq_t  mem_cp0_reg_wr,
 	input  HiloWriteReq_t mem_hilo_wr,
-	output HiloWriteReq_t hilo_wr,
-	output RegWriteReq_t  cp0_reg_wr,
 	output RegAddr_t      cp0_raddr,
-	output MemAccessReq_t memory_req,
-	output Word_t         ret,
-	output Bit_t          llbit_set,
 	output Bit_t          stall_req,
-	output ExceptInfo_t   except
+
+	input  PipelineData_t  data_idex,
+	input  PipelineReq_t   req_idex,
+	output PipelineData_t  data_ex,
+	output PipelineReq_t   req_ex
 );
 
-// set llbit
-assign llbit_set = (op == OP_LL);
+// setup data and request
+Oper_t         op;
+InstAddr_t     pc;
+Inst_t         inst;
+Word_t         reg1, reg2, imm;
+HiloWriteReq_t hilo_wr;
+RegWriteReq_t  cp0_reg_wr;
+MemAccessReq_t memory_req;
+Word_t         ret;
+ExceptInfo_t   except;
+
+assign op = data_idex.op;
+assign pc = data_idex.pc;
+assign inst = data_idex.inst;
+assign reg1 = data_idex.reg1;
+assign reg2 = data_idex.reg2;
+assign imm = data_idex.imm;
+assign data_ex = data_idex;
+assign req_ex.hilo_wr = hilo_wr;
+assign req_ex.cp0_reg_wr = cp0_reg_wr;
+assign req_ex.memory_req = memory_req;
+assign req_ex.reg_wr.we = req_idex.reg_wr.we;
+assign req_ex.reg_wr.waddr = req_idex.reg_wr.waddr;
+assign req_ex.reg_wr.wdata = ret;
+assign req_ex.except = req_idex.except.occur ? req_idex.except : except;
+assign req_ex.llbit_set = (op == OP_LL);
 
 // safe HILO
 DoubleWord_t hilo_safe;

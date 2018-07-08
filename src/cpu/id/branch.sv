@@ -2,15 +2,20 @@
 
 module branch(
 	input  rst,
-	input  InstAddr_t pc,
-	input  Inst_t     inst,
-	input  Word_t     reg1,
-	input  Word_t     reg2,
+	input  PipelineData_t data_id,
 
 	output Bit_t      is_branch,
 	output Bit_t      jump,
 	output InstAddr_t jump_to
 );
+
+InstAddr_t pc;
+Inst_t inst;
+Word_t reg1, reg2;
+assign pc = data_id.pc;
+assign inst = data_id.inst;
+assign reg1 = data_id.reg1;
+assign reg2 = data_id.reg2;
 
 logic [5:0] opcode;
 logic [25:0] instr_index;
