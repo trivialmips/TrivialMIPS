@@ -37,7 +37,7 @@ begin
 		cyc_number = 1;
 	end else begin
 		unique case(op)
-		OP_MADD, OP_MADDU, OP_MSUB, OP_MSUBU, OP_MUL:
+		OP_MADD, OP_MADDU, OP_MSUB, OP_MSUBU, OP_MUL, OP_MULT:
 			cyc_number = 2;
 		OP_DIV, OP_DIVU:
 			cyc_number = DIV_CYC;
@@ -64,9 +64,19 @@ assign abs_reg2 = (is_signed && reg2[31]) ? -reg2 : reg2;
 
 /* multiply */
 DoubleWord_t mul_abs, mul_result;
-assign mul_abs = abs_reg1 * abs_reg2;
+Word_t pipe_mul_hi, pipe_mul_lo;
+logic [32:0] pipe_mul_md;
+// assign mul_abs = abs_reg1 * abs_reg2;
+assign mul_abs = { pipe_mul_hi, pipe_mul_lo } + { 15'b0, pipe_mul_md, 16'b0 };
 assign mul_result = negate_result ? -mul_abs : mul_abs;
 assign mult_word = mul_result[31:0];
+
+always @(posedge clk)
+begin
+	pipe_mul_hi <= abs_reg1[31:16] * abs_reg2[31:16];
+	pipe_mul_md <= abs_reg1[15:0] * abs_reg2[31:16] + abs_reg1[31:16] * abs_reg2[15:0];
+	pipe_mul_lo <= abs_reg1[15:0] * abs_reg2[15:0];
+end
 
 /* division */
 Word_t abs_quotient, abs_remainder;

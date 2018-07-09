@@ -1,6 +1,7 @@
 `include "cpu_defs.svh"
 
-`define PATH_PREFIX "../../../../../testbench/testcase/"
+`define PATH_PREFIX1 "../../../../../testbench/testcase/"
+`define PATH_PREFIX2 "../../../../../../testbench/testcase/"
 
 module test_cpu_tb();
 
@@ -75,7 +76,14 @@ task unittest(
 	for(i = 0; i < $size(fake_data_bus_instance.inst_ram); i = i + 1)
 	fake_data_bus_instance.inst_ram[i] = 32'h0;
 
-	$readmemh({ `PATH_PREFIX, name, ".mem" }, fake_inst_bus_instance.inst_mem);
+	fans = $fopen({ `PATH_PREFIX1, name, ".ans"}, "r");
+	if(fans)
+	begin
+		$readmemh({ `PATH_PREFIX1, name, ".mem" }, fake_inst_bus_instance.inst_mem);
+	end else begin
+		fans = $fopen({ `PATH_PREFIX2, name, ".ans"}, "r");
+		$readmemh({ `PATH_PREFIX2, name, ".mem" }, fake_inst_bus_instance.inst_mem);
+	end
 
 	begin
 		rst = 1'b1;
@@ -83,8 +91,6 @@ task unittest(
 	end
 
 	$display("======= unittest: %0s =======", name);
-
-	fans = $fopen({ `PATH_PREFIX, name, ".ans"}, "r");
 
 	cycle = 0;
 	while(!$feof(fans))
@@ -148,6 +154,7 @@ begin
 	unittest("inst_llsc");
 	unittest("inst_jump");
 	unittest("inst_multicyc");
+	unittest("superscalar");
 	$display("[Done]");
 	$finish;
 end

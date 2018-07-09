@@ -113,6 +113,9 @@ begin
 			// privileged instructions
 			// TODO: not sure, may be taken
 			inst2_taken = 1'b0;
+		end else if(data_a.op == OP_MUL && reg_data_related) begin
+			// MUL requires two cycles
+			inst2_taken = 1'b0;
 		end else begin
 			// otherwise
 			inst2_taken = 1'b1;
