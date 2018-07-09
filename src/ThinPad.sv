@@ -34,8 +34,8 @@ assign clk._50M = clk_50M;
 assign clk._11M0592 = clk_11M0592;
 
 top_clk_wiz clk_wiz_instance(
-    .clk_out1(clk._100M),
-    .clk_out2(clk._25M),
+    .clk_out1(clk.base_2x),
+    .clk_out2(clk.base_half),
     .clk_out3(clk._10M),            
     .reset(reset_btn), 
     .locked(rst_n),

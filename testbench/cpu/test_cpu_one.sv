@@ -4,19 +4,13 @@
 
 module test_cpu_one_tb();
 
-reg clk50M;
-reg rst;
+Clock_t clk;
 
 initial begin
-	clk50M = 1'b0;
+	clk.base = 1'b0;
 end
 
-always #10 clk50M = ~clk50M;
-
-Clock_t clk;
-assign clk._50M = clk50M;
-assign clk.rst = rst;
-
+always #10 clk.base = ~clk.base;
 
 Bus_if data_bus_if(.clk);
 Bus_if inst_bus_if(.clk);
@@ -45,8 +39,8 @@ initial begin
 
 	$readmemh({ `PATH_PREFIX, "inst", ".mem" }, fake_inst_bus_instance.inst_mem);
 
-	rst = 1'b1;
-	#50 rst = 1'b0;
+	clk.rst = 1'b1;
+	#50 clk.rst = 1'b0;
 	#2000 $stop;
 end
 

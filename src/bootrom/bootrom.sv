@@ -5,7 +5,7 @@ module bootrom(
 );
 
     wire clk, rst;
-    assign clk = inst_bus.clk._50M;
+    assign clk = inst_bus.clk.base;
     assign rst = inst_bus.clk.rst;
 
     assign inst_bus.stall = `ZERO_BIT;
