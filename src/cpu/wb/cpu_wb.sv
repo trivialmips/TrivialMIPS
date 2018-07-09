@@ -9,7 +9,7 @@ module cpu_wb(
 	output RegWriteReq_t  reg_wr1,
 	output RegWriteReq_t  reg_wr2,
 	output HiloWriteReq_t hilo_wr,
-	output RegWriteReq_t  cp0_reg_wr,
+	output CP0RegWriteReq_t  cp0_reg_wr,
 
 	output Bit_t         stall_req
 );

@@ -23,6 +23,13 @@ typedef struct packed {
 	DoubleWord_t hilo;
 } HiloWriteReq_t;
 
+typedef struct packed {
+	Bit_t     we;
+	RegAddr_t waddr;
+	Word_t    wdata;
+	logic [2:0] sel;
+} CP0RegWriteReq_t;
+
 // memory access
 typedef struct packed {
 	// READ  if ce = 1 and we = 0
@@ -69,6 +76,7 @@ typedef struct packed {
 } CP0CauseReg_t;
 
 typedef struct packed {
+	Word_t config1;
 	/* The order of the following registers is important.
 	 * DO NOT change them. New registers must be added 
 	 * BEFORE this comment */
@@ -182,12 +190,12 @@ typedef struct packed {
 } PipelineData_t;
 
 typedef struct packed {
-	HiloWriteReq_t hilo_wr;     // EX, MEM, WB
-	RegWriteReq_t cp0_reg_wr;   // EX, MEM, WB
-	MemAccessReq_t memory_req;  // EX, MEM
-	RegWriteReq_t reg_wr;       // ID, EX, MEM, WB
-	ExceptInfo_t except;        // ID, EX, MEM
-	Bit_t llbit_set;            // EX, MEM
+	HiloWriteReq_t hilo_wr;      // EX, MEM, WB
+	CP0RegWriteReq_t cp0_reg_wr; // EX, MEM, WB
+	MemAccessReq_t memory_req;   // EX, MEM
+	RegWriteReq_t reg_wr;        // ID, EX, MEM, WB
+	ExceptInfo_t except;         // ID, EX, MEM
+	Bit_t llbit_set;             // EX, MEM
 } PipelineReq_t;
 
 // superscalar

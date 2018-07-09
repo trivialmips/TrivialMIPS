@@ -70,13 +70,16 @@ ll_bit_reg ll_bit_instance(
 ExceptReq_t except_req;
 CP0Regs_t cp0_regs;
 RegAddr_t cp0_raddr1, cp0_raddr2;
-RegWriteReq_t cp0_reg_wr;
+logic [2:0] cp0_rsel1, cp0_rsel2;
+CP0RegWriteReq_t cp0_reg_wr;
 Word_t cp0_rdata1, cp0_rdata2;
 cp0 cp0_instance(
 	.clk,
 	.rst,
 	.raddr1(cp0_raddr1),
 	.raddr2(cp0_raddr2),
+	.rsel1(cp0_rsel1),
+	.rsel2(cp0_rsel2),
 	.wr(cp0_reg_wr),
 	.except_req,
 	.int_req,
@@ -259,6 +262,7 @@ cpu_ex stage_ex_a(
 	.hilo_unsafe(reg_hilo),
 	.cp0_rdata_unsafe(cp0_rdata1),
 	.cp0_raddr(cp0_raddr1),
+	.cp0_rsel(cp0_rsel1),
 	.stall_req(stall_from_ex_a),
 
 	.data_idex(data_idex_a),
@@ -282,6 +286,7 @@ cpu_ex stage_ex_b(
 	.hilo_unsafe(reg_hilo),
 	.cp0_rdata_unsafe(cp0_rdata2),
 	.cp0_raddr(cp0_raddr2),
+	.cp0_rsel(cp0_rsel2),
 	.stall_req(stall_from_ex_b),
 
 	.data_idex(data_idex_b),

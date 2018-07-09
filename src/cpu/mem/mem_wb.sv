@@ -20,6 +20,7 @@ module mem_wb(
 	q.hilo_wr.we    <= 1'b0;        \
 	q.hilo_wr.hilo  <= `ZERO_DWORD; \
 	q.cp0_reg_wr.we    <= 1'b0;        \
+	q.cp0_reg_wr.sel   <= 3'b0;        \
 	q.cp0_reg_wr.waddr <= `ZERO_WORD;  \
 	q.cp0_reg_wr.wdata <= `ZERO_WORD;
 

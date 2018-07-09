@@ -50,7 +50,8 @@ Bus_if cpu_inst_if(.clk);
 // cpu
 trivial_mips cpu(
 	.inst_bus(cpu_data_if.master),
-	.data_bus(cpu_inst_if.master) 
+	.data_bus(cpu_inst_if.master),
+	.int_req(6'b0)
 );
 
 
