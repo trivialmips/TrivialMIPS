@@ -2,7 +2,8 @@
 
 module trivial_mips(
 	Bus_if.master inst_bus,
-	Bus_if.master data_bus 
+	Bus_if.master data_bus,
+	input wire [5:0] int_req
 );
 
 wire clk, rst;
@@ -78,6 +79,7 @@ cp0 cp0_instance(
 	.raddr2(cp0_raddr2),
 	.wr(cp0_reg_wr),
 	.except_req,
+	.int_req,
 	.rdata1(cp0_rdata1),
 	.rdata2(cp0_rdata2),
 	.regs(cp0_regs)
@@ -360,10 +362,8 @@ end
 
 except except_handler(
 	.rst,
-	.pc_a(data_mem_a.pc),
-	.pc_b(data_mem_b.pc),
-	.delayslot_a(data_mem_a.delayslot),
-	.delayslot_b(data_mem_b.delayslot),
+	.data_a(data_mem_a),
+	.data_b(data_mem_b),
 	.except_a(req_mem_a.except),
 	.except_b(req_mem_b.except),
 	.except_req,

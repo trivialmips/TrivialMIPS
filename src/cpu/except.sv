@@ -2,10 +2,8 @@
 
 module except(
 	input  rst,
-	input  InstAddr_t    pc_a,
-	input  InstAddr_t    pc_b,
-	input  Bit_t         delayslot_a,
-	input  Bit_t         delayslot_b,
+	input  PipelineData_t data_a,
+	input  PipelineData_t data_b,
 	input  ExceptInfo_t  except_a,
 	input  ExceptInfo_t  except_b,
 	input  CP0Regs_t     cp0_regs,
@@ -14,19 +12,52 @@ module except(
 
 InstAddr_t pc;
 ExceptInfo_t except;
+Bit_t interrupt_occur, is_user_mode;
+assign interrupt_occur = (
+	// TODO: check whether DM bit in debug is zero
+	cp0_regs.status.ie &&
+	~cp0_regs.status.exl && ~cp0_regs.status.erl &&
+	(cp0_regs.cause.ip & cp0_regs.status.im) != 8'b0
+);
+assign is_user_mode = (
+	// TODO: check whether DM bit in debug is zero
+	cp0_regs.status.um &&
+	~cp0_regs.status.exl &&
+	~cp0_regs.status.erl
+);
+
 always_comb
 begin
-	if(except_a.occur)
+	if(interrupt_occur)
 	begin
-		pc = pc_a;
+		except.occur = 1'b1;
+		except.eret  = 1'b0;
+		except.code  = `EXCCODE_INT;
+		except_req.alpha_taken = 1'b1;
+	end else if(is_user_mode && (data_a.is_priv_inst || data_b.is_priv_inst)) begin
+		except.occur = is_user_mode;
+		except.eret  = 1'b0;
+		except.code  = `EXCCODE_CpU;
+		except.extra = 2'd1;  // for status.ce
+		except_req.alpha_taken = data_a.is_priv_inst;
+	end else if(except_a.occur) begin
 		except = except_a;
 		except_req.alpha_taken = 1'b1;
-		except_req.delayslot = delayslot_a;
 	end else begin
-		pc = pc_b;
 		except = except_b;
 		except_req.alpha_taken = 1'b0;
-		except_req.delayslot = delayslot_b;
+	end
+end
+
+always_comb
+begin
+	if(except_req.alpha_taken)
+	begin
+		pc = data_a.pc;
+		except_req.delayslot = data_a.delayslot;
+	end else begin
+		pc = data_b.pc;
+		except_req.delayslot = data_b.delayslot;
 	end
 end
 

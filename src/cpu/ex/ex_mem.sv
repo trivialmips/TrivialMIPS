@@ -35,7 +35,8 @@ module ex_mem(
 `define RST_DATA_EXMEM(d) \
 	d.pc         <= `ZERO_WORD; \
 	d.op         <= OP_NOP;     \
-	d.delayslot  <= 1'b0;
+	d.delayslot  <= 1'b0;      \
+	d.is_priv_inst <= 1'b0;
 
 always @(posedge clk)
 begin

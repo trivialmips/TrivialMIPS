@@ -55,7 +55,6 @@ assign op = data_idex.op;
 assign pc = data_idex.pc;
 assign inst = data_idex.inst;
 assign imm = data_idex.imm;
-assign data_ex = data_idex;
 assign req_ex.hilo_wr = hilo_wr;
 assign req_ex.cp0_reg_wr = cp0_reg_wr;
 assign req_ex.memory_req = memory_req;
@@ -64,6 +63,20 @@ assign req_ex.reg_wr.waddr = req_idex.reg_wr.waddr;
 assign req_ex.reg_wr.wdata = ret;
 assign req_ex.except = req_idex.except.occur ? req_idex.except : except;
 assign req_ex.llbit_set = (op == OP_LL);
+assign data_ex.op = data_idex.op;
+assign data_ex.pc = data_idex.pc;
+assign data_ex.inst = data_idex.inst;
+assign data_ex.reg1 = reg1;
+assign data_ex.reg2 = reg2;
+assign data_ex.imm = data_idex.imm;
+assign data_ex.reg_addr1 = data_idex.reg_addr1;
+assign data_ex.reg_addr2 = data_idex.reg_addr2;
+assign data_ex.delayslot = data_idex.delayslot;
+assign data_ex.is_priv_inst = (
+	op == OP_CACHE || op == OP_ERET || op == OP_MFC0 ||
+	op == OP_MTC0 || op == OP_TLBP || op == OP_TLBR ||
+	op == OP_TLBWI || op == OP_TLBWR || op == OP_WAIT
+);
 
 // safe HILO
 DoubleWord_t hilo_safe;
