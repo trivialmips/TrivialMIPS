@@ -5,7 +5,7 @@ module fake_data_bus(
 );
 
 wire clk, rst;
-assign clk = data_bus.clk._50M;
+assign clk = data_bus.clk.base;
 assign rst = data_bus.clk.rst;
 
 `define MEM_SIZE 8192

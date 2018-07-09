@@ -5,18 +5,13 @@
 
 module test_cpu_tb();
 
-reg clk50M;
-reg rst;
+Clock_t clk;
 
 initial begin
-	clk50M = 1'b0;
+	clk.base = 1'b0;
 end
 
-always #10 clk50M = ~clk50M;
-
-Clock_t clk;
-assign clk._50M = clk50M;
-assign clk.rst = rst;
+always #10 clk.base = ~clk.base;
 
 
 Bus_if data_bus_if(.clk);
@@ -60,7 +55,7 @@ endtask
 Bit_t dbus_we_delay;
 logic [15:0] dbus_addr_delay;
 logic [31:0] dbus_data_delay;
-always @(negedge clk50M)
+always @(negedge clk.base)
 begin
 	dbus_we_delay <= fake_data_bus_instance.data_bus.write;
 	dbus_addr_delay <= fake_data_bus_instance.data_bus.address;
@@ -90,15 +85,15 @@ task unittest(
 	end
 
 	begin
-		rst = 1'b1;
-		#50 rst = 1'b0;
+		clk.rst = 1'b1;
+		#50 clk.rst = 1'b0;
 	end
 
 	$display("======= unittest: %0s =======", name);
 
 	cycle = 0;
 	while(!$feof(fans))
-	begin @(negedge clk50M);
+	begin @(negedge clk.base);
 		cycle = cycle + 1;
 
 		if(dbus_we_delay && mem_access_path1) begin

@@ -70,7 +70,8 @@ typedef logic [3:0] ByteMask_t;
 
 
 typedef struct packed {
-    logic _100M, _50M, _25M, _11M0592, _10M;
+    logic _50M, _11M0592, _10M;
+    logic base, base_2x, base_half;
     logic rst;
 } Clock_t;
 
