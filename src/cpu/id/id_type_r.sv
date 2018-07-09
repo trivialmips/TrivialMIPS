@@ -43,8 +43,9 @@ begin
 		begin 
 			if(inst == 32'b0)
 			begin
-				// TODO: remove this, it can be replaced by OP_SLL
 				`INST_R(OP_NOP, 5'b0, 5'b0)
+			end else if(inst == 32'h40) begin
+				`INST_R(OP_SSNOP, 5'b0, 5'b0)
 			end else begin
 				unique case(inst[5:0])
 				/* logical */

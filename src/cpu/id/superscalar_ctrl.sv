@@ -88,8 +88,12 @@ begin
 	begin
 		inst2_taken = 1'b0;
 	end else begin
-		if(cond_move_inst_b && reg_data_related) begin
-			// data is required at ID stage, but arrived at EX stage
+		if(data_a.op == OP_SSNOP || data_b.op == OP_SSNOP)
+		begin
+			// SSNOP is used to break the superscalar issue.
+			inst2_taken = 1'b0;
+		end else if(cond_move_inst_b && reg_data_related) begin
+			// data is required at ID stage, but arrived at EX stage.
 			inst2_taken = 1'b0;
 		end else if(jump_inst_b) begin
 			// only pipe-a can have jump instructions

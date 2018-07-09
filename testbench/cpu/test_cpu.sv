@@ -44,9 +44,12 @@ assign hilo_wr1 = trivial_cpu_instance.stage_wb.req_a.hilo_wr;
 assign hilo_wr2 = trivial_cpu_instance.stage_wb.req_b.hilo_wr;
 assign mem_access_path1 = trivial_cpu_instance.stage_mem.memory_req_a.ce;
 
-task judge(input integer fans, input string out);
-	string ans;
+task judge(input integer fans, input integer cycle, input string out, input check_cyc);
+	string ans, out_with_cyc;
 	$fscanf(fans, "%s\n", ans);
+	$sformat(out_with_cyc, "[%0d]%s", cycle, out);
+	$display("[%0d] %s", cycle, out);
+	if(check_cyc) out = out_with_cyc;
 	if(out != ans && ans != "skip")
 	begin
 		$display("[Error] Expected: %0s, Got: %0s", ans, out);
@@ -65,7 +68,8 @@ begin
 end
 
 task unittest(
-	input [128 * 8 - 1:0] name
+	input [128 * 8 - 1:0] name,
+	input check_cyc
 );
 	integer i, fans, cycle = 0, is_event = 0;
 	string ans, out, info;
@@ -99,40 +103,34 @@ task unittest(
 
 		if(dbus_we_delay && mem_access_path1) begin
 			$sformat(out, "[0x%x]=0x%x", dbus_addr_delay[15:0], dbus_data_delay);
-			$display("[%0d] %s", cycle, out);
-			judge(fans, out);
+			judge(fans, cycle, out, check_cyc);
 		end 
 
 		if(reg_wr1.we && reg_wr1.waddr)
 		begin
 			$sformat(out, "$%0d=0x%x", reg_wr1.waddr, reg_wr1.wdata);
-			$display("[%0d] %s", cycle, out);
-			judge(fans, out);
+			judge(fans, cycle, out, check_cyc);
 		end 
 
 		if(hilo_wr1.we) begin
 			$sformat(out, "$hilo=0x%x", hilo_wr1.hilo);
-			$display("[%0d] %s", cycle, out);
-			judge(fans, out);
+			judge(fans, cycle, out, check_cyc);
 		end 
 
 		if(dbus_we_delay && ~mem_access_path1) begin
 			$sformat(out, "[0x%x]=0x%x", dbus_addr_delay[15:0], dbus_data_delay);
-			$display("[%0d] %s", cycle, out);
-			judge(fans, out);
+			judge(fans, cycle, out, check_cyc);
 		end 
 
 		if(reg_wr2.we && reg_wr2.waddr)
 		begin
 			$sformat(out, "$%0d=0x%x", reg_wr2.waddr, reg_wr2.wdata);
-			$display("[%0d] %s", cycle, out);
-			judge(fans, out);
+			judge(fans, cycle, out, check_cyc);
 		end 
 
 		if(hilo_wr2.we) begin
 			$sformat(out, "$hilo=0x%x", hilo_wr2.hilo);
-			$display("[%0d] %s", cycle, out);
-			judge(fans, out);
+			judge(fans, cycle, out, check_cyc);
 		end 
 	end
 
@@ -142,19 +140,19 @@ endtask
 
 initial
 begin
-	unittest("inst_ori");
-	unittest("inst_logical");
-	unittest("inst_move");
-	unittest("inst_shift");
-	unittest("inst_except");
-	unittest("inst_trap");
-	unittest("inst_arith");
-	unittest("inst_mem_aligned");
-	unittest("inst_mem_unaligned");
-	unittest("inst_llsc");
-	unittest("inst_jump");
-	unittest("inst_multicyc");
-	unittest("superscalar");
+	unittest("inst_ori", 0);
+	unittest("inst_logical", 0);
+	unittest("inst_move", 0);
+	unittest("inst_shift", 0);
+	unittest("inst_except", 0);
+	unittest("inst_trap", 0);
+	unittest("inst_arith", 0);
+	unittest("inst_mem_aligned", 0);
+	unittest("inst_mem_unaligned", 0);
+	unittest("inst_llsc", 0);
+	unittest("inst_jump", 0);
+	unittest("inst_multicyc", 0);
+	unittest("superscalar", 1);
 	$display("[Done]");
 	$finish;
 end
