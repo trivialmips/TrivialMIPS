@@ -3,6 +3,7 @@
 module cpu_if(
 	input  rst,
 	input  InstAddr_t    pc,
+	input  Bit_t         pc_ce,
 	Bus_if.master        inst_bus,
 	output Bit_t         stall_req
 );
@@ -16,7 +17,7 @@ assign inst_bus.write   = `ZERO_BIT;
 
 always_comb
 begin
-	if(rst == 1'b1)
+	if(rst == 1'b1 || ~pc_ce)
 	begin
 		inst_bus.read    = `ZERO_BIT;
 		inst_bus.address = `ZERO_WORD;

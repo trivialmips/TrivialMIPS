@@ -42,3 +42,13 @@ _start:
 	lw $3, 0x0($5)         # ans: [+1]$3=0x00000002
 	lw $4, 0x4($5)         # ans: [+1]$4=0x00000002
 	nop
+
+	# multi-cycle instructions
+	lui $3, 0x0080      # ans: [+1]$3=0x00800000
+	nop
+	ori $3, $3, 0xffff  # ans: [+1]$3=0x0080ffff
+	lui $4, 0xffff      # ans: [+0]$4=0xffff0000
+	ori $4, $4, 0xfff1  # ans: [+1]$4=0xfffffff1
+	ori $5, $0, 0x0011  # ans: [+0]$5=0x00000011
+	mult $3, $3         # ans: [+36]$hilo=0x00004100fefe0001
+	div  $zero, $4, $5  # ans: [+0]$hilo=0xfffffff100000000

@@ -108,7 +108,7 @@ ctrl ctrl_instance(
 InstPair_t if_inst_pair;
 InstPair_t inst_pair_forward;
 InstAddr_t if_pc, jump_to;
-Bit_t is_branch, jump;
+Bit_t is_branch, jump, pc_ce;
 Bit_t is_pc_ahead, is_pc_hard_reset;
 
 reg_pc pc_instance(
@@ -119,6 +119,7 @@ reg_pc pc_instance(
 	.jump,
 	.jump_to,
 	.except_req,
+	.ce(pc_ce),
 	.is_ahead(is_pc_ahead),
 	.is_hard_reset(is_pc_hard_reset),
 	.hold_pc(stall.hold_pc)
@@ -127,6 +128,7 @@ reg_pc pc_instance(
 cpu_if stage_if(
 	.rst,
 	.pc(if_pc),
+	.pc_ce,
 	.inst_bus,
 	.stall_req(stall_from_if)
 );
