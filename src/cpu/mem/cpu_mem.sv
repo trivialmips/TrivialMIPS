@@ -14,7 +14,9 @@ module cpu_mem(
 	output RegWriteReq_t  wr_a_o,
 	output RegWriteReq_t  wr_b_o,
 
-	Bus_if.master         data_bus,
+	input  Bit_t         except_already_occur,
+
+	Bus_if.master        data_bus,
 
 	output Bit_t         alpha_taken,
 	output Bit_t         llbit_reset,
@@ -96,8 +98,18 @@ begin
 
 		// except.occur = 1'b0;
 	end else if(memory_req.ce) begin
-		if(memory_req.we)
+		if(except_already_occur)
 		begin
+			wr_o.we    = 1'b0;
+			wr_o.waddr = `ZERO_WORD;
+			wr_o.wdata = `ZERO_WORD;
+
+			data_bus.address = `ZERO_WORD;
+			data_bus.read    = `ZERO_BIT;
+			data_bus.write   = `ZERO_BIT;
+			data_bus.data_wr = `ZERO_WORD;
+			data_bus.mask    = 4'b0000;
+		end else if(memory_req.we) begin
 			// write memory
 			data_bus.address = { memory_req.addr[31:2], 2'b0 };
 			data_bus.read    = `ZERO_BIT;

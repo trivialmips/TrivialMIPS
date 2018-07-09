@@ -28,8 +28,8 @@ _start:
 
 	ori $9, $0, 0       # skip
 j0:
-	lui $1, 0xccdd      # ans: skip
-	ori $1, $1, 0xffaa  # ans: skip
+	lui $1, 0xccdd      # ans: $1=0xccdd0000
+	ori $1, $1, 0xffaa  # ans: $1=0xccddffaa
 	sb  $1, 0x4($s0)    # ans: [0x1004]=0x0000ffaa
 	srl $1, $1, 8       # ans: skip
 	sb  $1, 0x6($s0)    # ans: [0x1004]=0x00ffffaa

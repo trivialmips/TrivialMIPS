@@ -323,6 +323,7 @@ cpu_mem stage_mem(
 	.ll_bit(reg_llbit),
 	.memory_req_a(req_mem_a.memory_req),
 	.memory_req_b(req_mem_b.memory_req),
+	.except_already_occur(req_exmem_a.except.occur | req_exmem_b.except.occur),
 	.data_bus,
 	.llbit_reset(mem_llbit_reset),
 	.stall_req(stall_from_mem),
