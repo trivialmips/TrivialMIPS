@@ -37,6 +37,9 @@ typedef logic [`REG_ADDR_WIDTH - 1:0] RegAddr_t;
 // memory
 typedef Word_t  MemAddr_t;
 
+`define ADDRESS_WIDTH 32
+`define HIGHZ_WORD {32{1'bZ}}
+
 `define SRAM_CHIP_ADDRESS_WIDTH 20
 `define FLASH_CHIP_ADDRESS_WIDTH 23
 
@@ -51,6 +54,11 @@ typedef Word_t  MemAddr_t;
 `define USB_ADDRESS_PREFIX      8'h07
 `define BOOTROM_ADDRESS_PREFIX  12'h1FC
 
+`define LONGEST_ADDRESS_PREFIX_WIDTH 12
+
+`define EVAL(A) `A
+`define CONCAT_PREFIX(NAME) {`EVAL(NAME``_ADDRESS_PREFIX), {(`LONGEST_ADDRESS_PREFIX_WIDTH - $bits(`EVAL(NAME``_ADDRESS_PREFIX))){1'b0}}}
+
 // actual address widths
 // the last two bits are always not used in order to align in 4 bytes
 //  ADDRESS  | NOT USED
@@ -64,14 +72,14 @@ typedef Word_t  MemAddr_t;
 `define ETHERNET_ADDRESS_WIDTH 1 // 2 addresses
 `define GPIO_ADDRESS_WIDTH     1 // 2 addresses 
 
-`define MATCH_PREFIX(a, b) (a[($bits(Word_t) - 1) -: $bits(b)] == b)
 
 typedef logic [3:0] ByteMask_t;
+`define BYTE_MASK_FULL 4'b1111
 
 
 typedef struct packed {
     logic _50M, _11M0592, _10M;
-    logic base, base_2x, base_half;
+    logic base, base_2x;
     logic rst;
 } Clock_t;
 
@@ -103,9 +111,11 @@ endinterface
 
 // interfaces for peripherals
 
+typedef logic [`SRAM_CHIP_ADDRESS_WIDTH-1 : 0] SramChipAddress_t;
+
 interface Sram_if();
     wire Word_t data;
-    wire[`SRAM_CHIP_ADDRESS_WIDTH - 1:0] address;
+    SramChipAddress_t address;
     wire[3:0] be_n;
     wire ce_n, oe_n, we_n;
 
@@ -117,8 +127,10 @@ interface Sram_if();
 endinterface
 
 
+typedef logic [`FLASH_CHIP_ADDRESS_WIDTH-1 : 0] FlashChipAddress_t;
+
 interface Flash_if();
-    wire [`FLASH_CHIP_ADDRESS_WIDTH - 1:0] address;
+    FlashChipAddress_t address;
     wire HalfWord_t data;
     wire rp_n, vpen, ce_n, oe_n, we_n, byte_n;
 
@@ -170,7 +182,8 @@ endinterface
 
 
 interface VGA_if();
-    wire[2:0] red, green, blue;
+    wire[2:0] red, green;
+    wire[1:0] blue;
     wire hsync, vsync, clk, de;
 
     modport master(

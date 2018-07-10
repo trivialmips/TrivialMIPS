@@ -58,38 +58,53 @@ module data_bus(
         cpu.data_rd_2 = `ZERO_WORD; // we only process one word of r/w on dbus at every clock
         cpu.stall     = `ZERO_BIT;
 
-        if (`MATCH_PREFIX(cpu.address, `RAM_ADDRESS_PREFIX)) begin
-            ram.read    = cpu.read;
-            ram.write   = cpu.write;
-            cpu.data_rd = ram.data_rd;
-            cpu.stall   = ram.stall;
-        end else if (`MATCH_PREFIX(cpu.address, `FLASH_ADDRESS_PREFIX)) begin
-            flash.read  = cpu.read;
-            flash.write = cpu.write;
-            cpu.data_rd = flash.data_rd;
-            cpu.stall   = flash.stall;
-        end else if (`MATCH_PREFIX(cpu.address, `UART_ADDRESS_PREFIX)) begin
-            uart.read   = cpu.read;
-            uart.write  = cpu.write;
-            cpu.data_rd = uart.data_rd;
-        end else if (`MATCH_PREFIX(cpu.address, `TIMER_ADDRESS_PREFIX)) begin
-            timer.read  = cpu.read;
-            timer.write = cpu.write;
-            cpu.data_rd = timer.data_rd;
-        end else if (`MATCH_PREFIX(cpu.address, `GRAPHICS_ADDRESS_PREFIX)) begin
-            graphics.read  = cpu.read;
-            graphics.write = cpu.write;
-            cpu.data_rd    = graphics.data_rd;
-        end else if (`MATCH_PREFIX(cpu.address, `ETHERNET_ADDRESS_PREFIX)) begin
-            ethernet.read  = cpu.read;
-            ethernet.write = cpu.write;
-            cpu.data_rd    = ethernet.data_rd;
-            cpu.stall      = ethernet.stall;
-        end else if (`MATCH_PREFIX(cpu.address, `GPIO_ADDRESS_PREFIX)) begin
-            gpio.read   = cpu.read;
-            gpio.write  = cpu.write;
-            cpu.data_rd = gpio.data_rd;
-        end
+        unique case (cpu.address[(`ADDRESS_WIDTH - 1) -: `LONGEST_ADDRESS_PREFIX_WIDTH])
+            `CONCAT_PREFIX(RAM): begin
+                ram.read    = cpu.read;
+                ram.write   = cpu.write;
+                cpu.data_rd = ram.data_rd;
+                cpu.stall   = ram.stall;
+            end
+
+            `CONCAT_PREFIX(FLASH): begin
+                flash.read  = cpu.read;
+                flash.write = cpu.write;
+                cpu.data_rd = flash.data_rd;
+                cpu.stall   = flash.stall;
+            end
+
+            `CONCAT_PREFIX(UART): begin
+                uart.read   = cpu.read;
+                uart.write  = cpu.write;
+                cpu.data_rd = uart.data_rd;
+            end
+
+            `CONCAT_PREFIX(TIMER): begin
+                timer.read  = cpu.read;
+                timer.write = cpu.write;
+                cpu.data_rd = timer.data_rd;
+            end
+
+            `CONCAT_PREFIX(GRAPHICS): begin
+                graphics.read  = cpu.read;
+                graphics.write = cpu.write;
+                cpu.data_rd    = graphics.data_rd;
+            end
+
+            `CONCAT_PREFIX(ETHERNET): begin
+                ethernet.read  = cpu.read;
+                ethernet.write = cpu.write;
+                cpu.data_rd    = ethernet.data_rd;
+                cpu.stall      = ethernet.stall;
+            end
+
+            `CONCAT_PREFIX(GPIO): begin
+                gpio.read   = cpu.read;
+                gpio.write  = cpu.write;
+                cpu.data_rd = gpio.data_rd;
+            end
+
+        endcase
     end
 
 endmodule
