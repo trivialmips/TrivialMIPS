@@ -55,6 +55,7 @@ begin
 		except.occur = 1'b1;
 		except.eret  = 1'b0;
 		except.code  = `EXCCODE_INT;
+		except.extra = 32'b0;
 		except_req.alpha_taken = 1'b1;
 	end else if(is_user_mode && (data_a.is_priv_inst || data_b.is_priv_inst)) begin
 		except.occur = is_user_mode;
