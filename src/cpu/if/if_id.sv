@@ -7,7 +7,10 @@ module if_id(
 	input  InstPair_t if_inst_pair,
 	output InstAddr_t id_pc,
 	output Bit_t      id_delayslot,
-	output InstPair_t id_inst_pair,
+
+	output Bit_t      id_inst_left,
+	output InstPair_t id_inst_pair_new,
+	output InstPair_t id_inst_pair_old,
 
 	input  Bit_t      is_ahead,
 	input  Bit_t      is_hard_reset,
@@ -25,18 +28,24 @@ begin
 	begin
 		id_pc              <= `ZERO_WORD;
 		id_delayslot       <= 1'b0;
-		id_inst_pair.inst1 <= `ZERO_WORD;
-		id_inst_pair.inst2 <= `ZERO_WORD;
-		id_inst_pair.inst2_taken <= `ZERO_WORD;
+		id_inst_pair_new.inst1 <= `ZERO_WORD;
+		id_inst_pair_new.inst2 <= `ZERO_WORD;
+		id_inst_pair_new.inst2_taken <= `ZERO_WORD;
+		id_inst_pair_old.inst1 <= `ZERO_WORD;
+		id_inst_pair_old.inst2 <= `ZERO_WORD;
+		id_inst_pair_old.inst2_taken <= `ZERO_WORD;
 	end else if(~stall.stall_if) begin
 		id_delayslot <= if_delayslot;
-		if(~inst_pair_forward.inst2_taken && ~is_hard_reset)
+/*		if(~inst_pair_forward.inst2_taken && ~is_hard_reset)
 		begin
 			id_inst_pair.inst1 <= inst_pair_forward.inst2;
 			id_inst_pair.inst2 <= if_inst_pair.inst1;
 		end else begin
 			id_inst_pair <= if_inst_pair;
-		end
+		end */
+		id_inst_pair_new <= if_inst_pair;
+		id_inst_pair_old <= inst_pair_forward;
+		id_inst_left <= ~inst_pair_forward.inst2_taken & ~is_hard_reset;
 
 		if(is_ahead)
 		begin

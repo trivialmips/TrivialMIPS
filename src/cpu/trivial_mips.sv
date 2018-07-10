@@ -141,6 +141,8 @@ cpu_if stage_if(
 assign if_inst_pair.inst1 = inst_bus.data_rd;
 assign if_inst_pair.inst2 = inst_bus.data_rd_2;
 
+Bit_t      id_inst_left;
+InstPair_t id_inst_pair_old, id_inst_pair_new;
 InstPair_t id_inst_pair;
 InstAddr_t id_pc;
 Bit_t      id_delayslot;
@@ -151,7 +153,9 @@ if_id stage_if_id(
 	.if_delayslot(is_branch & ~inst_pair_forward.inst2_taken),
 	.if_inst_pair,
 	.id_pc,
-	.id_inst_pair,
+	.id_inst_left,
+	.id_inst_pair_new,
+	.id_inst_pair_old,
 	.id_delayslot,
 	.inst_pair_forward,
 	.is_ahead(is_pc_ahead),
@@ -159,6 +163,18 @@ if_id stage_if_id(
 	.stall,
 	.flush
 );
+
+always_comb
+begin
+	id_inst_pair.inst2_taken = 1'b0;  // not used for now
+	if(id_inst_left) 
+	begin
+		id_inst_pair.inst1 = id_inst_pair_old.inst2;
+		id_inst_pair.inst2 = id_inst_pair_new.inst1;
+	end else begin
+		id_inst_pair = id_inst_pair_new;
+	end
+end
 
 Bit_t stall_from_id_a, stall_from_id_b;
 assign stall_from_id = stall_from_id_a | stall_from_id_b;
