@@ -14,21 +14,6 @@ assign rst = inst_bus.clk.rst;
 
 assign inst_bus.stall = `ZERO_BIT;
 
-`define CONNECT_REG(NAME, SIGNAL, LENGTH) logic [(LENGTH-1):0] NAME``_``SIGNAL; \
-assign NAME``.``SIGNAL = NAME``_``SIGNAL;
-
-`define GENERATE_SIGNAL(NAME) `CONNECT_REG(NAME, ce_n, 1)\
-`CONNECT_REG(NAME, oe_n, 1) \
-`CONNECT_REG(NAME, we_n, 1) \
-`CONNECT_REG(NAME, be_n, 4) \
-`CONNECT_REG(NAME, address, `SRAM_CHIP_ADDRESS_WIDTH) \
-
-`GENERATE_SIGNAL(base_ram)
-`GENERATE_SIGNAL(ext_ram)
-
-`undef GENERATE_SIGNAL
-`undef CONNECT_REG
-
 logic ram_write;
 
 Word_t base_ram_data, ext_ram_data;
@@ -58,12 +43,12 @@ assign inst_bus.data_rd_2 = inst_even ? ext_ram.data : base_ram.data;
 
 always_ff @(posedge clk or posedge rst) begin
     if (rst) begin
-        base_ram_ce_n <= 1'b1;
-        base_ram_oe_n <= 1'b1;
-        base_ram_we_n <= 1'b1;
-        ext_ram_ce_n <= 1'b1;
-        ext_ram_oe_n <= 1'b1;
-        ext_ram_we_n <= 1'b1;
+        base_ram.ce_n <= 1'b1;
+        base_ram.oe_n <= 1'b1;
+        base_ram.we_n <= 1'b1;
+        ext_ram.ce_n <= 1'b1;
+        ext_ram.oe_n <= 1'b1;
+        ext_ram.we_n <= 1'b1;
         ram_write <= 1'b0;
         last_stall <= 1'b0;
         last_data_even <= 1'b0;
@@ -82,19 +67,19 @@ always_ff @(posedge clk or posedge rst) begin
             // do the real r/w on dbus
             ram_write <= 1'b1;
 
-            base_ram_ce_n <= ~data_even;
-            base_ram_oe_n <= ~data_bus.read;
-            base_ram_we_n <= ~data_bus.write;
-            base_ram_be_n <= ~data_bus.mask;
+            base_ram.ce_n <= ~data_even;
+            base_ram.oe_n <= ~data_bus.read;
+            base_ram.we_n <= ~data_bus.write;
+            base_ram.be_n <= ~data_bus.mask;
             base_ram_data <= data_bus.data_wr;
-            base_ram_address <= data_addr_half;
+            base_ram.address <= data_addr_half;
 
-            ext_ram_ce_n <= data_even;
-            ext_ram_oe_n <= ~data_bus.read;
-            ext_ram_we_n <= ~data_bus.write;
-            ext_ram_be_n <= ~data_bus.mask;
+            ext_ram.ce_n <= data_even;
+            ext_ram.oe_n <= ~data_bus.read;
+            ext_ram.we_n <= ~data_bus.write;
+            ext_ram.be_n <= ~data_bus.mask;
             ext_ram_data <= data_bus.data_wr;
-            ext_ram_address <= data_addr_half;
+            ext_ram.address <= data_addr_half;
 
         end else begin // falling edge of bus_clk, read instruction
 
@@ -109,22 +94,22 @@ always_ff @(posedge clk or posedge rst) begin
             // send the read request
             ram_write <= 1'b0;
 
-            base_ram_we_n <= 1'b1;
-            base_ram_ce_n <= 1'b1;
-            base_ram_be_n <= 4'b0000;
-            base_ram_oe_n <= ~inst_bus.read;
+            base_ram.we_n <= 1'b1;
+            base_ram.ce_n <= 1'b1;
+            base_ram.be_n <= 4'b0000;
+            base_ram.oe_n <= ~inst_bus.read;
 
-            ext_ram_we_n <= 1'b1;
-            ext_ram_ce_n <= 1'b0;
-            ext_ram_be_n <= 4'b0000;
-            ext_ram_oe_n <= ~inst_bus.read;
+            ext_ram.we_n <= 1'b1;
+            ext_ram.ce_n <= 1'b0;
+            ext_ram.be_n <= 4'b0000;
+            ext_ram.oe_n <= ~inst_bus.read;
 
             if (inst_even) begin
-                base_ram_address <= inst_addr_half;
-                ext_ram_address <= inst_addr_half;
+                base_ram.address <= inst_addr_half;
+                ext_ram.address <= inst_addr_half;
             end else begin
-                base_ram_address <= inst_addr_half + 1'b1;
-                ext_ram_address <= inst_addr_half;
+                base_ram.address <= inst_addr_half + 1'b1;
+                ext_ram.address <= inst_addr_half;
             end
 
         end
