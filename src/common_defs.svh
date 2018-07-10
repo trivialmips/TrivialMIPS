@@ -16,11 +16,11 @@ typedef logic [15:0]    HalfWord_t;
 typedef logic [31:0]    Word_t;
 typedef logic [63:0]    DoubleWord_t;
 
-`define ZERO_BIT        1'b0;
-`define ZERO_BYTE       8'h0;
-`define ZERO_HWORD      16'h0;
-`define ZERO_WORD       32'h0;
-`define ZERO_DWORD      64'h0;
+`define ZERO_BIT        1'b0
+`define ZERO_BYTE       8'h0
+`define ZERO_HWORD      16'h0
+`define ZERO_WORD       32'h0
+`define ZERO_DWORD      64'h0
 
 // instructions
 `define INST_WIDTH      32
@@ -71,11 +71,18 @@ typedef Word_t  MemAddr_t;
 `define TIMER_ADDRESS_WIDTH    1 // 1 address
 `define GRAPHICS_ADDRESS_WIDTH 16 // 256 KB, use 240004 Byte
 `define ETHERNET_ADDRESS_WIDTH 1 // 2 addresses
-`define GPIO_ADDRESS_WIDTH     1 // 2 addresses 
+`define GPIO_ADDRESS_WIDTH     2 // 3 addresses 
+`define USB_ADDRESS_WIDTH      1 // 2 addresses TODO: to be checked
 
+typedef logic [`GRAPHICS_ADDRESS_WIDTH - 1 : 0] GraphicsMemoryAddress_t;
+typedef logic [7:0] SegmentDisplay_t;
 
 typedef logic [3:0] ByteMask_t;
 `define BYTE_MASK_FULL 4'b1111
+
+// the configuration register of graphics is 0x02_03A980
+// take [2+:16], it is EA60
+`define GRAPHICS_CONFIG_ADDRESS 16'hEA60
 
 
 typedef struct packed {
@@ -117,8 +124,8 @@ typedef logic [`SRAM_CHIP_ADDRESS_WIDTH-1 : 0] SramChipAddress_t;
 interface Sram_if();
     wire Word_t data;
     SramChipAddress_t address;
-    wire[3:0] be_n;
-    wire ce_n, oe_n, we_n;
+    logic[3:0] be_n;
+    logic      ce_n, oe_n, we_n;
 
     modport master(
         output address, be_n, ce_n, oe_n, we_n,
@@ -133,7 +140,7 @@ typedef logic [`FLASH_CHIP_ADDRESS_WIDTH-1 : 0] FlashChipAddress_t;
 interface Flash_if();
     FlashChipAddress_t address;
     wire HalfWord_t data;
-    wire rp_n, vpen, ce_n, oe_n, we_n, byte_n;
+    logic rp_n, vpen, ce_n, oe_n, we_n, byte_n;
 
     modport master(
         output address, rp_n, vpen, ce_n, oe_n, we_n, byte_n,
@@ -144,7 +151,7 @@ endinterface
 
 
 interface Uart_if();
-    wire txd, rxd;
+    logic txd, rxd;
 
     modport master(
         output txd,
@@ -155,9 +162,9 @@ endinterface
 
 
 interface USB_if();
-    wire a0;
-    wire Byte_t data;
-    wire wr_n, rd_n, cs_n, rst_n, dack_n, intrq, drq_n;
+    logic a0;
+    wire  Byte_t data;
+    logic wr_n, rd_n, cs_n, rst_n, dack_n, intrq, drq_n;
 
     modport master(
         output a0, wr_n, rd_n, cs_n, rst_n, dack_n,
@@ -169,9 +176,9 @@ endinterface
 
 
 interface Ethernet_if();
-    wire cmd;
-    wire HalfWord_t sd;
-    wire iow_n, ior_n, cs_n, pwrst_n, intr;
+    logic cmd;
+    wire  HalfWord_t sd;
+    logic iow_n, ior_n, cs_n, pwrst_n, intr;
 
     modport master(
         output cmd, iow_n, ior_n, cs_n, pwrst_n,
@@ -183,9 +190,9 @@ endinterface
 
 
 interface VGA_if();
-    wire[2:0] red, green;
-    wire[1:0] blue;
-    wire hsync, vsync, clk, de;
+    logic[2:0] red, green;
+    logic[1:0] blue;
+    logic      hsync, vsync, clk, de;
 
     modport master(
         output red, green, blue, hsync, vsync, clk, de
@@ -193,11 +200,22 @@ interface VGA_if();
 
 endinterface
 
+`define VGA_COLOR_LIST_WIDTH 4
+
+typedef logic [`VGA_COLOR_LIST_WIDTH - 1 : 0] VgaColorNumber_t;
+
+typedef struct packed{
+    logic [2:0] red;
+    logic [2:0] green;
+    logic [1:0] blue;
+} VgaColor_t;
+
+
 
 interface GPIO_if();
-    wire [31:0] dip_sw;
-    wire [15:0] leds;
-    wire [7:0]  dpy0, dpy1;
+    logic [31:0] dip_sw;
+    logic [15:0] leds;
+    logic [7:0]  dpy0, dpy1;
 
     modport master(
         input  dip_sw,

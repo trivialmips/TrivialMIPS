@@ -25,13 +25,15 @@ This section describes the allocation of physical addresses that used in instruc
 | UART     | `0x03000000` | `0x03FFFFFF` | 16 MB | First 2 Addresses | Register |
 | Timer    | `0x04000000` | `0x04FFFFFF` | 16 MB | First 1 Address   | Register |
 | Ethernet | `0x05000000` | `0x05FFFFFF` | 16 MB | First 2 Addresses | Register |
-| GPIO     | `0x06000000` | `0x06FFFFFF` | 16 MB | First 2 Addresses | Register |
+| GPIO     | `0x06000000` | `0x06FFFFFF` | 16 MB | First 3 Addresses | Register |
 | USB      | `0x07000000` | `0x07FFFFFF` | 16 MB | First 2 Addresses | Register |
 | Bootrom  | `0x1FC00000` | `0x1FCFFFFF` |  4 MB | First 4KB         | Storage  |
 
 The address and size of bootrom is special due to the hardcorded value `0xBFC00000` of register `PC` after reset, which will be mapped to `0x1FC00000`.
 
-Graphics device is of type 'hybrid', because it consists of 240000 Byte Storage from `0x02000000` to `0x203A97F` and a configuration register at `0x203A980`.
+Graphics device is of type 'hybrid', because it consists of 240000 Byte Storage from `0x02000000` to `0x0203A97F` and a configuration register at `0x0203A980`.
+
+The first register(`0x06000000`) of GPIO contains the status of switches and is read-only. The second(`0x06000004`) and the third(`0x06000008`) can be written, respectively changing the status of 7-segment displays and leds, whose higher 16-bits are always ignored, except the highest bit of `0x06000004` incicating whether to decode the lowest 8 bits of itself.
 
 ## MMIO Address Mapping
 

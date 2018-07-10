@@ -18,7 +18,7 @@ module bootrom_controller(
         .addra(inst_bus.address),
         .douta(inst_1),
         .clkb(clk2x),
-        .addrb(inst_bus.address + 4'h4),
+        .addrb(inst_bus.address + 1'h1), // the trailing 2 bit has already been stripped by inst bus
         .doutb(inst_2)
     );
 
