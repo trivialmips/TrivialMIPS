@@ -8,7 +8,8 @@ module data_bus(
     Bus_if.master timer,
     Bus_if.master graphics,
     Bus_if.master ethernet,
-    Bus_if.master gpio
+    Bus_if.master gpio,
+    Bus_if.master usb
 );
 
     assign ram.data_wr = cpu.data_wr;
@@ -39,6 +40,9 @@ module data_bus(
     assign gpio.address = cpu.address[2 +: `GPIO_ADDRESS_WIDTH];
     assign gpio.mask    = cpu.mask;
 
+    assign usb.data_wr = cpu.data_wr;
+    assign usb.address = cpu.address[2 +: `USB_ADDRESS_WIDTH];
+
     always_comb begin
 
         ram.read       = `ZERO_BIT;
@@ -53,6 +57,10 @@ module data_bus(
         graphics.write = `ZERO_BIT;
         ethernet.read  = `ZERO_BIT;
         ethernet.write = `ZERO_BIT;
+        gpio.read      = `ZERO_BIT;
+        gpio.write     = `ZERO_BIT;
+        usb.read       = `ZERO_BIT;
+        usb.write      = `ZERO_BIT;
 
         cpu.data_rd   = `ZERO_WORD;
         cpu.data_rd_2 = `ZERO_WORD; // we only process one word of r/w on dbus at every clock
@@ -95,13 +103,18 @@ module data_bus(
                 ethernet.read  = cpu.read;
                 ethernet.write = cpu.write;
                 cpu.data_rd    = ethernet.data_rd;
-                cpu.stall      = ethernet.stall;
             end
 
             `CONCAT_PREFIX(GPIO): begin
                 gpio.read   = cpu.read;
                 gpio.write  = cpu.write;
                 cpu.data_rd = gpio.data_rd;
+            end
+
+            `CONCAT_PREFIX(USB): begin
+                usb.read    = cpu.read;
+                usb.write   = cpu.write;
+                cpu.data_rd = usb.data_rd;
             end
 
         endcase

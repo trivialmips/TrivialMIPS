@@ -72,6 +72,7 @@ typedef Word_t  MemAddr_t;
 `define GRAPHICS_ADDRESS_WIDTH 16 // 256 KB, use 240004 Byte
 `define ETHERNET_ADDRESS_WIDTH 1 // 2 addresses
 `define GPIO_ADDRESS_WIDTH     1 // 2 addresses 
+`define USB_ADDRESS_WIDTH      1 // 2 addresses TODO: to be checked
 
 typedef logic [`GRAPHICS_ADDRESS_WIDTH - 1 : 0] GraphicsMemoryAddress_t;
 

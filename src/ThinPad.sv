@@ -64,7 +64,8 @@ module ThinPad(
     Bus_if timer_if(.clk);
     Bus_if graphics_if(.clk);
     Bus_if ethernet_if(.clk);
-    Bus_if gpio_if(clk);
+    Bus_if gpio_if(.clk);
+    Bus_if usb_if(.clk);
 
     data_bus data_bus_instance(
         .cpu(cpu_data_if.slave),
@@ -74,7 +75,8 @@ module ThinPad(
         .timer(timer_if.master),
         .graphics(graphics_if.master),
         .ethernet(ethernet_if.master),
-        .gpio(gpio_if.master)
+        .gpio(gpio_if.master),
+        .usb(usb_if.master)
     );
 
     instruction_bus instruction_bus_instance(

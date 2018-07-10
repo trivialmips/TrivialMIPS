@@ -38,7 +38,7 @@ module graphics_controller(
         .clkb(vga_clk),
         .web(`ZERO_BIT),
         .addrb(mem_address),
-        .dinb(),
+        .dinb(`ZERO_BIT),
         .doutb(mem_data)
     );
 
@@ -87,11 +87,11 @@ module graphics_controller(
     Word_t visible_x, visible_y;
     Word_t pixel_count;
 
-    wire [1:0] pixel_count_mod_4 = pixel_count[1:0] << 3;
+    wire [1:0] pixel_count_mod_4 = pixel_count[1:0];
 
     VgaColor_t color;
     // every pixel takes 8 bits, little endian
-    assign color = now_data[pixel_count_mod_4 +: $bits(VgaColor_t)];
+    assign color = now_data[pixel_count_mod_4 * 8 +: $bits(VgaColor_t)];
 
     assign {vga.red, vga.green, vga.blue} = color;
 
