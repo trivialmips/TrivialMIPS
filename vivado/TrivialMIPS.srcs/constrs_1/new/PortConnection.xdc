@@ -1,33 +1,29 @@
 #Clock
-set_property -dict {PACKAGE_PIN D18 IOSTANDARD LVCMOS33} [get_ports clk_50M] ;#50MHz main clock in
-set_property -dict {PACKAGE_PIN C18 IOSTANDARD LVCMOS33} [get_ports clk_11M0592] ;#11.0592MHz clock for UART
-set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets clk_11M0592_IBUF]
+set_property -dict {PACKAGE_PIN D18 IOSTANDARD LVCMOS33} [get_ports clk_50M]
+set_property -dict {PACKAGE_PIN C18 IOSTANDARD LVCMOS33} [get_ports clk_11M0592]
 
-create_clock -period 20.000 -name clk_50M -waveform {0.000 10.000} [get_ports clk_50M]
-create_clock -period 90.422 -name clk_11M0592 -waveform {0.000 45.211} [get_ports clk_11M0592]
 
 #Touch Button
-set_property -dict {PACKAGE_PIN J19 IOSTANDARD LVCMOS33} [get_ports touch_btn[0]] ;#BTN1
-set_property -dict {PACKAGE_PIN E25 IOSTANDARD LVCMOS33} [get_ports touch_btn[1]] ;#BTN2
-set_property -dict {PACKAGE_PIN F23 IOSTANDARD LVCMOS33} [get_ports touch_btn[2]] ;#BTN3
-set_property -dict {PACKAGE_PIN E23 IOSTANDARD LVCMOS33} [get_ports touch_btn[3]] ;#BTN4
-set_property -dict {PACKAGE_PIN H19 IOSTANDARD LVCMOS33} [get_ports clock_btn] ;#BTN5
-set_property -dict {PACKAGE_PIN F22 IOSTANDARD LVCMOS33} [get_ports reset_btn] ;#BTN6
+set_property -dict {PACKAGE_PIN J19 IOSTANDARD LVCMOS33} [get_ports {touch_btn[0]}]
+set_property -dict {PACKAGE_PIN E25 IOSTANDARD LVCMOS33} [get_ports {touch_btn[1]}]
+set_property -dict {PACKAGE_PIN F23 IOSTANDARD LVCMOS33} [get_ports {touch_btn[2]}]
+set_property -dict {PACKAGE_PIN E23 IOSTANDARD LVCMOS33} [get_ports {touch_btn[3]}]
+set_property -dict {PACKAGE_PIN H19 IOSTANDARD LVCMOS33} [get_ports clock_btn]
+set_property -dict {PACKAGE_PIN F22 IOSTANDARD LVCMOS33} [get_ports reset_btn]
 
 #required if touch button used as manual clock source
-set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets clock_btn_IBUF]
 set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets reset_btn_IBUF]
 
 #CPLD
-set_property -dict {PACKAGE_PIN P20 IOSTANDARD LVCMOS33} [get_ports {uart_wrn}]
-set_property -dict {PACKAGE_PIN K22 IOSTANDARD LVCMOS33} [get_ports {uart_rdn}]
-set_property -dict {PACKAGE_PIN M20 IOSTANDARD LVCMOS33} [get_ports {uart_tbre}]
-set_property -dict {PACKAGE_PIN M16 IOSTANDARD LVCMOS33} [get_ports {uart_tsre}]
-set_property -dict {PACKAGE_PIN J24 IOSTANDARD LVCMOS33} [get_ports {uart_dataready}]
+set_property -dict {PACKAGE_PIN P20 IOSTANDARD LVCMOS33} [get_ports uart_wrn]
+set_property -dict {PACKAGE_PIN K22 IOSTANDARD LVCMOS33} [get_ports uart_rdn]
+set_property -dict {PACKAGE_PIN M20 IOSTANDARD LVCMOS33} [get_ports uart_tbre]
+set_property -dict {PACKAGE_PIN M16 IOSTANDARD LVCMOS33} [get_ports uart_tsre]
+set_property -dict {PACKAGE_PIN J24 IOSTANDARD LVCMOS33} [get_ports uart_dataready]
 
 #Ext serial
-set_property -dict {IOSTANDARD LVCMOS33 PACKAGE_PIN L19} [get_ports {uart\.txd}] ;#GPIO5
-set_property -dict {IOSTANDARD LVCMOS33 PACKAGE_PIN K21} [get_ports {uart\.rxd}] ;#GPIO6
+set_property -dict {IOSTANDARD LVCMOS33 PACKAGE_PIN L19} [get_ports {uart\.txd}]
+set_property -dict {IOSTANDARD LVCMOS33 PACKAGE_PIN K21} [get_ports {uart\.rxd}]
 
 #USB
 set_property -dict {PACKAGE_PIN K3 IOSTANDARD LVCMOS33} [get_ports {usb\.a0}]
@@ -111,7 +107,7 @@ set_property -dict {PACKAGE_PIN G15 IOSTANDARD LVCMOS33} [get_ports {gpio\.dpy0[
 set_property -dict {PACKAGE_PIN H16 IOSTANDARD LVCMOS33} [get_ports {gpio\.dpy0[4]}]
 set_property -dict {PACKAGE_PIN H14 IOSTANDARD LVCMOS33} [get_ports {gpio\.dpy0[5]}]
 set_property -dict {PACKAGE_PIN G19 IOSTANDARD LVCMOS33} [get_ports {gpio\.dpy0[6]}]
-set_property -dict {PACKAGE_PIN  J8 IOSTANDARD LVCMOS33} [get_ports {gpio\.dpy0[7]}]
+set_property -dict {PACKAGE_PIN J8 IOSTANDARD LVCMOS33} [get_ports {gpio\.dpy0[7]}]
 
 #DPY1
 set_property -dict {PACKAGE_PIN H9 IOSTANDARD LVCMOS33} [get_ports {gpio\.dpy1[0]}]
@@ -157,7 +153,7 @@ set_property -dict {PACKAGE_PIN N7 IOSTANDARD LVCMOS33} [get_ports {gpio\.dip_sw
 set_property -dict {PACKAGE_PIN M7 IOSTANDARD LVCMOS33} [get_ports {gpio\.dip_sw[30]}]
 set_property -dict {PACKAGE_PIN M5 IOSTANDARD LVCMOS33} [get_ports {gpio\.dip_sw[31]}]
 
-set_property -dict {PACKAGE_PIN K8 IOSTANDARD LVCMOS33}  [get_ports {flash\.address[0]}]
+set_property -dict {PACKAGE_PIN K8 IOSTANDARD LVCMOS33} [get_ports {flash\.address[0]}]
 set_property -dict {PACKAGE_PIN C26 IOSTANDARD LVCMOS33} [get_ports {flash\.address[1]}]
 set_property -dict {PACKAGE_PIN B26 IOSTANDARD LVCMOS33} [get_ports {flash\.address[2]}]
 set_property -dict {PACKAGE_PIN B25 IOSTANDARD LVCMOS33} [get_ports {flash\.address[3]}]
@@ -198,12 +194,12 @@ set_property -dict {PACKAGE_PIN B1 IOSTANDARD LVCMOS33} [get_ports {flash\.data[
 set_property -dict {PACKAGE_PIN G2 IOSTANDARD LVCMOS33} [get_ports {flash\.data[14]}]
 set_property -dict {PACKAGE_PIN E1 IOSTANDARD LVCMOS33} [get_ports {flash\.data[15]}]
 
-set_property -dict {PACKAGE_PIN G9  IOSTANDARD LVCMOS33} [get_ports {flash\.byte_n}]
+set_property -dict {PACKAGE_PIN G9 IOSTANDARD LVCMOS33} [get_ports {flash\.byte_n}]
 set_property -dict {PACKAGE_PIN A22 IOSTANDARD LVCMOS33} [get_ports {flash\.ce_n}]
-set_property -dict {PACKAGE_PIN D1  IOSTANDARD LVCMOS33} [get_ports {flash\.oe_n}]
+set_property -dict {PACKAGE_PIN D1 IOSTANDARD LVCMOS33} [get_ports {flash\.oe_n}]
 set_property -dict {PACKAGE_PIN C22 IOSTANDARD LVCMOS33} [get_ports {flash\.rp_n}]
 set_property -dict {PACKAGE_PIN B22 IOSTANDARD LVCMOS33} [get_ports {flash\.vpen}]
-set_property -dict {PACKAGE_PIN C1  IOSTANDARD LVCMOS33} [get_ports {flash\.we_n}]
+set_property -dict {PACKAGE_PIN C1 IOSTANDARD LVCMOS33} [get_ports {flash\.we_n}]
 
 set_property -dict {PACKAGE_PIN F24 IOSTANDARD LVCMOS33} [get_ports {base_ram\.address[0]}]
 set_property -dict {PACKAGE_PIN G24 IOSTANDARD LVCMOS33} [get_ports {base_ram\.address[1]}]
@@ -328,3 +324,31 @@ set_property -dict {PACKAGE_PIN U16 IOSTANDARD LVCMOS33} [get_ports {ext_ram\.we
 set_property CFGBVS VCCO [current_design]
 set_property CONFIG_VOLTAGE 3.3 [current_design]
 
+
+create_clock -period 20.000 -name clk_50M -waveform {0.000 10.000} [get_ports clk_50M]
+create_clock -period 90.422 -name clk_11M0592 -waveform {0.000 45.211} [get_ports clk_11M0592]
+create_clock -period 12.500 -name VIRTUAL_clk_out1_top_clk_wiz -waveform {0.000 6.250}
+set_input_delay -clock [get_clocks VIRTUAL_clk_out1_top_clk_wiz] -min -add_delay 8.000 [get_ports {base_ram\.data[*]}]
+set_input_delay -clock [get_clocks VIRTUAL_clk_out1_top_clk_wiz] -max -add_delay 10.000 [get_ports {base_ram\.data[*]}]
+set_input_delay -clock [get_clocks VIRTUAL_clk_out1_top_clk_wiz] -min -add_delay 8.000 [get_ports {ext_ram\.data[*]}]
+set_input_delay -clock [get_clocks VIRTUAL_clk_out1_top_clk_wiz] -max -add_delay 10.000 [get_ports {ext_ram\.data[*]}]
+set_output_delay -clock [get_clocks VIRTUAL_clk_out1_top_clk_wiz] -min -add_delay 0.000 [get_ports {base_ram\.address[*]}]
+set_output_delay -clock [get_clocks VIRTUAL_clk_out1_top_clk_wiz] -max -add_delay 8.000 [get_ports {base_ram\.address[*]}]
+set_output_delay -clock [get_clocks VIRTUAL_clk_out1_top_clk_wiz] -min -add_delay 0.000 [get_ports {base_ram\.be_n[*]}]
+set_output_delay -clock [get_clocks VIRTUAL_clk_out1_top_clk_wiz] -max -add_delay 8.000 [get_ports {base_ram\.be_n[*]}]
+set_output_delay -clock [get_clocks VIRTUAL_clk_out1_top_clk_wiz] -min -add_delay 0.000 [get_ports {base_ram\.data[*]}]
+set_output_delay -clock [get_clocks VIRTUAL_clk_out1_top_clk_wiz] -max -add_delay 8.000 [get_ports {base_ram\.data[*]}]
+set_output_delay -clock [get_clocks VIRTUAL_clk_out1_top_clk_wiz] -min -add_delay 0.000 [get_ports {ext_ram\.address[*]}]
+set_output_delay -clock [get_clocks VIRTUAL_clk_out1_top_clk_wiz] -max -add_delay 8.000 [get_ports {ext_ram\.address[*]}]
+set_output_delay -clock [get_clocks VIRTUAL_clk_out1_top_clk_wiz] -min -add_delay 0.000 [get_ports {ext_ram\.be_n[*]}]
+set_output_delay -clock [get_clocks VIRTUAL_clk_out1_top_clk_wiz] -max -add_delay 8.000 [get_ports {ext_ram\.be_n[*]}]
+set_output_delay -clock [get_clocks VIRTUAL_clk_out1_top_clk_wiz] -min -add_delay 0.000 [get_ports {ext_ram\.data[*]}]
+set_output_delay -clock [get_clocks VIRTUAL_clk_out1_top_clk_wiz] -max -add_delay 8.000 [get_ports {ext_ram\.data[*]}]
+set_output_delay -clock [get_clocks VIRTUAL_clk_out1_top_clk_wiz] -min -add_delay 0.000 [get_ports {base_ram\.ce_n}]
+set_output_delay -clock [get_clocks VIRTUAL_clk_out1_top_clk_wiz] -max -add_delay 8.000 [get_ports {base_ram\.ce_n}]
+set_output_delay -clock [get_clocks VIRTUAL_clk_out1_top_clk_wiz] -min -add_delay 0.000 [get_ports {base_ram\.oe_n}]
+set_output_delay -clock [get_clocks VIRTUAL_clk_out1_top_clk_wiz] -max -add_delay 8.000 [get_ports {base_ram\.oe_n}]
+set_output_delay -clock [get_clocks VIRTUAL_clk_out1_top_clk_wiz] -min -add_delay 0.000 [get_ports {ext_ram\.ce_n}]
+set_output_delay -clock [get_clocks VIRTUAL_clk_out1_top_clk_wiz] -max -add_delay 8.000 [get_ports {ext_ram\.ce_n}]
+set_output_delay -clock [get_clocks VIRTUAL_clk_out1_top_clk_wiz] -min -add_delay 0.000 [get_ports {ext_ram\.oe_n}]
+set_output_delay -clock [get_clocks VIRTUAL_clk_out1_top_clk_wiz] -max -add_delay 8.000 [get_ports {ext_ram\.oe_n}]

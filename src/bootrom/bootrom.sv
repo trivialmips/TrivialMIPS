@@ -4,8 +4,9 @@ module bootrom(
     Bus_if.slave inst_bus
 );
 
-    wire clk, rst;
+    wire clk, clk2x, rst;
     assign clk = inst_bus.clk.base;
+    assign clk2x = inst_bus.clk.base_2x;
     assign rst = inst_bus.clk.rst;
 
     assign inst_bus.stall = `ZERO_BIT;
@@ -13,10 +14,10 @@ module bootrom(
     Word_t inst_1, inst_2;
 
     blk_mem_bootrom rom_instance(
-        .clka(~clk),
+        .clka(clk2x),
         .addra(inst_bus.address),
         .douta(inst_1),
-        .clkb(~clk),
+        .clkb(clk2x),
         .addrb(inst_bus.address + 4'h4),
         .doutb(inst_2)
     );
