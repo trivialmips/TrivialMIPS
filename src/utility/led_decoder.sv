@@ -1,6 +1,8 @@
-module LedDecoder(
-	input   [3:0]	hex,
-	output  [7:0]	segments
+`include "common_defs.svh"
+
+module led_decoder(
+	input  [3:0]	        hex,
+	output SegmentDisplay_t	segments
 );
 
 	logic [6:0] oSEG;
@@ -28,4 +30,4 @@ module LedDecoder(
 
 	assign segments = {~oSEG,1'b0};
 
-endmodule // LedDecoder
+endmodule

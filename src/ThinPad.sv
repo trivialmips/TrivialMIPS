@@ -99,8 +99,13 @@ module ThinPad(
     );
 
     graphics_controller graphics_controller_instance(
-        .data_bus(graphics_if),
+        .data_bus(graphics_if.slave),
         .vga
+    );
+
+    gpio_controller gpio_controller_instance(
+        .data_bus(gpio_if.slave),
+        .gpio
     );
 
 endmodule
