@@ -23,6 +23,7 @@ module ex_mem(
 	q.cp0_reg_wr.we    <= 1'b0;           \
 	q.cp0_reg_wr.waddr <= `ZERO_WORD;     \
 	q.cp0_reg_wr.wdata <= `ZERO_WORD;     \
+	q.cp0_reg_wr.sel   <= 3'b0;           \
 	q.hilo_wr.we       <= 1'b0;           \
 	q.hilo_wr.hilo     <= `ZERO_DWORD;    \
 	q.memory_req.ce    <= 1'b0;           \
@@ -35,7 +36,8 @@ module ex_mem(
 `define RST_DATA_EXMEM(d) \
 	d.pc         <= `ZERO_WORD; \
 	d.op         <= OP_NOP;     \
-	d.delayslot  <= 1'b0;
+	d.delayslot  <= 1'b0;      \
+	d.is_priv_inst <= 1'b0;
 
 always @(posedge clk)
 begin

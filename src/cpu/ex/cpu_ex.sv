@@ -6,6 +6,7 @@ module cpu_ex(
 	input  Word_t         cp0_rdata_unsafe,
 	input  DoubleWord_t   hilo_unsafe,
 	output RegAddr_t      cp0_raddr,
+	output wire [2:0]     cp0_rsel,
 	output Bit_t          stall_req,
 
 	input  PipelineData_t  data_idex,
@@ -14,10 +15,10 @@ module cpu_ex(
 	output PipelineReq_t   req_ex,
 
 	// data forward
-	input  RegWriteReq_t  mem_cp0_reg_wr_a,
-	input  RegWriteReq_t  mem_cp0_reg_wr_b,
-	input  HiloWriteReq_t mem_hilo_wr_a,
-	input  HiloWriteReq_t mem_hilo_wr_b,
+	input  CP0RegWriteReq_t mem_cp0_reg_wr_a,
+	input  CP0RegWriteReq_t mem_cp0_reg_wr_b,
+	input  HiloWriteReq_t   mem_hilo_wr_a,
+	input  HiloWriteReq_t   mem_hilo_wr_b,
 
 	// data downward
 	input  HiloWriteReq_t ex_hilo_wr_a,
@@ -30,7 +31,7 @@ InstAddr_t     pc;
 Inst_t         inst;
 Word_t         reg1, reg2, imm;
 HiloWriteReq_t hilo_wr;
-RegWriteReq_t  cp0_reg_wr;
+CP0RegWriteReq_t cp0_reg_wr;
 MemAccessReq_t memory_req;
 Word_t         ret;
 ExceptInfo_t   except;
@@ -55,7 +56,6 @@ assign op = data_idex.op;
 assign pc = data_idex.pc;
 assign inst = data_idex.inst;
 assign imm = data_idex.imm;
-assign data_ex = data_idex;
 assign req_ex.hilo_wr = hilo_wr;
 assign req_ex.cp0_reg_wr = cp0_reg_wr;
 assign req_ex.memory_req = memory_req;
@@ -64,6 +64,20 @@ assign req_ex.reg_wr.waddr = req_idex.reg_wr.waddr;
 assign req_ex.reg_wr.wdata = ret;
 assign req_ex.except = req_idex.except.occur ? req_idex.except : except;
 assign req_ex.llbit_set = (op == OP_LL);
+assign data_ex.op = data_idex.op;
+assign data_ex.pc = data_idex.pc;
+assign data_ex.inst = data_idex.inst;
+assign data_ex.reg1 = reg1;
+assign data_ex.reg2 = reg2;
+assign data_ex.imm = data_idex.imm;
+assign data_ex.reg_addr1 = data_idex.reg_addr1;
+assign data_ex.reg_addr2 = data_idex.reg_addr2;
+assign data_ex.delayslot = data_idex.delayslot;
+assign data_ex.is_priv_inst = (
+	op == OP_CACHE || op == OP_ERET || op == OP_MFC0 ||
+	op == OP_MTC0 || op == OP_TLBP || op == OP_TLBR ||
+	op == OP_TLBWI || op == OP_TLBWR || op == OP_WAIT
+);
 
 // safe HILO
 DoubleWord_t hilo_safe;
@@ -115,24 +129,33 @@ assign ov_add = (reg1[31] & reg2[31]) & (reg1[31] ^ add_u[31]);
 assign ov_sub = (reg1[31] ^ reg2[31]) & (reg1[31] ^ sub_u[31]);
 
 // CP0 operation
-Word_t cp0_rdata_safe;
+Word_t cp0_rdata_safe, cp0_wmask;
+cp0_write_mask cp0_write_mask_instance_ex(
+	.rst,
+	.sel(cp0_rsel),
+	.addr(cp0_raddr),
+	.mask(cp0_wmask)
+);
+
 always_comb
 begin
 	if(rst)
 	begin
 		cp0_rdata_safe = `ZERO_DWORD;
-	end else if(mem_cp0_reg_wr_b.we && mem_cp0_reg_wr_b.waddr == cp0_raddr) begin
-		cp0_rdata_safe = mem_cp0_reg_wr_b.wdata;
-	end else if(mem_cp0_reg_wr_a.we && mem_cp0_reg_wr_a.waddr == cp0_raddr) begin
-		cp0_rdata_safe = mem_cp0_reg_wr_a.wdata;
+	end else if(mem_cp0_reg_wr_b.we && mem_cp0_reg_wr_b.waddr == cp0_raddr && mem_cp0_reg_wr_b.sel == cp0_rsel) begin
+		cp0_rdata_safe = (cp0_wmask & mem_cp0_reg_wr_b.wdata) | (~cp0_wmask & cp0_rdata_unsafe);
+	end else if(mem_cp0_reg_wr_a.we && mem_cp0_reg_wr_a.waddr == cp0_raddr && mem_cp0_reg_wr_a.sel == cp0_rsel) begin
+		cp0_rdata_safe = (cp0_wmask & mem_cp0_reg_wr_a.wdata) | (~cp0_wmask & cp0_rdata_unsafe);
 	end else begin
 		cp0_rdata_safe = cp0_rdata_unsafe;
 	end
 end
 assign cp0_raddr = inst[15:11];
+assign cp0_rsel  = inst[2:0];
 assign cp0_reg_wr.we = (op == OP_MTC0);
 assign cp0_reg_wr.wdata = reg2;
 assign cp0_reg_wr.waddr = inst[15:11];
+assign cp0_reg_wr.sel   = inst[2:0];
 
 // memory operation
 Bit_t is_load_memory_inst;

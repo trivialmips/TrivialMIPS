@@ -23,6 +23,13 @@ typedef struct packed {
 	DoubleWord_t hilo;
 } HiloWriteReq_t;
 
+typedef struct packed {
+	Bit_t     we;
+	RegAddr_t waddr;
+	Word_t    wdata;
+	logic [2:0] sel;
+} CP0RegWriteReq_t;
+
 // memory access
 typedef struct packed {
 	// READ  if ce = 1 and we = 0
@@ -69,6 +76,7 @@ typedef struct packed {
 } CP0CauseReg_t;
 
 typedef struct packed {
+	Word_t config1;
 	/* The order of the following registers is important.
 	 * DO NOT change them. New registers must be added 
 	 * BEFORE this comment */
@@ -113,10 +121,12 @@ typedef struct packed {
 `define EXCCODE_TLBS  5'h03  // TLB exception (store)
 `define EXCCODE_ADEL  5'h04  // address exception (load or instruction fetch)
 `define EXCCODE_ADES  5'h05  // address exception (store)
-`define EXCCODE_SYS 5'h08  // syscall
-`define EXCCODE_BP  5'h09  // breakpoint
-`define EXCCODE_OV  5'h0c  // overflow
-`define EXCCODE_TR  5'h0d  // trap
+`define EXCCODE_SYS   5'h08  // syscall
+`define EXCCODE_BP    5'h09  // breakpoint
+`define EXCCODE_RI    5'h0a  // reserved instruction exception
+`define EXCCODE_CpU   5'h0b  // coprocesser unusable exception
+`define EXCCODE_OV    5'h0c  // overflow
+`define EXCCODE_TR    5'h0d  // trap
 
 // operation
 typedef enum {
@@ -176,15 +186,16 @@ typedef struct packed {
 	Word_t reg1, reg2, imm;  // ID, EX
 	RegAddr_t reg_addr1, reg_addr2;  // ID, EX
 	Bit_t delayslot;         // IF, ID, EX, MEM
+	Bit_t is_priv_inst;      // EX, MEM
 } PipelineData_t;
 
 typedef struct packed {
-	HiloWriteReq_t hilo_wr;     // EX, MEM, WB
-	RegWriteReq_t cp0_reg_wr;   // EX, MEM, WB
-	MemAccessReq_t memory_req;  // EX, MEM
-	RegWriteReq_t reg_wr;       // ID, EX, MEM, WB
-	ExceptInfo_t except;        // ID, EX, MEM
-	Bit_t llbit_set;            // EX, MEM
+	HiloWriteReq_t hilo_wr;      // EX, MEM, WB
+	CP0RegWriteReq_t cp0_reg_wr; // EX, MEM, WB
+	MemAccessReq_t memory_req;   // EX, MEM
+	RegWriteReq_t reg_wr;        // ID, EX, MEM, WB
+	ExceptInfo_t except;         // ID, EX, MEM
+	Bit_t llbit_set;             // EX, MEM
 } PipelineReq_t;
 
 // superscalar
