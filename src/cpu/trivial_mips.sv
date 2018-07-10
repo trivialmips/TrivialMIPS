@@ -274,6 +274,7 @@ cpu_ex stage_ex_a(
 	.mem_hilo_wr_b(req_mem_b.hilo_wr),
 	.mem_cp0_reg_wr_a(req_mem_a.cp0_reg_wr),
 	.mem_cp0_reg_wr_b(req_mem_b.cp0_reg_wr),
+	.wb_cp0_reg_wr(cp0_reg_wr),
 
 	.ex_hilo_wr_a(empty_hilo_wr),
 	.ex_reg_wr_a(empty_reg_wr)
@@ -298,6 +299,7 @@ cpu_ex stage_ex_b(
 	.mem_hilo_wr_b(req_mem_b.hilo_wr),
 	.mem_cp0_reg_wr_a(req_mem_a.cp0_reg_wr),
 	.mem_cp0_reg_wr_b(req_mem_b.cp0_reg_wr),
+	.wb_cp0_reg_wr(cp0_reg_wr),
 
 	.ex_hilo_wr_a(req_ex_a.hilo_wr),
 	.ex_reg_wr_a(req_ex_a.reg_wr)
@@ -372,7 +374,8 @@ except except_handler(
 	.except_a(req_mem_a.except),
 	.except_b(req_mem_b.except),
 	.except_req,
-	.cp0_regs
+	.cp0_regs_unsafe(cp0_regs),
+	.wb_cp0_reg_wr(cp0_reg_wr)
 );
 
 assign llbit_wr.we = req_mem_a.llbit_set | req_mem_b.llbit_set | mem_llbit_reset;

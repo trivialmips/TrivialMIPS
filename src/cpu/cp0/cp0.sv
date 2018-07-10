@@ -16,7 +16,7 @@ module cp0(
 );
 
 CP0Regs_t regs_new, regs_inner;
-assign regs = regs_new;
+assign regs = regs_inner;
 
 function Word_t read_cp0(
 	input CP0Regs_t cp0_regs,

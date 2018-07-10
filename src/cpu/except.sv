@@ -6,9 +6,31 @@ module except(
 	input  PipelineData_t data_b,
 	input  ExceptInfo_t  except_a,
 	input  ExceptInfo_t  except_b,
-	input  CP0Regs_t     cp0_regs,
+	input  CP0Regs_t     cp0_regs_unsafe,
+	input  CP0RegWriteReq_t wb_cp0_reg_wr,
 	output ExceptReq_t   except_req
 );
+
+
+Word_t wb_cp0_reg_wmask, wb_cp0_reg_wdata;
+cp0_write_mask cp0_write_mask_instance(
+	.rst,
+	.sel(wb_cp0_reg_wr.sel),
+	.addr(wb_cp0_reg_wr.waddr),
+	.mask(wb_cp0_reg_wmask)
+);
+
+CP0Regs_t cp0_regs;
+always_comb
+begin
+	cp0_regs = cp0_regs_unsafe;
+	if(wb_cp0_reg_wr.we)
+	begin
+		wb_cp0_reg_wdata = cp0_regs[wb_cp0_reg_wr.waddr * `REG_DATA_WIDTH +: 32];
+		wb_cp0_reg_wdata = (wb_cp0_reg_wr.wdata & wb_cp0_reg_wmask) | (wb_cp0_reg_wdata & ~wb_cp0_reg_wmask);
+		cp0_regs[wb_cp0_reg_wr.waddr * `REG_DATA_WIDTH +: 32] = wb_cp0_reg_wdata;
+	end
+end
 
 InstAddr_t pc;
 ExceptInfo_t except;
