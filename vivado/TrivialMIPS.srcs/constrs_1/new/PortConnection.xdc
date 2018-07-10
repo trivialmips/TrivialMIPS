@@ -352,3 +352,5 @@ set_output_delay -clock [get_clocks VIRTUAL_clk_out1_top_clk_wiz] -min -add_dela
 set_output_delay -clock [get_clocks VIRTUAL_clk_out1_top_clk_wiz] -max -add_delay 8.000 [get_ports {ext_ram\.ce_n}]
 set_output_delay -clock [get_clocks VIRTUAL_clk_out1_top_clk_wiz] -min -add_delay 0.000 [get_ports {ext_ram\.oe_n}]
 set_output_delay -clock [get_clocks VIRTUAL_clk_out1_top_clk_wiz] -max -add_delay 8.000 [get_ports {ext_ram\.oe_n}]
+
+set_false_path -setup -rise_from [get_clocks VIRTUAL_clk_out1_top_clk_wiz] -rise_to [get_clocks -of_objects [get_pins clk_wiz_instance/inst/mmcm_adv_inst/CLKOUT1]]

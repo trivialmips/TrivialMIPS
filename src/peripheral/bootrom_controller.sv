@@ -1,6 +1,6 @@
 `include "common_defs.svh"
 
-module bootrom(
+module bootrom_controller(
     Bus_if.slave inst_bus
 );
 

@@ -85,7 +85,7 @@ instruction_bus instruction_bus_instance(
 
 // pheripheral
 
-bootrom bootrom_instance(
+bootrom_controller bootrom_controller_instance(
     .inst_bus(bootrom_if.slave)
 );
 
