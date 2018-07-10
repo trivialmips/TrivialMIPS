@@ -8,6 +8,8 @@ module if_id(
 	output InstAddr_t id_pc,
 	output Bit_t      id_delayslot,
 
+	output Bit_t      set_empty_inst,
+	output Bit_t      keep_inst,
 	output Bit_t      id_inst_left,
 	output InstPair_t id_inst_pair_new,
 	output InstPair_t id_inst_pair_old,
@@ -24,16 +26,25 @@ module if_id(
 
 always @(posedge clk)
 begin
+	set_empty_inst <= (rst || flush || (stall.stall_if && ~stall.stall_id));
+	keep_inst <= stall.stall_if;
+	id_inst_pair_new <= if_inst_pair;
+	id_inst_pair_old <= inst_pair_forward;
+	id_inst_left <= ~inst_pair_forward.inst2_taken & ~is_hard_reset;
+end
+
+always @(posedge clk)
+begin
 	if(rst || flush || (stall.stall_if && ~stall.stall_id))
 	begin
 		id_pc              <= `ZERO_WORD;
 		id_delayslot       <= 1'b0;
-		id_inst_pair_new.inst1 <= `ZERO_WORD;
+/*		id_inst_pair_new.inst1 <= `ZERO_WORD;
 		id_inst_pair_new.inst2 <= `ZERO_WORD;
 		id_inst_pair_new.inst2_taken <= `ZERO_WORD;
 		id_inst_pair_old.inst1 <= `ZERO_WORD;
 		id_inst_pair_old.inst2 <= `ZERO_WORD;
-		id_inst_pair_old.inst2_taken <= `ZERO_WORD;
+		id_inst_pair_old.inst2_taken <= `ZERO_WORD; */
 	end else if(~stall.stall_if) begin
 		id_delayslot <= if_delayslot;
 /*		if(~inst_pair_forward.inst2_taken && ~is_hard_reset)
@@ -43,9 +54,9 @@ begin
 		end else begin
 			id_inst_pair <= if_inst_pair;
 		end */
-		id_inst_pair_new <= if_inst_pair;
-		id_inst_pair_old <= inst_pair_forward;
-		id_inst_left <= ~inst_pair_forward.inst2_taken & ~is_hard_reset;
+//		id_inst_pair_new <= if_inst_pair;
+//		id_inst_pair_old <= inst_pair_forward;
+//		id_inst_left <= ~inst_pair_forward.inst2_taken & ~is_hard_reset;
 
 		if(is_ahead)
 		begin

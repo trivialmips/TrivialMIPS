@@ -141,7 +141,7 @@ cpu_if stage_if(
 assign if_inst_pair.inst1 = inst_bus.data_rd;
 assign if_inst_pair.inst2 = inst_bus.data_rd_2;
 
-Bit_t      id_inst_left;
+Bit_t      id_inst_left, ifid_keep_inst, ifid_set_empty_inst;
 InstPair_t id_inst_pair_old, id_inst_pair_new;
 InstPair_t id_inst_pair;
 InstAddr_t id_pc;
@@ -157,6 +157,8 @@ if_id stage_if_id(
 	.id_inst_pair_new,
 	.id_inst_pair_old,
 	.id_delayslot,
+	.keep_inst(ifid_keep_inst),
+	.set_empty_inst(ifid_set_empty_inst),
 	.inst_pair_forward,
 	.is_ahead(is_pc_ahead),
 	.is_hard_reset(is_pc_hard_reset),
@@ -167,12 +169,20 @@ if_id stage_if_id(
 always_comb
 begin
 	id_inst_pair.inst2_taken = 1'b0;  // not used for now
-	if(id_inst_left) 
+	if(ifid_set_empty_inst)
 	begin
-		id_inst_pair.inst1 = id_inst_pair_old.inst2;
-		id_inst_pair.inst2 = id_inst_pair_new.inst1;
+		id_inst_pair.inst1 = `ZERO_WORD;
+		id_inst_pair.inst2 = `ZERO_WORD;
+	end else if(ifid_keep_inst) begin
+		id_inst_pair = id_inst_pair_old;
 	end else begin
-		id_inst_pair = id_inst_pair_new;
+		if(id_inst_left) 
+		begin
+			id_inst_pair.inst1 = id_inst_pair_old.inst2;
+			id_inst_pair.inst2 = id_inst_pair_new.inst1;
+		end else begin
+			id_inst_pair = id_inst_pair_new;
+		end
 	end
 end
 
