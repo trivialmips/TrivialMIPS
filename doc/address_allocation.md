@@ -31,7 +31,7 @@ This section describes the allocation of physical addresses that used in instruc
 
 The address and size of bootrom is special due to the hardcorded value `0xBFC00000` of register `PC` after reset, which will be mapped to `0x1FC00000`.
 
-Graphics device is of type 'hybrid', because it consists of 240000 Byte Storage from `0x02000000` to `0x203A97F` and a configuration register at `0x203A980`.
+Graphics device is of type 'hybrid', because it consists of 240000 Byte Storage from `0x02000000` to `0x0203A97F` and a configuration register at `0x0203A980`.
 
 ## MMIO Address Mapping
 
