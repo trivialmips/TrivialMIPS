@@ -41,8 +41,8 @@ function Word_t read_cp0(
 	end
 endfunction
 
-assign rdata1 = read_cp0(regs_new, raddr1, rsel1);
-assign rdata2 = read_cp0(regs_new, raddr2, rsel2);
+assign rdata1 = read_cp0(regs, raddr1, rsel1);
+assign rdata2 = read_cp0(regs, raddr2, rsel2);
 
 always @(posedge clk)
 begin

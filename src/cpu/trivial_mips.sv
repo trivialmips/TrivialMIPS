@@ -380,6 +380,11 @@ cpu_ex stage_ex_b(
 	.ex_reg_wr_a(req_ex_a.reg_wr)
 );
 
+// early lookup TLB
+assign mmu_data_vaddr = req_ex_b.memory_req.ce ?
+	req_ex_b.memory_req.addr : req_ex_a.memory_req.addr;
+
+MMUResult_t mem_mmu_data_result;
 ex_mem stage_ex_mem(
 	.clk,
 	.rst,
@@ -391,6 +396,10 @@ ex_mem stage_ex_mem(
 	.mem_data_b(data_exmem_b),
 	.mem_req_a(req_exmem_a),
 	.mem_req_b(req_exmem_b),
+
+	.ex_mmu_data_result(mmu_data_result),
+	.mem_mmu_data_result,
+
 	.stall,
 	.flush
 );
@@ -406,10 +415,7 @@ cpu_mem stage_mem(
 	.req_ex_b(req_exmem_b),
 	.req_mem_a(req_mem_a),
 	.req_mem_b(req_mem_b),
-
-	.mmu_data_result,
-	.mmu_data_vaddr,
-
+	.mmu_data_result(mem_mmu_data_result),
 //	.except_already_occur(req_exmem_a.except.occur | req_exmem_b.except.occur),
 	.except_already_occur(flush),
 	.data_bus,
@@ -429,7 +435,7 @@ except except_handler(
 	.except_b(req_mem_b.except),
 	.except_req,
 	.memory_data_we,
-	.data_vaddr(mmu_data_vaddr),
+	.data_vaddr(mem_mmu_data_result.virt_addr),
 	.cp0_regs_unsafe(cp0_regs),
 	.is_user_mode(cp0_user_mode),
 	.wb_cp0_reg_wr(cp0_reg_wr)

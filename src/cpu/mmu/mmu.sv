@@ -44,6 +44,7 @@ begin: generate_mmu_enabled_code
 	assign inst_result.illegal  = (is_user_mode & inst_vaddr[31]);
 	assign inst_result.invalid  = (inst_mapped & ~inst_tlb_result.valid);
 	assign inst_result.phy_addr = inst_mapped ? inst_tlb_result.phy_addr : { 3'b0, inst_vaddr[28:0] };
+	assign inst_result.virt_addr = inst_vaddr;
 
 	// note that dirty = 1 when writable
 	assign data_result.dirty    = (~data_mapped | data_tlb_result.dirty);
@@ -51,6 +52,7 @@ begin: generate_mmu_enabled_code
 	assign data_result.illegal  = (is_user_mode & data_vaddr[31]);
 	assign data_result.invalid  = (data_mapped & ~data_tlb_result.valid);
 	assign data_result.phy_addr = data_mapped ? data_tlb_result.phy_addr : { 3'b0, data_vaddr[28:0] };
+	assign data_result.virt_addr = data_vaddr;
 
 	tlb tlb_instance(
 		.clk,
