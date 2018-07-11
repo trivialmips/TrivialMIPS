@@ -17,15 +17,20 @@ _start:
 	sw $1, 0x3($s0)    # ans: [exc_code]=0x05
 	sw $1, 0x2($s0)    # ans: [exc_code]=0x05
 	lw $1, 0x2($s0)    # ans: [exc_code]=0x04
+	mfc0 $8, $8        # ans: $8=0xa0001002
 	sw $1, 0x1($s0)    # ans: [exc_code]=0x05
 	lw $1, 0x1($s0)    # ans: [exc_code]=0x04
 	lw $1, 0x3($s0)    # ans: [exc_code]=0x04
 
 	sh $1, 0x1($s0)    # ans: [exc_code]=0x05
+	mfc0 $8, $8        # ans: $8=0xa0001001
 	lh $1, 0x1($s0)    # ans: [exc_code]=0x04
+	mfc0 $8, $8        # ans: $8=0xa0001001
 	lhu $1, 0x3($s0)   # ans: [exc_code]=0x04
+	mfc0 $8, $8        # ans: $8=0xa0001003
 
 	ll $1, 0x1($s0)    # ans: [exc_code]=0x04
+	mfc0 $8, $8        # ans: $8=0xa0001001
 	sc $3, 0x0($s0)    # ans: $3=0x00000000
 
 	ll $3, 0x0($s0)    # ans: $3=0x12345678
@@ -47,11 +52,13 @@ _start:
 	# ===== Test TLB invalid =====
 	ori $1, $0, 0x0000 # ans: $1=0x00000000
 	sw $1, 0x0($1)     # ans: [exc_code]=0x03
+	mfc0 $8, $8        # ans: $8=0x00000000
 	lw $1, 0x0($1)     # ans: [exc_code]=0x02
 
 	# ===== Test TLB miss =====
 	ori $1, $0, 0x1000 # ans: $1=0x00001000
 	sw $1, 0x0($1)     # ans: [exc_code]=0x03
+	mfc0 $8, $8        # ans: $8=0x00001000
 	lw $1, 0x0($1)     # ans: [exc_code]=0x02
 
 	# ===== Test TLB modification =====
