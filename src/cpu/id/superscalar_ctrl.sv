@@ -115,7 +115,7 @@ begin
 			inst2_taken = 1'b0;
 		end else if(privileged_inst_b || privileged_inst_a) begin
 			// privileged instructions
-			// TODO: not sure, may be taken
+			// only pipeline-A can access CP0, for timing optimization
 			inst2_taken = 1'b0;
 		end else if(data_a.op == OP_MUL && reg_data_related) begin
 			// MUL requires two cycles

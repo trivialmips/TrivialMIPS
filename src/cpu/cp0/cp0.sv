@@ -3,10 +3,8 @@
 module cp0(
 	input  clk, rst,
 
-	input  RegAddr_t     raddr1,
-	input  RegAddr_t     raddr2,
-	input  wire [2:0]    rsel1,
-	input  wire [2:0]    rsel2,
+	input  RegAddr_t     raddr,
+	input  wire [2:0]    rsel,
 	input  CP0RegWriteReq_t wr,
 	input  ExceptReq_t   except_req,
 	input  wire [5:0]    int_req,
@@ -16,8 +14,7 @@ module cp0(
 	input  Bit_t         tlbp_req,
 	input  Word_t        tlbp_res,
 
-	output Word_t        rdata1,
-	output Word_t        rdata2,
+	output Word_t        rdata,
 	output CP0Regs_t     regs,
 	output wire [7:0]    asid,
 	output Bit_t         user_mode
@@ -28,21 +25,15 @@ assign regs = regs_inner;
 assign asid = regs.entry_hi[7:0];
 assign user_mode = (regs.status[4:1] == 4'b1000);
 
-function Word_t read_cp0(
-	input CP0Regs_t cp0_regs,
-	input RegAddr_t raddr,
-	input [2:0] sel
-);
-	if(sel == 3'b0)
+always_comb
+begin
+	if(rsel == 3'b0)
 	begin
-		read_cp0 = cp0_regs[raddr * `REG_DATA_WIDTH +: 32];
+		rdata = regs[raddr * `REG_DATA_WIDTH +: 32];
 	end else begin
-		read_cp0 = 32'b0;
+		rdata = 32'b0;
 	end
-endfunction
-
-assign rdata1 = read_cp0(regs_new, raddr1, rsel1);
-assign rdata2 = read_cp0(regs_new, raddr2, rsel2);
+end
 
 always @(posedge clk)
 begin

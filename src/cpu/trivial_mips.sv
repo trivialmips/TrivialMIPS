@@ -71,10 +71,10 @@ ll_bit_reg ll_bit_instance(
 // coprocesser 0
 ExceptReq_t except_req;
 CP0Regs_t cp0_regs;
-RegAddr_t cp0_raddr1, cp0_raddr2;
-logic [2:0] cp0_rsel1, cp0_rsel2;
+RegAddr_t cp0_raddr;
+logic [2:0] cp0_rsel;
 CP0RegWriteReq_t cp0_reg_wr;
-Word_t cp0_rdata1, cp0_rdata2;
+Word_t cp0_rdata;
 logic [7:0] cp0_asid;
 Bit_t cp0_user_mode;
 TLBEntry_t tlbrw_rdata;
@@ -82,10 +82,8 @@ Word_t tlbp_index;
 cp0 cp0_instance(
 	.clk,
 	.rst,
-	.raddr1(cp0_raddr1),
-	.raddr2(cp0_raddr2),
-	.rsel1(cp0_rsel1),
-	.rsel2(cp0_rsel2),
+	.raddr(cp0_raddr),
+	.rsel(cp0_rsel),
 	.wr(cp0_reg_wr),
 	.except_req,
 	.int_req,
@@ -95,8 +93,7 @@ cp0 cp0_instance(
 	.tlbr_req(req_memwb_a.tlb_read),
 	.tlbr_res(tlbrw_rdata),
 
-	.rdata1(cp0_rdata1),
-	.rdata2(cp0_rdata2),
+	.rdata(cp0_rdata),
 	.regs(cp0_regs),
 	.asid(cp0_asid),
 	.user_mode(cp0_user_mode)
@@ -324,22 +321,21 @@ id_ex stage_id_ex(
 Bit_t stall_from_ex_a, stall_from_ex_b;
 assign stall_from_ex = stall_from_ex_a | stall_from_ex_b;
 
+CP0RegWriteReq_t empty_cp0_reg_wr;
 RegWriteReq_t empty_reg_wr;
 HiloWriteReq_t empty_hilo_wr;
-assign empty_hilo_wr.we   = 1'b0;
-assign empty_hilo_wr.hilo = 'b0;
-assign empty_reg_wr.we    = 1'b0;
-assign empty_reg_wr.waddr = 'b0;
-assign empty_reg_wr.wdata = 'b0;
+assign empty_reg_wr     = {$bits(RegWriteReq_t){1'b0}};
+assign empty_hilo_wr    = {$bits(HiloWriteReq_t){1'b0}};
+assign empty_cp0_reg_wr = {$bits(CP0RegWriteReq_t){1'b0}};
 
 cpu_ex stage_ex_a(
 	.clk,
 	.rst,
 	.flush,
 	.hilo_unsafe(reg_hilo),
-	.cp0_rdata_unsafe(cp0_rdata1),
-	.cp0_raddr(cp0_raddr1),
-	.cp0_rsel(cp0_rsel1),
+	.cp0_rdata_unsafe(cp0_rdata),
+	.cp0_raddr(cp0_raddr),
+	.cp0_rsel(cp0_rsel),
 	.stall_req(stall_from_ex_a),
 
 	.data_idex(data_idex_a),
@@ -361,9 +357,10 @@ cpu_ex stage_ex_b(
 	.rst,
 	.flush,
 	.hilo_unsafe(reg_hilo),
-	.cp0_rdata_unsafe(cp0_rdata2),
-	.cp0_raddr(cp0_raddr2),
-	.cp0_rsel(cp0_rsel2),
+	// only pipe-a will read CP0
+	.cp0_rdata_unsafe(`ZERO_WORD),
+	.cp0_raddr(),
+	.cp0_rsel(),
 	.stall_req(stall_from_ex_b),
 
 	.data_idex(data_idex_b),
@@ -373,7 +370,7 @@ cpu_ex stage_ex_b(
 
 	.mem_hilo_wr_a(req_mem_a.hilo_wr),
 	.mem_hilo_wr_b(req_mem_b.hilo_wr),
-	.mem_cp0_reg_wr(req_mem_a.cp0_reg_wr),
+	.mem_cp0_reg_wr(empty_cp0_reg_wr),
 	.wb_cp0_reg_wr(cp0_reg_wr),
 
 	.ex_hilo_wr_a(req_ex_a.hilo_wr),

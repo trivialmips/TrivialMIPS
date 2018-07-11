@@ -34,7 +34,8 @@ begin
 		reg_wr1 = req_a.reg_wr;
 		reg_wr2 = req_b.reg_wr;
 		hilo_wr = req_b.hilo_wr.we ? req_b.hilo_wr : req_a.hilo_wr;
-		cp0_reg_wr = req_b.cp0_reg_wr.we ? req_b.cp0_reg_wr : req_a.cp0_reg_wr;
+		// only pipe-a will access CP0
+		cp0_reg_wr = req_a.cp0_reg_wr;
 	end
 end
 
