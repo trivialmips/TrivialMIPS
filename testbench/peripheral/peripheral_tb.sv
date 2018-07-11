@@ -144,6 +144,10 @@ module peripheral_tb();
         .gpio(gpio.master)
     );
 
+    timer_controller timer_controller_instance(
+        .data_bus(timer_if.slave)
+    );
+
     task test_data_bus(
         input Word_t address,
         input Word_t data,
@@ -341,6 +345,46 @@ module peripheral_tb();
         assert_value("Inst 1 read next clock", 32'h11773377, cpu_inst_if.data_rd);
 
         $display("[SRAM] test ended");
+
+        $display("[Timer] test begin");
+
+        @(negedge clk.base);
+        begin
+            test_data_bus(
+                .address(32'h04000000),
+                .data(32'h22222222),
+                .read(0),
+                .write(1),
+                .mask(4'b1111)
+            );
+        end
+
+        @(negedge clk._10M);
+        @(negedge clk._10M);
+        @(negedge clk._10M);
+        @(negedge clk._10M);
+        assert_value("Timer set", 32'h22222222, timer_controller_instance.timer);
+
+        @(negedge clk.base);
+        begin
+            test_data_bus(
+                .address(32'h04000000),
+                .data(32'h22222222),
+                .read(1),
+                .write(0),
+                .mask(4'b1111)
+            );
+        end
+
+        @(negedge clk._10M);
+        @(negedge clk._10M);
+        @(negedge clk._10M);
+        @(negedge clk._10M);
+        assert_value("Timer read after 1 period", 32'h22222223, cpu_data_if.data_rd);
+
+        $display("[Timer] test ended");
+
+
         $stop;
     end
 
