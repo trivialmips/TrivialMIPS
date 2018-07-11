@@ -7,10 +7,10 @@ module except(
 	input  ExceptInfo_t  except_a,
 	input  ExceptInfo_t  except_b,
 	input  CP0Regs_t     cp0_regs_unsafe,
+	input  Bit_t         is_user_mode,
 	input  CP0RegWriteReq_t wb_cp0_reg_wr,
 	output ExceptReq_t   except_req
 );
-
 
 Word_t wb_cp0_reg_wmask, wb_cp0_reg_wdata;
 cp0_write_mask cp0_write_mask_instance(
@@ -40,12 +40,6 @@ assign interrupt_occur = (
 	cp0_regs.status.ie &&
 	~cp0_regs.status.exl && ~cp0_regs.status.erl &&
 	(cp0_regs.cause.ip & cp0_regs.status.im) != 8'b0
-);
-assign is_user_mode = (
-	// TODO: check whether DM bit in debug is zero
-	cp0_regs.status.um &&
-	~cp0_regs.status.exl &&
-	~cp0_regs.status.erl
 );
 
 always_comb

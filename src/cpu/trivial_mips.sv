@@ -73,6 +73,8 @@ RegAddr_t cp0_raddr1, cp0_raddr2;
 logic [2:0] cp0_rsel1, cp0_rsel2;
 CP0RegWriteReq_t cp0_reg_wr;
 Word_t cp0_rdata1, cp0_rdata2;
+logic [7:0] cp0_asid;
+Bit_t cp0_user_mode;
 cp0 cp0_instance(
 	.clk,
 	.rst,
@@ -85,7 +87,24 @@ cp0 cp0_instance(
 	.int_req,
 	.rdata1(cp0_rdata1),
 	.rdata2(cp0_rdata2),
-	.regs(cp0_regs)
+	.regs(cp0_regs),
+	.asid(cp0_asid),
+	.user_mode(cp0_user_mode)
+);
+
+// MMU
+InstAddr_t mmu_inst_vaddr;
+MemAddr_t  mmu_data_vaddr;
+MMUResult_t mmu_inst_result, mmu_data_result;
+mmu mmu_instance(
+	.clk,
+	.rst,
+	.asid(cp0_asid),
+	.is_user_mode(cp0_user_mode),
+	.inst_vaddr(mmu_inst_vaddr),
+	.data_vaddr(mmu_data_vaddr),
+	.inst_result(mmu_inst_result),
+	.data_result(mmu_data_result)
 );
 
 // stall control
@@ -401,6 +420,7 @@ except except_handler(
 	.except_b(req_mem_b.except),
 	.except_req,
 	.cp0_regs_unsafe(cp0_regs),
+	.is_user_mode(cp0_user_mode),
 	.wb_cp0_reg_wr(cp0_reg_wr)
 );
 
