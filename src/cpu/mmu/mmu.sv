@@ -19,11 +19,11 @@ begin: generate_mmu_enabled_code
 	Bit_t inst_mapped, data_mapped;
 	TLBResult_t inst_tlb_result, data_tlb_result;
 
-	function is_vaddr_mapped(
+	function logic is_vaddr_mapped(
 		input MemAddr_t vaddr
 	);
 		// useg (0xx), kseg2 (110), kseg3 (111)
-		assign is_vaddr_mapped = (~vaddr[31] || vaddr[31:30] == 2'b11);
+		return (~vaddr[31] || vaddr[31:30] == 2'b11);
 	endfunction
 
 	assign inst_mapped = is_vaddr_mapped(inst_vaddr);
