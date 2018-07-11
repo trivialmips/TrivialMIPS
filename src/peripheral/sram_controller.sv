@@ -95,7 +95,7 @@ always_ff @(posedge clk or posedge rst) begin
             ram_write <= 1'b0;
 
             base_ram.we_n <= 1'b1;
-            base_ram.ce_n <= 1'b1;
+            base_ram.ce_n <= 1'b0;
             base_ram.be_n <= 4'b0000;
             base_ram.oe_n <= ~inst_bus.read;
 

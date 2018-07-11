@@ -39,7 +39,7 @@ module gpio_controller(
         end else begin
             if (clk_bus == 1'b0) begin
                 if (data_bus.read) begin
-                    if (data_bus.address[1:0] == 2'h0) begin
+                    if (data_bus.address[1:0] != 2'h0) begin
                         data_bus.data_rd <= `ZERO_WORD;
                     end else begin
                         data_bus.data_rd <= gpio.dip_sw;

@@ -22,9 +22,9 @@ module peripheral_tb();
     wire[7:0]  dpy1;
 
     assign gpio.dip_sw = dip_sw;
-    assign gpio.leds = leds;
-    assign gpio.dpy0 = dpy0;
-    assign gpio.dpy1 = dpy1;
+    assign leds = gpio.leds;
+    assign dpy0 = gpio.dpy0;
+    assign dpy1 = gpio.dpy1;
 
     parameter BASE_RAM_INIT_FILE = "";
     parameter EXT_RAM_INIT_FILE = "";
@@ -143,5 +143,205 @@ module peripheral_tb();
         .data_bus(gpio_if.slave),
         .gpio(gpio.master)
     );
+
+    task test_data_bus(
+        input Word_t address,
+        input Word_t data,
+        input logic read,
+        input logic write,
+        input ByteMask_t mask
+    );
+
+    cpu_data_if.read = read;
+    cpu_data_if.write = write;
+    cpu_data_if.address = address;
+    cpu_data_if.data_wr = data;
+    cpu_data_if.mask = mask;
+
+    endtask
+
+    task test_inst_bus(
+        input Word_t address
+    );
+
+    cpu_inst_if.read = 1'b1;
+    cpu_inst_if.write = 1'b0;
+    cpu_inst_if.address = address;
+
+    endtask
+
+    task assert_value(
+        input string name,
+        input integer expected,
+        input integer result
+    );
+    assert (result == expected) $display("[%s] OK, is 0x%x", name, expected);
+    else begin
+        $error("[%s] Failed, shoule be 0x%x, got 0x%x", name, expected, result);
+        $stop;
+    end
+
+    endtask
+
+    initial begin
+        wait (clk.rst == 1'b0);
+
+        // bootrom
+        $display("[Bootrom] test begin");
+        @(negedge clk.base_2x);
+        begin
+            test_inst_bus(
+                .address(32'h1FC00000)
+            );
+        end
+
+        @(posedge clk.base);
+        assert_value("Read instruction 1", 32'h3C04BFC0, cpu_inst_if.data_rd);
+        assert_value("Read instruction 2", 32'h3C038000, cpu_inst_if.data_rd_2);
+        $display("[Bootrom] test ended");
+
+
+        // GPIO
+        $display("[GPIO] test begin");
+        @(negedge clk.base_2x);
+        begin
+            dip_sw = 32'h12345678;
+            test_data_bus(
+                .address(32'h06000000),
+                .data(0),
+                .read(1),
+                .write(0),
+                .mask(4'b1111)
+            );
+        end
+
+        @(posedge clk.base);
+        assert_value("Read dip_sw", 32'h12345678, cpu_data_if.data_rd);
+
+
+        @(negedge clk.base_2x);
+        begin
+            test_data_bus(
+                .address(32'h06000004),
+                .data(32'h0000CAFE),
+                .read(0),
+                .write(1),
+                .mask(4'b1111)
+            );
+        end
+
+        @(posedge clk.base);
+        assert_value("Write 7-segment low", 8'hFE, dpy0);
+        assert_value("Write 7-segment high", 8'hCA, dpy1);
+
+
+        @(negedge clk.base_2x);
+        begin
+            test_data_bus(
+                .address(32'h06000004),
+                .data(32'h800000FE),
+                .read(0),
+                .write(1),
+                .mask(4'b1111)
+            );
+        end
+
+        @(posedge clk.base);
+        assert_value("Write 7-segment low", 8'hEC, dpy0);
+        assert_value("Write 7-segment high", 8'hE8, dpy1);
+
+
+        @(negedge clk.base_2x);
+        begin
+            test_data_bus(
+                .address(32'h06000008),
+                .data(32'h00002333),
+                .read(0),
+                .write(1),
+                .mask(4'b1111)
+            );
+        end
+
+        @(posedge clk.base);
+        assert_value("Write leds", 16'h2333, leds);
+        $display("[GPIO] test ended");
+
+
+        // sram
+        $display("[SRAM] test begin");
+        @(negedge clk.base_2x);
+        begin
+            test_data_bus(
+                .address(32'h00000000),
+                .data(32'h66666666),
+                .read(0),
+                .write(1),
+                .mask(4'b1111)
+            );
+        end
+
+        @(posedge clk.base);
+        assert_value("Data bus stall this clock", 1'b1, cpu_data_if.stall);
+
+        @(negedge clk.base_2x);
+        begin
+            test_inst_bus(
+                .address(32'h00000000)
+            );
+        end
+
+        @(posedge clk.base);
+        assert_value("Data bus stall next clock", 1'b0, cpu_data_if.stall);
+        assert_value("Inst 1 read this clock", 32'h66666666, cpu_inst_if.data_rd);
+
+        @(negedge clk.base_2x);
+        begin
+            test_data_bus(
+                .address(32'h00000004),
+                .data(32'h77777777),
+                .read(0),
+                .write(1),
+                .mask(4'b1111)
+            );
+            test_inst_bus(
+                .address(32'h00000000)
+            );
+        end
+
+        @(posedge clk.base);
+        assert_value("Data bus stall this clock", 1'b1, cpu_data_if.stall);
+        assert_value("Inst 1 read this clock", 32'h66666666, cpu_inst_if.data_rd);
+
+        @(posedge clk.base);
+        assert_value("Data bus stall next clock", 1'b0, cpu_data_if.stall);
+        assert_value("Inst 1 read next clock", 32'h66666666, cpu_inst_if.data_rd);
+        assert_value("Inst 2 read next clock", 32'h77777777, cpu_inst_if.data_rd_2);
+
+
+        @(negedge clk.base_2x);
+        begin
+            test_data_bus(
+                .address(32'h00000004),
+                .data(32'h11223344),
+                .read(0),
+                .write(1),
+                .mask(4'b1010)
+            );
+            test_inst_bus(
+                .address(32'h00000004)
+            );
+        end
+
+        @(posedge clk.base);
+        assert_value("Data bus stall this clock", 1'b1, cpu_data_if.stall);
+        assert_value("Inst 1 read this clock", 32'h77777777, cpu_inst_if.data_rd);
+
+        @(posedge clk.base);
+        assert_value("Data bus stall next clock", 1'b0, cpu_data_if.stall);
+        assert_value("Inst 1 read next clock", 32'h11773377, cpu_inst_if.data_rd);
+
+        $display("[SRAM] test ended");
+        $stop;
+    end
 
 endmodule

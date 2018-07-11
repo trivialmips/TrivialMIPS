@@ -131,6 +131,7 @@ endtask
 
 initial
 begin
+	wait (clk.rst == 1'b0);
 	unittest("inst_ori", 0);
 	unittest("inst_logical", 0);
 	unittest("inst_move", 0);

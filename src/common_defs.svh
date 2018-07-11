@@ -58,7 +58,8 @@ typedef Word_t  MemAddr_t;
 
 `define EVAL(A) `A
 `define CONCAT_TO_LENGTH(NAME, LENGTH) {NAME, {(LENGTH - $bits(NAME)){1'b0}}}
-`define CONCAT_PREFIX(NAME) `CONCAT_TO_LENGTH(`EVAL(NAME``_ADDRESS_PREFIX), `LONGEST_ADDRESS_PREFIX_WIDTH)
+`define SHIFT_TO_LENGTH(NAME,LENGTH) (NAME << (LENGTH-$bits(NAME)))
+`define CONCAT_PREFIX(NAME) `SHIFT_TO_LENGTH(`EVAL(NAME``_ADDRESS_PREFIX), `LONGEST_ADDRESS_PREFIX_WIDTH)
 
 // actual address widths
 // the last two bits are always not used in order to align in 4 bytes
