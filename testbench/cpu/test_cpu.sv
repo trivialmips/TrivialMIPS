@@ -7,11 +7,7 @@ module test_cpu_tb();
 
 Clock_t clk;
 
-initial begin
-	clk.base = 1'b0;
-end
-
-always #10 clk.base = ~clk.base;
+clock clock_instance(.clk);
 
 
 Bus_if data_bus_if(.clk);
