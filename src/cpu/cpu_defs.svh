@@ -9,6 +9,8 @@
 `include "common_defs.svh"
 
 
+`define TLB_ENTRIES_NUM       16
+`define TLB_ENTRIES_NUM_LOG2  4
 `define PC_RESET_VECTOR 32'hbfc00000
 
 // register access
@@ -102,9 +104,11 @@ typedef struct packed {
 
 // exception
 typedef struct packed {
-	Bit_t occur, eret;
-	logic [4:0] code;
-	Word_t extra;
+	Bit_t iaddr_miss, iaddr_illegal, iaddr_invalid;
+	Bit_t daddr_miss, daddr_illegal, daddr_invalid;
+	Bit_t syscall, break_, priv_inst, overflow;
+	Bit_t invalid_inst, trap, eret;
+	Bit_t daddr_unaligned, daddr_readonly;
 } ExceptInfo_t;
 
 typedef struct packed {
@@ -117,6 +121,7 @@ typedef struct packed {
 
 /* cause register exc_code field */
 `define EXCCODE_INT   5'h00  // interrupt
+`define EXCCODE_MOD   5'h01  // TLB modification exception
 `define EXCCODE_TLBL  5'h02  // TLB exception (load or instruction fetch)
 `define EXCCODE_TLBS  5'h03  // TLB exception (store)
 `define EXCCODE_ADEL  5'h04  // address exception (load or instruction fetch)
@@ -186,7 +191,6 @@ typedef struct packed {
 	Word_t reg1, reg2, imm;  // ID, EX
 	RegAddr_t reg_addr1, reg_addr2;  // ID, EX
 	Bit_t delayslot;         // IF, ID, EX, MEM
-	Bit_t is_priv_inst;      // EX, MEM
 } PipelineData_t;
 
 typedef struct packed {
@@ -203,5 +207,28 @@ typedef struct packed {
 	Inst_t inst1, inst2;
 	Bit_t inst2_taken;
 } InstPair_t;
+
+// TLB entries
+typedef struct packed {
+	logic [2:0] c0, c1;
+	logic [7:0] asid;
+	logic [18:0] vpn2;
+	logic [23:0] pfn0, pfn1;
+	logic d1, v1, d0, v0;
+	logic G;
+} TLBEntry_t;
+
+typedef logic [`TLB_ENTRIES_NUM * $bits(TLBEntry_t) - 1:0] TLBFlatEntries_t;
+typedef struct packed {
+	MemAddr_t phy_addr;
+	logic [3:0] which;
+	logic miss, dirty, valid;
+	logic [2:0] cache_flag;
+} TLBResult_t;
+
+typedef struct packed {
+	MemAddr_t phy_addr;
+	logic invalid, miss, dirty, illegal;
+} MMUResult_t;
 
 `endif

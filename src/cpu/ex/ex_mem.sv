@@ -30,14 +30,13 @@ module ex_mem(
 	q.memory_req.we    <= 1'b0;           \
 	q.memory_req.addr  <= `ZERO_WORD;     \
 	q.memory_req.wdata <= `ZERO_WORD;     \
-	q.except.occur     <= 1'b0;           \
+	q.except           <= {$bits(ExceptInfo_t){1'b0}};  \
 	q.llbit_set        <= 1'b0;
 
 `define RST_DATA_EXMEM(d) \
 	d.pc         <= `ZERO_WORD; \
 	d.op         <= OP_NOP;     \
-	d.delayslot  <= 1'b0;      \
-	d.is_priv_inst <= 1'b0;
+	d.delayslot  <= 1'b0; 
 
 always @(posedge clk)
 begin

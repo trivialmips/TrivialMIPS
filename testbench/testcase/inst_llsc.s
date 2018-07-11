@@ -4,7 +4,8 @@
 	.set nomacro
 	.set noat
 _start:
-	ori $5, $0, 0x1000    # ans: $5=0x00001000
+    lui $5, 0xa000        # ans: $5=0xa0000000
+	ori $5, $5, 0x1000    # ans: $5=0xa0001000
 	ori $1, $0, 0x1234    # ans: $1=0x00001234
 	sw  $1, 0x0($5)       # ans: [0x1000]=0x00001234
 	ori $2, $0, 0x5678    # ans: $2=0x00005678

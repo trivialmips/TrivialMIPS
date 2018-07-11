@@ -4,54 +4,89 @@ module cpu_mem(
 	input  rst,
 
 	input  Bit_t          ll_bit,
-	input  Oper_t         op_a,
-	input  Oper_t         op_b,
-	input  MemAccessReq_t memory_req_a,
-	input  MemAccessReq_t memory_req_b,
 
-	input  RegWriteReq_t  wr_a_i,
-	input  RegWriteReq_t  wr_b_i,
-	output RegWriteReq_t  wr_a_o,
-	output RegWriteReq_t  wr_b_o,
+	input  PipelineData_t data_ex_a,
+	input  PipelineData_t data_ex_b,
+	input  PipelineReq_t  req_ex_a,
+	input  PipelineReq_t  req_ex_b,
+	output PipelineReq_t  req_mem_a,
+	output PipelineReq_t  req_mem_b,
+
+	input  MMUResult_t    mmu_data_result,
+	output MemAddr_t      mmu_data_vaddr,
 
 	input  Bit_t         except_already_occur,
 
 	Bus_if.master        data_bus,
 
-	output Bit_t         alpha_taken,
-	output Bit_t         llbit_reset,
-	output Bit_t         stall_req,
-	output ExceptInfo_t  except
+	output Bit_t  memory_data_we,
+	output Bit_t  llbit_reset,
+	output Bit_t  stall_req
 );
+
+assign req_mem_a.llbit_set  = req_ex_a.llbit_set;
+assign req_mem_a.memory_req = req_ex_a.memory_req;
+assign req_mem_a.hilo_wr    = req_ex_a.hilo_wr;
+assign req_mem_a.cp0_reg_wr = req_ex_a.cp0_reg_wr;
+
+assign req_mem_b.llbit_set  = req_ex_b.llbit_set;
+assign req_mem_b.memory_req = req_ex_b.memory_req;
+assign req_mem_b.hilo_wr    = req_ex_b.hilo_wr;
+assign req_mem_b.cp0_reg_wr = req_ex_b.cp0_reg_wr;
 
 Oper_t op;
 MemAccessReq_t memory_req;
 RegWriteReq_t wr_i, wr_o;
+ExceptInfo_t except_i, except_o;
+assign memory_data_we = (memory_req.ce & memory_req.we);
 
 always_comb
 begin
 	// Only one of pipe-a and pipe-b may access memory
-	if(memory_req_b.ce)
+	if(req_ex_b.memory_req.ce)
 	begin
-		alpha_taken = 1'b0;
-		memory_req = memory_req_b;
-		op = op_b;
-		wr_i = wr_b_i;
-		wr_b_o = wr_o;
-		wr_a_o = wr_a_i;
+		memory_req       = req_ex_b.memory_req;
+		op               = data_ex_b.op;
+		except_i         = req_ex_b.except;
+		wr_i             = req_ex_b.reg_wr;
+		req_mem_b.except = except_o;
+		req_mem_a.except = req_ex_a.except;
+		req_mem_b.reg_wr = wr_o;
+		req_mem_a.reg_wr = req_ex_a.reg_wr;
 	end else begin
-		alpha_taken = 1'b1;
-		memory_req = memory_req_a;
-		op = op_a;
-		wr_i = wr_a_i;
-		wr_a_o = wr_o;
-		wr_b_o = wr_b_i;
+		memory_req       = req_ex_a.memory_req;
+		op               = data_ex_a.op;
+		except_i         = req_ex_a.except;
+		wr_i             = req_ex_a.reg_wr;
+		req_mem_a.except = except_o;
+		req_mem_b.except = req_ex_b.except;
+		req_mem_a.reg_wr = wr_o;
+		req_mem_b.reg_wr = req_ex_b.reg_wr;
 	end
 end
 
+// exception
+always_comb
+begin
+	except_o = except_i;
+	if(memory_req.ce)
+	begin
+		except_o.daddr_miss     = mmu_data_result.miss;
+		except_o.daddr_invalid  = mmu_data_result.invalid;
+		except_o.daddr_illegal  = mmu_data_result.illegal;
+		except_o.daddr_readonly = memory_req.we & ~mmu_data_result.dirty;
+	end else begin
+		except_o.daddr_miss     = 1'b0;
+		except_o.daddr_invalid  = 1'b0;
+		except_o.daddr_illegal  = 1'b0;
+		except_o.daddr_readonly = 1'b0;
+	end
+end
+
+assign mmu_data_vaddr = memory_req.addr;
 assign stall_req = data_bus.stall;
 assign llbit_reset = 1'b0;
-assign except.occur = 1'b0;
+// assign except.occur = 1'b0;
 
 logic [1:0] addr_offset;
 Word_t aligned_data_rd, unaligned_data_rd, ext_sel;
@@ -65,7 +100,7 @@ assign ext_sel = {
 	{8{memory_req.sel[1]}},
 	{8{memory_req.sel[0]}}
 };
-assign addr_offset = memory_req.addr[1:0];
+assign addr_offset          = mmu_data_result.phy_addr[1:0];
 assign signed_ext_byte      = { {24{aligned_data_rd[7]}}, aligned_data_rd[7:0] };
 assign signed_ext_half_word = { {16{aligned_data_rd[15]}}, aligned_data_rd[15:0] };
 assign zero_ext_byte      = { 24'b0, aligned_data_rd[7:0] };
@@ -82,6 +117,8 @@ begin
 	end
 end
 
+assign data_bus.address = mmu_data_result.phy_addr;
+
 always_comb
 begin
 	if(rst == 1'b1)
@@ -90,13 +127,10 @@ begin
 		wr_o.waddr = `ZERO_WORD;
 		wr_o.wdata = `ZERO_WORD;
 
-		data_bus.address = `ZERO_WORD;
 		data_bus.read    = `ZERO_BIT;
 		data_bus.write   = `ZERO_BIT;
 		data_bus.data_wr = `ZERO_WORD;
 		data_bus.mask    = 4'b0000;
-
-		// except.occur = 1'b0;
 	end else if(memory_req.ce) begin
 		if(except_already_occur)
 		begin
@@ -104,14 +138,12 @@ begin
 			wr_o.waddr = `ZERO_WORD;
 			wr_o.wdata = `ZERO_WORD;
 
-			data_bus.address = `ZERO_WORD;
 			data_bus.read    = `ZERO_BIT;
 			data_bus.write   = `ZERO_BIT;
 			data_bus.data_wr = `ZERO_WORD;
 			data_bus.mask    = 4'b0000;
 		end else if(memory_req.we) begin
 			// write memory
-			data_bus.address = { memory_req.addr[31:2], 2'b0 };
 			data_bus.read    = `ZERO_BIT;
 			data_bus.write   = 1'b1;
 			data_bus.data_wr = memory_req.wdata;
@@ -130,7 +162,6 @@ begin
 			end
 		end else begin
 			// read memory
-			data_bus.address = { memory_req.addr[31:2], 2'b0 };
 			data_bus.read    = 1'b1;
 			data_bus.write   = `ZERO_BIT;
 			data_bus.data_wr = `ZERO_WORD;
@@ -150,7 +181,6 @@ begin
 	end else begin
 		wr_o = wr_i;
 
-		data_bus.address = `ZERO_WORD;
 		data_bus.read    = `ZERO_BIT;
 		data_bus.write   = `ZERO_BIT;
 		data_bus.data_wr = `ZERO_WORD;

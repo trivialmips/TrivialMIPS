@@ -33,7 +33,7 @@ assign reg_wr1 = trivial_cpu_instance.reg_wr1;
 assign reg_wr2 = trivial_cpu_instance.reg_wr2;
 assign hilo_wr1 = trivial_cpu_instance.stage_wb.req_a.hilo_wr;
 assign hilo_wr2 = trivial_cpu_instance.stage_wb.req_b.hilo_wr;
-assign mem_access_path1 = trivial_cpu_instance.stage_mem.memory_req_a.ce;
+assign mem_access_path1 = trivial_cpu_instance.stage_mem.req_mem_a.memory_req.ce;
 
 task judge(input integer fans, input integer cycle, input string out, input check_cyc);
 	string ans, out_with_cyc;
@@ -54,7 +54,7 @@ logic [31:0] dbus_data_delay;
 always @(negedge clk.base)
 begin
 	dbus_we_delay <= fake_data_bus_instance.data_bus.write;
-	dbus_addr_delay <= fake_data_bus_instance.data_bus.address;
+	dbus_addr_delay <= {fake_data_bus_instance.data_bus.address[15:2], 2'b0};
 	dbus_data_delay <= fake_data_bus_instance.data_w;
 end
 

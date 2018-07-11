@@ -7,10 +7,11 @@ module except(
 	input  ExceptInfo_t  except_a,
 	input  ExceptInfo_t  except_b,
 	input  CP0Regs_t     cp0_regs_unsafe,
+	input  Bit_t         is_user_mode,
+	input  Bit_t         memory_data_we,
 	input  CP0RegWriteReq_t wb_cp0_reg_wr,
 	output ExceptReq_t   except_req
 );
-
 
 Word_t wb_cp0_reg_wmask, wb_cp0_reg_wdata;
 cp0_write_mask cp0_write_mask_instance(
@@ -34,40 +35,74 @@ end
 
 InstAddr_t pc;
 ExceptInfo_t except;
-Bit_t interrupt_occur, is_user_mode;
+
+Bit_t interrupt_occur;
 assign interrupt_occur = (
 	// TODO: check whether DM bit in debug is zero
 	cp0_regs.status.ie &&
 	~cp0_regs.status.exl && ~cp0_regs.status.erl &&
 	(cp0_regs.cause.ip & cp0_regs.status.im) != 8'b0
 );
-assign is_user_mode = (
-	// TODO: check whether DM bit in debug is zero
-	cp0_regs.status.um &&
-	~cp0_regs.status.exl &&
-	~cp0_regs.status.erl
-);
 
+Bit_t except_occur;
+Word_t except_extra;
+logic [4:0] except_code;
 always_comb
 begin
+	except = except_a | except_b;
+	except.priv_inst = except.priv_inst & is_user_mode;
+	except_occur = |except;
+	except_extra = `ZERO_WORD;
+
+	// see MIPS32 Spec Vol3 Sec6.2.1 for exception priority
 	if(interrupt_occur)
 	begin
-		except.occur = 1'b1;
-		except.eret  = 1'b0;
-		except.code  = `EXCCODE_INT;
-		except.extra = 32'b0;
+		except_code = `EXCCODE_INT;
 		except_req.alpha_taken = 1'b1;
-	end else if(is_user_mode && (data_a.is_priv_inst || data_b.is_priv_inst)) begin
-		except.occur = is_user_mode;
-		except.eret  = 1'b0;
-		except.code  = `EXCCODE_CpU;
-		except.extra = 2'd1;  // for status.ce
-		except_req.alpha_taken = data_a.is_priv_inst;
-	end else if(except_a.occur) begin
-		except = except_a;
-		except_req.alpha_taken = 1'b1;
+	end else if(except.iaddr_illegal) begin
+		except_code = `EXCCODE_ADEL;
+		except_req.alpha_taken = except_a.iaddr_illegal;
+	end else if(except.iaddr_miss) begin
+		except_code = `EXCCODE_TLBL;
+		except_req.alpha_taken = except_a.iaddr_miss;
+	end else if(except.iaddr_invalid) begin
+		except_code = `EXCCODE_TLBL;
+		except_req.alpha_taken = except_a.iaddr_invalid;
+	end else if(except.syscall) begin
+		except_code = `EXCCODE_SYS;
+		except_req.alpha_taken = except_a.syscall;
+	end else if(except.break_) begin
+		except_code = `EXCCODE_BP;
+		except_req.alpha_taken = except_a.break_;
+	end else if(except.overflow) begin
+		except_code = `EXCCODE_OV;
+		except_req.alpha_taken = except_a.overflow;
+	end else if(except.trap) begin
+		except_code = `EXCCODE_TR;
+		except_req.alpha_taken = except_a.trap;
+	end else if(except.eret) begin
+		except_code = 5'b0;
+		except_req.alpha_taken = except_a.eret;
+	end else if(except.priv_inst) begin
+		except_code = `EXCCODE_CpU;
+		except_req.alpha_taken = except_a.priv_inst;
+	end else if(except.invalid_inst) begin
+		except_code = `EXCCODE_RI;
+		except_req.alpha_taken = except_a.invalid_inst;
+	end else if(except.daddr_unaligned || except.daddr_illegal) begin
+		except_code = memory_data_we ? `EXCCODE_ADES : `EXCCODE_ADEL;
+		except_req.alpha_taken = except_a.daddr_unaligned | except_a.daddr_illegal;
+	end else if(except.daddr_miss) begin
+		except_code = memory_data_we ? `EXCCODE_TLBS : `EXCCODE_TLBL;
+		except_req.alpha_taken = except_a.daddr_miss;
+	end else if(except.daddr_invalid) begin
+		except_code = memory_data_we ? `EXCCODE_TLBS : `EXCCODE_TLBL;
+		except_req.alpha_taken = except_a.daddr_invalid;
+	end else if(except.daddr_readonly) begin
+		except_code = `EXCCODE_MOD;
+		except_req.alpha_taken = except_a.daddr_readonly;
 	end else begin
-		except = except_b;
+		except_code = 5'b0;
 		except_req.alpha_taken = 1'b0;
 	end
 end
@@ -86,7 +121,7 @@ end
 
 always_comb
 begin
-	if(rst || ~except.occur)
+	if(rst || ~except_occur)
 	begin
 		except_req.flush   = 1'b0;
 		except_req.code    = 5'b0;
@@ -96,10 +131,10 @@ begin
 		except_req.extra   = `ZERO_WORD;
 	end else begin
 		except_req.flush  = 1'b1;
-		except_req.code   = except.code;
+		except_req.code   = except_code;
 		except_req.cur_pc = pc;
-		except_req.eret   = except.eret;
-		except_req.extra  = except.extra;
+		except_req.eret   = except_a.eret; // ERET only occurs in pipe-a
+		except_req.extra  = except_extra;
 		if(except.eret)
 		begin
 			if(cp0_regs.status.erl)
@@ -109,10 +144,10 @@ begin
 			HalfWord_t offset;
 			if(cp0_regs.status.exl == 1'b0)
 			begin
-				if(except.code == `EXCCODE_TLBL || except.code == `EXCCODE_TLBS)
+				if(except_code == `EXCCODE_TLBL || except_code == `EXCCODE_TLBS)
 				begin
 					offset = 16'h000;
-				end else if(except.code == `EXCCODE_INT && cp0_regs.cause.iv) begin
+				end else if(except_code == `EXCCODE_INT && cp0_regs.cause.iv) begin
 					offset = 16'h200;
 				end else begin
 					offset = 16'h180;

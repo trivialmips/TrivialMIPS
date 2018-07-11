@@ -12,11 +12,15 @@ module cp0(
 	input  wire [5:0]    int_req,
 	output Word_t        rdata1,
 	output Word_t        rdata2,
-	output CP0Regs_t     regs
+	output CP0Regs_t     regs,
+	output wire [7:0]    asid,
+	output Bit_t         user_mode
 );
 
 CP0Regs_t regs_new, regs_inner;
 assign regs = regs_inner;
+assign asid = regs.entry_hi[7:0];
+assign user_mode = (regs.status[4:1] == 4'b1000);
 
 function Word_t read_cp0(
 	input CP0Regs_t cp0_regs,

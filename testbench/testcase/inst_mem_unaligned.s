@@ -4,7 +4,8 @@
    .set nomacro
    .global _start
 _start:
-    ori $s0, $0, 0x1000  # ans: $16=0x00001000
+	lui $s0, 0xa000      # ans: $16=0xa0000000
+    ori $s0, $s0, 0x1000 # ans: $16=0xa0001000
     lui $2, 0x1234       # ans: $2=0x12340000
     ori $2, $2, 0x5678   # ans: $2=0x12345678
 
