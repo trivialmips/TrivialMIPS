@@ -13,8 +13,6 @@ module cpu_mem(
 	output PipelineReq_t  req_mem_b,
 
 	input  MMUResult_t    mmu_data_result,
-	output MemAddr_t      mmu_data_vaddr,
-
 	input  Bit_t         except_already_occur,
 
 	Bus_if.master        data_bus,
@@ -76,7 +74,6 @@ begin
 	end
 end
 
-assign mmu_data_vaddr = memory_req.addr;
 assign stall_req = data_bus.stall;
 assign llbit_reset = 1'b0;
 // assign except.occur = 1'b0;

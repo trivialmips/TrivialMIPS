@@ -32,7 +32,8 @@ begin
 		inst_bus.read    = `ZERO_BIT;
 		inst_bus.mask    = 4'b0000;
 	end else begin
-		inst_bus.read    = ~except.iaddr_miss & ~except.iaddr_illegal & ~except.iaddr_invalid;
+		// TODO: danger!
+		inst_bus.read    = ~except.iaddr_miss; // & ~except.iaddr_illegal & ~except.iaddr_invalid;
 		inst_bus.mask    = 4'b1111;
 	end
 end

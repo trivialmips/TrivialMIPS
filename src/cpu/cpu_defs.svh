@@ -229,7 +229,7 @@ typedef struct packed {
 } TLBResult_t;
 
 typedef struct packed {
-	MemAddr_t phy_addr;
+	MemAddr_t phy_addr, virt_addr;
 	logic invalid, miss, dirty, illegal;
 } MMUResult_t;
 
