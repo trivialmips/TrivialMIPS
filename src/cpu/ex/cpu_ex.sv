@@ -63,7 +63,7 @@ assign req_ex.memory_req = memory_req;
 assign req_ex.reg_wr.we = req_idex.reg_wr.we;
 assign req_ex.reg_wr.waddr = req_idex.reg_wr.waddr;
 assign req_ex.reg_wr.wdata = ret;
-assign req_ex.except = req_idex.except.occur ? req_idex.except : except;
+assign req_ex.except = except;
 assign req_ex.llbit_set = (op == OP_LL);
 assign data_ex.op = data_idex.op;
 assign data_ex.pc = data_idex.pc;
@@ -74,11 +74,6 @@ assign data_ex.imm = data_idex.imm;
 assign data_ex.reg_addr1 = data_idex.reg_addr1;
 assign data_ex.reg_addr2 = data_idex.reg_addr2;
 assign data_ex.delayslot = data_idex.delayslot;
-assign data_ex.is_priv_inst = (
-	op == OP_CACHE || op == OP_ERET || op == OP_MFC0 ||
-	op == OP_MTC0 || op == OP_TLBP || op == OP_TLBR ||
-	op == OP_TLBWI || op == OP_TLBWR || op == OP_WAIT
-);
 
 // safe HILO
 DoubleWord_t hilo_safe;
@@ -243,60 +238,38 @@ end
 // exception
 always_comb
 begin
+	except = req_idex.except;
 	if(rst == 1'b1)
 	begin
-		except.occur = 1'b0;
-		except.code  = 5'b0;
-		except.eret  = 1'b0;
-		except.extra = `ZERO_WORD;
+		except = {$bits(ExceptInfo_t){1'b0}};
 	end else begin
-		except.occur = 1'b0;
-		except.code  = `EXCCODE_TR;
-		except.eret  = 1'b0;
-		except.extra = `ZERO_WORD;
-		case(op)
-		OP_TEQ: except.occur = (reg1 == reg2);
-		OP_TNE: except.occur = (reg1 != reg2);
-		OP_TGE: except.occur = ~signed_lt;
-		OP_TLT: except.occur = signed_lt;
-		OP_TGEU: except.occur = ~unsigned_lt;
-		OP_TLTU: except.occur = unsigned_lt;
-		OP_LW, OP_LL, OP_SW: begin
-			except.occur = mem_addr[0] | mem_addr[1];
-			except.code  = (op == OP_SW) ? `EXCCODE_ADES : `EXCCODE_ADEL;
-			except.extra = mem_addr;
-		end
-		OP_LH, OP_LHU, OP_SH: begin
-			except.occur = mem_addr[0];
-			except.code  = (op == OP_SH) ? `EXCCODE_ADES : `EXCCODE_ADEL;
-			except.extra = mem_addr;
-		end
-		OP_BREAK: begin
-			except.occur = 1'b1;
-			except.code  = `EXCCODE_BP;
-		end
-		OP_SYSCALL: begin
-			except.occur = 1'b1;
-			except.code  = `EXCCODE_SYS;
-		end
-		OP_ADD: begin
-			except.occur = ov_add;
-			except.code  = `EXCCODE_OV;
-		end
-		OP_SUB: begin
-			except.occur = ov_sub;
-			except.code  = `EXCCODE_OV;
-		end
-		OP_ERET: begin
-			except.occur = 1'b1;
-			except.eret  = 1'b1;
-		end
-		default: begin
-			except.occur = 1'b0;
-			except.code  = 5'b0;
-			except.eret  = 1'b0;
-			except.extra = `ZERO_WORD;
-		end
+		except.eret     = (op == OP_ERET);
+		except.break_   = (op == OP_BREAK);
+		except.syscall  = (op == OP_SYSCALL);
+		except.overflow = ((op == OP_ADD) & ov_add) | ((op == OP_SUB) & ov_sub);
+		except.invalid_inst = (op == OP_INVALID);
+		except.priv_inst = (
+			op == OP_CACHE || op == OP_ERET || op == OP_MFC0 ||
+			op == OP_MTC0 || op == OP_TLBP || op == OP_TLBR ||
+			op == OP_TLBWI || op == OP_TLBWR || op == OP_WAIT
+		);
+
+		unique case(op)
+			OP_TEQ:  except.trap = (reg1 == reg2);
+			OP_TNE:  except.trap = (reg1 != reg2);
+			OP_TGE:  except.trap = ~signed_lt;
+			OP_TLT:  except.trap = signed_lt;
+			OP_TGEU: except.trap = ~unsigned_lt;
+			OP_TLTU: except.trap = unsigned_lt;
+			default: except.trap = 1'b0;
+		endcase
+
+		unique case(op)
+			OP_LW, OP_LL, OP_SW:
+				except.daddr_unaligned = mem_addr[0] | mem_addr[1];
+			OP_LH, OP_LHU, OP_SH:
+				except.daddr_unaligned = mem_addr[0];
+			default: except.daddr_unaligned = 1'b0;
 		endcase
 	end
 end

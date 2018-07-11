@@ -32,7 +32,7 @@ module id_ex(
 `define RST_REQ_IDEX(q) \
 	q.reg_wr.we    <= 1'b0; \
 	q.reg_wr.waddr <= 5'b0; \
-	q.except.occur <= 1'b0;
+	q.except       <= {$bits(ExceptInfo_t){1'b0}};
 
 always @(posedge clk)
 begin

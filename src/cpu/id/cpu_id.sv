@@ -9,6 +9,8 @@ module cpu_id(
 	input  Word_t     reg1_i,
 	input  Word_t     reg2_i,
 
+	input  ExceptInfo_t ifid_except,
+
 	output RegAddr_t  reg_raddr1,
 	output RegAddr_t  reg_raddr2,
 
@@ -26,13 +28,10 @@ module cpu_id(
 	input  RegWriteReq_t  mem_wr_b
 );
 
-assign except.occur = 1'b0;
-
 Oper_t op;
 Word_t reg1_o, reg2_o, imm_o;
 Bit_t reg_we;
 RegAddr_t reg_waddr;
-ExceptInfo_t except;
 assign data_id.op = op;
 assign data_id.pc = pc;
 assign data_id.inst = inst;
@@ -44,7 +43,7 @@ assign data_id.imm  = imm_o;
 assign data_id.delayslot  = delayslot;
 assign req_id.reg_wr.we    = reg_we;
 assign req_id.reg_wr.waddr = reg_waddr;
-assign req_id.except = except;
+assign req_id.except = ifid_except;
 
 // 6-bit primary operation code
 logic [5:0] opcode;
@@ -52,15 +51,12 @@ logic [5:0] opcode;
 RegAddr_t rs, rd, rt;
 // 16-bit immediate
 HalfWord_t immediate;
-// 26-bit index shifted left two bits to supply the low-order 28 bits of the jump target address
-logic [25:0] instr_index;
 
 assign opcode = inst[31:26];
 assign rs = inst[25:21];
 assign rt = inst[20:16];
 assign rd = inst[15:11];
 assign immediate = inst[15:0];
-assign instr_index = inst[25:0];
 
 // load related stalling
 Bit_t is_ex_load_inst;

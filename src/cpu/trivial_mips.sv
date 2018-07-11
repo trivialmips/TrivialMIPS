@@ -6,6 +6,8 @@ module trivial_mips(
 	input wire [5:0] int_req
 );
 
+parameter mmu_enabled = 1;
+
 wire clk, rst;
 assign clk = inst_bus.clk.base;
 assign rst = inst_bus.clk.rst;
@@ -96,7 +98,9 @@ cp0 cp0_instance(
 InstAddr_t mmu_inst_vaddr;
 MemAddr_t  mmu_data_vaddr;
 MMUResult_t mmu_inst_result, mmu_data_result;
-mmu mmu_instance(
+mmu #(
+	.mmu_enabled(mmu_enabled)
+) mmu_instance (
 	.clk,
 	.rst,
 	.asid(cp0_asid),
@@ -149,17 +153,22 @@ reg_pc pc_instance(
 	.hold_pc(stall.hold_pc)
 );
 
+ExceptInfo_t if_except;
 cpu_if stage_if(
 	.rst,
 	.pc(if_pc),
 	.pc_ce,
+	.mmu_inst_result,
+	.mmu_inst_vaddr,
 	.inst_bus,
+	.except(if_except),
 	.stall_req(stall_from_if)
 );
 
 assign if_inst_pair.inst1 = inst_bus.data_rd;
 assign if_inst_pair.inst2 = inst_bus.data_rd_2;
 
+ExceptInfo_t ifid_except;
 Bit_t      id_inst_left, ifid_keep_inst, ifid_set_empty_inst;
 InstPair_t id_inst_pair_old, id_inst_pair_new;
 InstPair_t id_inst_pair;
@@ -169,9 +178,11 @@ if_id stage_if_id(
 	.clk,
 	.rst,
 	.if_pc,
+	.if_except,
 	.if_delayslot(is_branch & ~inst_pair_forward.inst2_taken),
 	.if_inst_pair,
 	.id_pc,
+	.id_except(ifid_except),
 	.id_inst_left,
 	.id_inst_pair_new,
 	.id_inst_pair_old,
@@ -214,6 +225,7 @@ cpu_id stage_id_a(
 	.pc(id_pc),
 	.inst(id_inst_pair.inst1),
 	.delayslot(id_delayslot),
+	.ifid_except(ifid_except),
 	.reg1_i(reg_rdata1),
 	.reg2_i(reg_rdata2),
 	.reg_raddr1(reg_raddr1),
@@ -235,6 +247,7 @@ cpu_id stage_id_b(
 	.pc(id_pc + 32'h4),
 	.inst(id_inst_pair.inst2),
 	.delayslot(1'b0),    // both jump and delayslot will be in pipe-a.
+	.ifid_except(ifid_except),
 	.reg1_i(reg_rdata3),
 	.reg2_i(reg_rdata4),
 	.reg_raddr1(reg_raddr3),
@@ -366,51 +379,30 @@ ex_mem stage_ex_mem(
 );
 
 // MEM stage
-ExceptInfo_t mem_except_tmp;
-Bit_t mem_llbit_reset, mem_alpha_taken;
+Bit_t mem_llbit_reset, memory_data_we;
 cpu_mem stage_mem(
 	.rst,
-	.wr_a_i(req_exmem_a.reg_wr),
-	.wr_b_i(req_exmem_b.reg_wr),
-	.wr_a_o(req_mem_a.reg_wr),
-	.wr_b_o(req_mem_b.reg_wr),
-	.op_a(data_exmem_a.op),
-	.op_b(data_exmem_b.op),
 	.ll_bit(reg_llbit),
-	.memory_req_a(req_mem_a.memory_req),
-	.memory_req_b(req_mem_b.memory_req),
-	.except_already_occur(req_exmem_a.except.occur | req_exmem_b.except.occur),
+	.data_ex_a(data_exmem_a),
+	.data_ex_b(data_exmem_b),
+	.req_ex_a(req_exmem_a),
+	.req_ex_b(req_exmem_b),
+	.req_mem_a(req_mem_a),
+	.req_mem_b(req_mem_b),
+
+	.mmu_data_result,
+	.mmu_data_vaddr,
+
+//	.except_already_occur(req_exmem_a.except.occur | req_exmem_b.except.occur),
+	.except_already_occur(flush),
 	.data_bus,
+	.memory_data_we,
 	.llbit_reset(mem_llbit_reset),
-	.stall_req(stall_from_mem),
-	.alpha_taken(mem_alpha_taken),
-	.except(mem_except_tmp)
+	.stall_req(stall_from_mem)
 );
 
 assign data_mem_a = data_exmem_a;
 assign data_mem_b = data_exmem_b;
-
-assign req_mem_a.llbit_set  = req_exmem_a.llbit_set;
-assign req_mem_a.memory_req = req_exmem_a.memory_req;
-assign req_mem_a.hilo_wr    = req_exmem_a.hilo_wr;
-assign req_mem_a.cp0_reg_wr = req_exmem_a.cp0_reg_wr;
-
-assign req_mem_b.llbit_set  = req_exmem_b.llbit_set;
-assign req_mem_b.memory_req = req_exmem_b.memory_req;
-assign req_mem_b.hilo_wr    = req_exmem_b.hilo_wr;
-assign req_mem_b.cp0_reg_wr = req_exmem_b.cp0_reg_wr;
-
-always_comb
-begin
-	if(mem_alpha_taken)
-	begin
-		req_mem_b.except = req_exmem_b.except;
-		req_mem_a.except = req_exmem_a.except.occur ? req_exmem_a.except : mem_except_tmp;
-	end else begin
-		req_mem_a.except = req_exmem_a.except;
-		req_mem_b.except = req_exmem_b.except.occur ? req_exmem_b.except : mem_except_tmp;
-	end
-end
 
 except except_handler(
 	.rst,
@@ -419,6 +411,7 @@ except except_handler(
 	.except_a(req_mem_a.except),
 	.except_b(req_mem_b.except),
 	.except_req,
+	.memory_data_we,
 	.cp0_regs_unsafe(cp0_regs),
 	.is_user_mode(cp0_user_mode),
 	.wb_cp0_reg_wr(cp0_reg_wr)
