@@ -1,9 +1,9 @@
 // Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
 // --------------------------------------------------------------------------------
 // Tool Version: Vivado v.2018.1 (win64) Build 2188600 Wed Apr  4 18:40:38 MDT 2018
-// Date        : Sun Jul  8 21:54:00 2018
+// Date        : Wed Jul 11 20:08:19 2018
 // Host        : Harry-XPS running 64-bit major release  (build 9200)
-// Command     : write_verilog -force -mode synth_stub {c:/Users/Harry
+// Command     : write_verilog -force -mode synth_stub {C:/Users/Harry
 //               Chen/Documents/Workspace/TrivialMIPS/vivado/TrivialMIPS.srcs/ip/blk_mem_bootrom/blk_mem_bootrom_stub.v}
 // Design      : blk_mem_bootrom
 // Purpose     : Stub declaration of top-level module interface
