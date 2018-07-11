@@ -74,6 +74,7 @@ typedef Word_t  MemAddr_t;
 `define GPIO_ADDRESS_WIDTH     2 // 3 addresses 
 `define USB_ADDRESS_WIDTH      1 // 2 addresses TODO: to be checked
 
+typedef logic [`BOOTROM_ADDRESS_WIDTH - 1 : 0] BootroomAddress_t;
 typedef logic [`GRAPHICS_ADDRESS_WIDTH - 1 : 0] GraphicsMemoryAddress_t;
 typedef logic [7:0] SegmentDisplay_t;
 
