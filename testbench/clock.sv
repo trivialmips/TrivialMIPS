@@ -10,7 +10,6 @@ module clock(
         clk.base = 0;
         clk.base_2x = 0;
         clk._10M = 0;
-        clk.rst = 0;
     end
 
     always #10000   clk._50M = ~clk._50M;
@@ -20,3 +19,5 @@ module clock(
     always #50000   clk._10M = ~clk._10M;
 
 endmodule
+
+`timescale 1ns / 1ps
