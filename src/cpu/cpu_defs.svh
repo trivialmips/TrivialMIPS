@@ -200,6 +200,7 @@ typedef struct packed {
 	RegWriteReq_t reg_wr;        // ID, EX, MEM, WB
 	ExceptInfo_t except;         // ID, EX, MEM
 	Bit_t llbit_set;             // EX, MEM
+	Bit_t tlb_read, tlb_wr, tlb_wi, tlbp;  // EX, MEM, WB
 } PipelineReq_t;
 
 // superscalar
@@ -218,6 +219,7 @@ typedef struct packed {
 	logic G;
 } TLBEntry_t;
 
+typedef logic [`TLB_ENTRIES_NUM_LOG2 - 1:0] TLBIndex_t;
 typedef logic [`TLB_ENTRIES_NUM * $bits(TLBEntry_t) - 1:0] TLBFlatEntries_t;
 typedef struct packed {
 	MemAddr_t phy_addr;

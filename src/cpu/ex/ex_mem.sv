@@ -31,7 +31,11 @@ module ex_mem(
 	q.memory_req.addr  <= `ZERO_WORD;     \
 	q.memory_req.wdata <= `ZERO_WORD;     \
 	q.except           <= {$bits(ExceptInfo_t){1'b0}};  \
-	q.llbit_set        <= 1'b0;
+	q.llbit_set        <= 1'b0;           \
+	q.tlb_read         <= 1'b0;           \
+	q.tlbp             <= 1'b0;           \
+	q.tlb_wr           <= 1'b0;           \
+	q.tlb_wi           <= 1'b0;
 
 `define RST_DATA_EXMEM(d) \
 	d.pc         <= `ZERO_WORD; \

@@ -8,7 +8,17 @@ module mmu(
 	input MemAddr_t   data_vaddr,
 
 	output MMUResult_t inst_result,
-	output MMUResult_t data_result
+	output MMUResult_t data_result,
+
+	// for TLBR/TLBWI/TLBWR
+	input  TLBIndex_t tlbrw_index,
+	input  Bit_t      tlbrw_we,
+	input  TLBEntry_t tlbrw_wdata,
+	output TLBEntry_t tlbrw_rdata,
+
+	// for TLBP
+	input  Word_t     tlbp_entry_hi,
+	output Word_t     tlbp_index
 );
 
 parameter mmu_enabled = 1;
@@ -49,7 +59,15 @@ begin: generate_mmu_enabled_code
 		.inst_vaddr,
 		.data_vaddr,
 		.inst_result(inst_tlb_result),
-		.data_result(data_tlb_result)
+		.data_result(data_tlb_result),
+
+		.tlbrw_index,
+		.tlbrw_we,
+		.tlbrw_wdata,
+		.tlbrw_rdata,
+
+		.tlbp_entry_hi,
+		.tlbp_index
 	);
 
 end else begin: generate_mmu_disabled_code
