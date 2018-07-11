@@ -10,6 +10,12 @@ module cp0(
 	input  CP0RegWriteReq_t wr,
 	input  ExceptReq_t   except_req,
 	input  wire [5:0]    int_req,
+
+	input  Bit_t         tlbr_req,
+	input  TLBEntry_t    tlbr_res,
+	input  Bit_t         tlbp_req,
+	input  Word_t        tlbp_res,
+
 	output Word_t        rdata1,
 	output Word_t        rdata2,
 	output CP0Regs_t     regs,
@@ -43,9 +49,23 @@ begin
 	if(rst)
 	begin
 		// TODO: the initial value of registers
-		regs_inner.count <= `ZERO_WORD;
-		regs_inner.cause <= `ZERO_WORD;
-		regs_inner.status <= 32'b0001_0000_0100_0000_0000_0000_0000_0000;
+		regs_inner.index     <= `ZERO_WORD;
+		regs_inner.random    <= `TLB_ENTRIES_NUM - 1;
+		regs_inner.entry_lo0 <= `ZERO_WORD;
+		regs_inner.entry_lo1 <= `ZERO_WORD;
+		regs_inner.context_  <= `ZERO_WORD;
+		regs_inner.page_mask <= `ZERO_WORD;
+		regs_inner.wired     <= `ZERO_WORD;
+		regs_inner.bad_vaddr <= `ZERO_WORD;
+		regs_inner.count     <= `ZERO_WORD;
+		regs_inner.entry_hi  <= `ZERO_WORD;
+		regs_inner.compare   <= `ZERO_WORD;
+		regs_inner.status    <= 32'b0001_0000_0100_0000_0000_0000_0000_0000;
+		regs_inner.cause     <= `ZERO_WORD;
+		regs_inner.epc       <= `ZERO_WORD;
+		regs_inner.prid      <= `ZERO_WORD;
+		regs_inner.config0   <= `ZERO_WORD;
+		regs_inner.error_epc <= `ZERO_WORD;
 	end else begin
 		regs_inner <= regs_new;
 	end
@@ -72,6 +92,21 @@ begin
 		wdata = (wr.wdata & wmask) | (wdata & ~wmask);
 		regs_new[wr.waddr * `REG_DATA_WIDTH +: 32] = wdata;
 	end
+
+	/* TLBR/TLBP instruction (WB stage) */
+	if(tlbr_req)
+	begin
+		regs_new.entry_hi[31:13] = tlbr_res.vpn2;
+		regs_new.entry_hi[7:0]   = tlbr_res.asid;
+		regs_new.entry_lo1 = {
+			2'b0, tlbr_res.pfn1, tlbr_res.c1,
+			tlbr_res.d1, tlbr_res.v1, tlbr_res.G };
+		regs_new.entry_lo0 = {
+			2'b0, tlbr_res.pfn0, tlbr_res.c0,
+			tlbr_res.d0, tlbr_res.v0, tlbr_res.G };
+	end
+
+	if(tlbp_req) regs_new.index = tlbp_res;
 
 	/* exception (MEM stage) */
 	if(except_req.flush)

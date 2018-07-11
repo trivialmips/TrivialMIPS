@@ -77,6 +77,8 @@ CP0RegWriteReq_t cp0_reg_wr;
 Word_t cp0_rdata1, cp0_rdata2;
 logic [7:0] cp0_asid;
 Bit_t cp0_user_mode;
+TLBEntry_t tlbrw_rdata;
+Word_t tlbp_index;
 cp0 cp0_instance(
 	.clk,
 	.rst,
@@ -87,6 +89,12 @@ cp0 cp0_instance(
 	.wr(cp0_reg_wr),
 	.except_req,
 	.int_req,
+
+	.tlbp_req(req_memwb_a.tlbp),
+	.tlbp_res(tlbp_index),
+	.tlbr_req(req_memwb_a.tlb_read),
+	.tlbr_res(tlbrw_rdata),
+
 	.rdata1(cp0_rdata1),
 	.rdata2(cp0_rdata2),
 	.regs(cp0_regs),
@@ -98,6 +106,9 @@ cp0 cp0_instance(
 InstAddr_t mmu_inst_vaddr;
 MemAddr_t  mmu_data_vaddr;
 MMUResult_t mmu_inst_result, mmu_data_result;
+TLBIndex_t tlbrw_index;
+Bit_t tlbrw_we;
+TLBEntry_t tlbrw_wdata;
 mmu #(
 	.mmu_enabled(mmu_enabled)
 ) mmu_instance (
@@ -108,7 +119,15 @@ mmu #(
 	.inst_vaddr(mmu_inst_vaddr),
 	.data_vaddr(mmu_data_vaddr),
 	.inst_result(mmu_inst_result),
-	.data_result(mmu_data_result)
+	.data_result(mmu_data_result),
+
+	.tlbrw_index,
+	.tlbrw_we,
+	.tlbrw_wdata,
+	.tlbrw_rdata,
+
+	.tlbp_entry_hi(cp0_regs.entry_hi),
+	.tlbp_index
 );
 
 // stall control
@@ -445,5 +464,19 @@ cpu_wb stage_wb(
 
 	.stall_req(stall_from_wb)
 );
+
+assign tlbrw_we = (req_memwb_a.tlb_wi | req_memwb_a.tlb_wr);
+assign tlbrw_index = req_memwb_a.tlb_wi ? cp0_regs.index : cp0_regs.random;
+assign tlbrw_wdata.vpn2 = cp0_regs.entry_hi[31:13];
+assign tlbrw_wdata.asid = cp0_regs.entry_hi[7:0];
+assign tlbrw_wdata.pfn1 = cp0_regs.entry_lo1[29:6];
+assign tlbrw_wdata.c1   = cp0_regs.entry_lo1[5:3];
+assign tlbrw_wdata.d1   = cp0_regs.entry_lo1[2];
+assign tlbrw_wdata.v1   = cp0_regs.entry_lo1[1];
+assign tlbrw_wdata.pfn0 = cp0_regs.entry_lo0[29:6];
+assign tlbrw_wdata.c0   = cp0_regs.entry_lo0[5:3];
+assign tlbrw_wdata.d0   = cp0_regs.entry_lo0[2];
+assign tlbrw_wdata.v0   = cp0_regs.entry_lo0[1];
+assign tlbrw_wdata.G    = cp0_regs.entry_lo0[0];
 
 endmodule

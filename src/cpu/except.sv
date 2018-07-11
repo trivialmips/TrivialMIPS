@@ -59,48 +59,63 @@ begin
 	begin
 		except_code = `EXCCODE_INT;
 		except_req.alpha_taken = 1'b1;
+		$display("[Exception] Interrupt");
 	end else if(except.iaddr_illegal) begin
 		except_code = `EXCCODE_ADEL;
 		except_req.alpha_taken = except_a.iaddr_illegal;
+		$display("[Exception] Illegal Instruction Address");
 	end else if(except.iaddr_miss) begin
 		except_code = `EXCCODE_TLBL;
 		except_req.alpha_taken = except_a.iaddr_miss;
+		$display("[Exception] TLB Miss (instruction)");
 	end else if(except.iaddr_invalid) begin
 		except_code = `EXCCODE_TLBL;
 		except_req.alpha_taken = except_a.iaddr_invalid;
+		$display("[Exception] TLB Invalid (instruction)");
 	end else if(except.syscall) begin
 		except_code = `EXCCODE_SYS;
 		except_req.alpha_taken = except_a.syscall;
+		$display("[Exception] Syscall");
 	end else if(except.break_) begin
 		except_code = `EXCCODE_BP;
 		except_req.alpha_taken = except_a.break_;
+		$display("[Exception] Breakpoint");
 	end else if(except.overflow) begin
 		except_code = `EXCCODE_OV;
 		except_req.alpha_taken = except_a.overflow;
+		$display("[Exception] Overflow");
 	end else if(except.trap) begin
 		except_code = `EXCCODE_TR;
 		except_req.alpha_taken = except_a.trap;
+		$display("[Exception] Trap");
 	end else if(except.eret) begin
 		except_code = 5'b0;
 		except_req.alpha_taken = except_a.eret;
+		$display("[ERET]");
 	end else if(except.priv_inst) begin
 		except_code = `EXCCODE_CpU;
 		except_req.alpha_taken = except_a.priv_inst;
+		$display("[Exception] Privileged Instruction");
 	end else if(except.invalid_inst) begin
 		except_code = `EXCCODE_RI;
 		except_req.alpha_taken = except_a.invalid_inst;
+		$display("[Exception] Invalid Instruction");
 	end else if(except.daddr_unaligned || except.daddr_illegal) begin
 		except_code = memory_data_we ? `EXCCODE_ADES : `EXCCODE_ADEL;
 		except_req.alpha_taken = except_a.daddr_unaligned | except_a.daddr_illegal;
+		$display("[Exception] Illegal Address (data)");
 	end else if(except.daddr_miss) begin
 		except_code = memory_data_we ? `EXCCODE_TLBS : `EXCCODE_TLBL;
 		except_req.alpha_taken = except_a.daddr_miss;
+		$display("[Exception] TLB Miss (data)");
 	end else if(except.daddr_invalid) begin
 		except_code = memory_data_we ? `EXCCODE_TLBS : `EXCCODE_TLBL;
 		except_req.alpha_taken = except_a.daddr_invalid;
+		$display("[Exception] TLB Invalid (data)");
 	end else if(except.daddr_readonly) begin
 		except_code = `EXCCODE_MOD;
 		except_req.alpha_taken = except_a.daddr_readonly;
+		$display("[Exception] TLB Modification (data)");
 	end else begin
 		except_code = 5'b0;
 		except_req.alpha_taken = 1'b0;

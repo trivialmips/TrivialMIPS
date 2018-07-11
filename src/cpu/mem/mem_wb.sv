@@ -22,7 +22,11 @@ module mem_wb(
 	q.cp0_reg_wr.we    <= 1'b0;        \
 	q.cp0_reg_wr.sel   <= 3'b0;        \
 	q.cp0_reg_wr.waddr <= `ZERO_WORD;  \
-	q.cp0_reg_wr.wdata <= `ZERO_WORD;
+	q.cp0_reg_wr.wdata <= `ZERO_WORD;  \
+	q.tlb_read         <= 1'b0;        \
+	q.tlbp             <= 1'b0;        \
+	q.tlb_wr           <= 1'b0;        \
+	q.tlb_wi           <= 1'b0;
 
 always @(posedge clk)
 begin
