@@ -28,6 +28,9 @@ module graphics_controller(
                              (mem_address_overflow - `GRAPHICS_CONFIG_ADDRESS) : mem_address_overflow);
 
 
+
+    Word_t data_read_gmem;
+
     // port a for read/write request from bus
     // port b for read request from vga
     blk_mem_graphics blk_mem_graphics_instance (
@@ -35,13 +38,16 @@ module graphics_controller(
         .wea(data_bus.write),
         .addra(GraphicsMemoryAddress_t'(data_bus.address)),
         .dina(data_bus.data_wr),
-        .douta(data_bus.data_rd),
+        .douta(data_read_gmem),
         .clkb(vga_clk),
         .web(`ZERO_BIT),
         .addrb(mem_address),
         .dinb(`ZERO_WORD),
         .doutb(mem_data)
     );
+
+    assign data_bus.data_rd = rst ? `ZERO_WORD : 
+           ((data_bus.read && data_bus.address == `GRAPHICS_CONFIG_ADDRESS) ? pixel_offset : data_read_gmem);
 
 
     always_ff @(posedge bus_clk or posedge rst) begin
@@ -87,11 +93,17 @@ module graphics_controller(
     Word_t x, y;
     Word_t visible_x, visible_y;
 
-    wire [1:0] pixel_count_mod_4 = pixel_count[1:0];
+    wire [2:0] pixel_count_mod_8 = pixel_count[2:0];
 
     VgaColor_t color;
-    // every pixel takes 8 bits, little endian
-    assign color = now_data[pixel_count_mod_4 * 8 +: $bits(VgaColor_t)];
+    VgaColorNumber_t color_number;
+    // every pixel takes 4 bits, little endian
+    assign color_number = now_data[pixel_count_mod_8 * $bits(VgaColorNumber_t) +: $bits(VgaColorNumber_t)];
+
+    color_mapper color_mapper_instance(
+        .number(color_number),
+        .color
+    );
 
     assign {vga.red, vga.green, vga.blue} = color;
 
@@ -100,7 +112,7 @@ module graphics_controller(
         if (rst) begin
             now_data <= `ZERO_WORD;
         end else begin
-            if (pixel_count_mod_4 == 2'd3) begin
+            if (pixel_count_mod_8 == 3'd7) begin
                 now_data <= mem_data;
             end
         end

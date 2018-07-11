@@ -108,4 +108,8 @@ module ThinPad(
         .gpio
     );
 
+    timer_controller timer_controller_instance(
+        .data_bus(timer_if.slave)
+    )
+
 endmodule

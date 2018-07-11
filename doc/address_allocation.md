@@ -29,11 +29,43 @@ This section describes the allocation of physical addresses that used in instruc
 | USB      | `0x07000000` | `0x07FFFFFF` | 16 MB | First 2 Addresses | Register |
 | Bootrom  | `0x1FC00000` | `0x1FCFFFFF` |  4 MB | First 4KB         | Storage  |
 
+All addresses are aligned in 4, a.k.a their last two bits must be zero, otherwise an 'Address Error' exception will be triggered. Any attempt to access addresses outside 'Valid Data Size' or write to an read-only address will cause an __UNPREDITABLE__ result. Please avoiding doing so.
+
+### Storage Device
+
+SRAM, flash and bootrom are storage devices, with only SRAM writable. SRAM and bootrom guarantees to give the result of a request for instruction on the next rising edge. The device controller will pull up the 'stall' signal on the bus until the operation it is processing can be done on the next rising edge.
+
 The address and size of bootrom is special due to the hardcorded value `0xBFC00000` of register `PC` after reset, which will be mapped to `0x1FC00000`.
 
-Graphics device is of type 'hybrid', because it consists of 240000 Byte Storage from `0x02000000` to `0x0203A97F` and a configuration register at `0x0203A980`.
+### Grapics
+
+Graphics device is of type 'hybrid', because it consists of 480000 byte graphics memory (or 'framebuffer') from `0x02000000` to `0x0203A97F` and a configuration register at `0x0203A980`. Every pixel takes 4 bits in the memory, and will converted to the format of `{RED[2:0], GREEN[2:0], BLUE[1:0]}` when displayed, with the mapping hardcoded.
+
+The configuration register, which can be both read and written, is used to indicate the offset of first pixel in the framebuffer, designed to be used in screen scrolling in the operating system.
+
+### UART
+
+The first register(`0x03000000`) is read-only, whose __last__ bit represents CTS (clear to send) signal, and second last one represents DR (data ready) signal.
+
+The second register(`0x03000004`) can be read and written. When `CTS` is asserted, a writing operating sends one byte out of the UART port. When `DR` is asserted, a reading operation gets one byte that is received from the UART port. Only the lowest byte of one word is valid while writing, whether using `SW`, `SH` or `SB`.
+
+The UART device will assert an external interruption when there is data coming.
+
+### GPIO
 
 The first register(`0x06000000`) of GPIO contains the status of switches and is read-only. The second(`0x06000004`) and the third(`0x06000008`) can be written, respectively changing the status of 7-segment displays and leds, whose higher 16-bits are always ignored, except the highest bit of `0x06000004` incicating whether to decode the lowest 8 bits of itself.
+
+### Timer
+
+The only register(`0x04000000`) of Timer contains an integer that automatically increases every 1ms. It can be used to meter the accurate executing time of some instructions, without being affected by the actual frequency of CPU. The register can be written and will be set to zero on hard-reset.
+
+## Ethernet
+
+T.B.D.
+
+## USB
+
+T.B.D.
 
 ## MMIO Address Mapping
 
