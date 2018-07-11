@@ -2,17 +2,17 @@
 
 module peripheral_tb();
 
-    reg Clock_t clk;
+    Clock_t clk;
     clock clock_instance(.clk);
 
-    Sram_if.master     base_ram;
-    Sram_if.master     ext_ram; 
-    Uart_if.master     uart;
-    Flash_if.master    flash;
-    USB_if.master      usb;
-    Ethernet_if.master ethernet;
-    VGA_if.master      vga;
-    GPIO_if.master     gpio;
+    Sram_if     base_ram();
+    Sram_if     ext_ram(); 
+    Uart_if     uart();
+    Flash_if    flash();
+    USB_if      usb();
+    Ethernet_if ethernet();
+    VGA_if      vga();
+    GPIO_if     gpio();
 
     reg[3:0]  touch_btn;
     reg[31:0] dip_sw;   
@@ -23,7 +23,7 @@ module peripheral_tb();
 
     assign gpio.dip_sw = dip_sw;
     assign gpio.leds = leds;
-    assign gpio.dpy0 = gpy0;
+    assign gpio.dpy0 = dpy0;
     assign gpio.dpy1 = dpy1;
 
     parameter BASE_RAM_INIT_FILE = "";
@@ -59,14 +59,14 @@ module peripheral_tb();
 
     sram_model ext2(
         .DataIO(ext_ram.data[31:16]),
-        .Address(ext_ram.addr[19:0]),
+        .Address(ext_ram.address[19:0]),
         .OE_n(ext_ram.oe_n),
         .CE_n(ext_ram.ce_n),
         .WE_n(ext_ram.we_n),
         .LB_n(ext_ram.be_n[2]),
         .UB_n(ext_ram.be_n[3]));
 
-    x28fxxxp30 #(.FILENAME_MEM(FLASH_INIT_FILE)) flash(
+    x28fxxxp30 #(.FILENAME_MEM(FLASH_INIT_FILE)) flash_behav(
         .A(flash.address[1+:22]), 
         .DQ(flash.data), 
         .W_N(flash.we_n),    // Write Enable 
@@ -130,18 +130,18 @@ module peripheral_tb();
     sram_controller sram_controller_instance(
         .inst_bus(ram_inst_if.slave),
         .data_bus(ram_data_if.slave),
-        .base_ram,
-        .ext_ram
+        .base_ram(base_ram.master),
+        .ext_ram(ext_ram.master)
     );
 
     graphics_controller graphics_controller_instance(
         .data_bus(graphics_if.slave),
-        .vga
+        .vga(vga.master)
     );
 
     gpio_controller gpio_controller_instance(
         .data_bus(gpio_if.slave),
-        .gpio
+        .gpio(gpio.master)
     );
 
 endmodule

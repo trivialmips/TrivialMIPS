@@ -15,10 +15,10 @@ module bootrom_controller(
 
     blk_mem_bootrom rom_instance(
         .clka(clk2x),
-        .addra(inst_bus.address),
+        .addra(BootroomAddress_t'(inst_bus.address)),
         .douta(inst_1),
         .clkb(clk2x),
-        .addrb(inst_bus.address + 1'h1), // the trailing 2 bit has already been stripped by inst bus
+        .addrb(BootroomAddress_t'(inst_bus.address) + 1'h1), // the trailing 2 bit has already been stripped by inst bus
         .doutb(inst_2)
     );
 

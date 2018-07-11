@@ -17,6 +17,7 @@ module graphics_controller(
 
     Word_t pixel_offset_reg[0:1];
     Word_t pixel_offset;
+    Word_t pixel_count;
 
     GraphicsMemoryAddress_t mem_address_offset, mem_address_overflow, mem_address;
     assign mem_address_offset = GraphicsMemoryAddress_t'(pixel_offset >> 2);
@@ -38,7 +39,7 @@ module graphics_controller(
         .clkb(vga_clk),
         .web(`ZERO_BIT),
         .addrb(mem_address),
-        .dinb(`ZERO_BIT),
+        .dinb(`ZERO_WORD),
         .doutb(mem_data)
     );
 
@@ -85,7 +86,6 @@ module graphics_controller(
     Word_t now_data;
     Word_t x, y;
     Word_t visible_x, visible_y;
-    Word_t pixel_count;
 
     wire [1:0] pixel_count_mod_4 = pixel_count[1:0];
 
