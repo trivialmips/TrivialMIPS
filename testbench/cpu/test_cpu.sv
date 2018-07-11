@@ -145,8 +145,8 @@ begin
 	unittest("inst_llsc", 0);
 	unittest("inst_jump", 0);
 	unittest("inst_multicyc", 0);
+	unittest("except", 0);
 	unittest("except_delayslot", 0);
-	unittest("except_addr", 0);
 	unittest("superscalar", 1);
 	$display("[Done]");
 	$finish;
