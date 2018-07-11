@@ -15,8 +15,7 @@ module cpu_ex(
 	output PipelineReq_t   req_ex,
 
 	// data forward
-	input  CP0RegWriteReq_t mem_cp0_reg_wr_a,
-	input  CP0RegWriteReq_t mem_cp0_reg_wr_b,
+	input  CP0RegWriteReq_t mem_cp0_reg_wr,
 	input  CP0RegWriteReq_t wb_cp0_reg_wr,
 	input  HiloWriteReq_t   mem_hilo_wr_a,
 	input  HiloWriteReq_t   mem_hilo_wr_b,
@@ -124,8 +123,8 @@ ex_count_bit count_clo(
 );
 
 // overflow checking
-Bit_t ov_add, ov_sub, is_overflow;
-assign ov_add = (reg1[31] & reg2[31]) & (reg1[31] ^ add_u[31]);
+Bit_t ov_add, ov_sub;
+assign ov_add = (reg1[31] == reg2[31]) & (reg1[31] ^ add_u[31]);
 assign ov_sub = (reg1[31] ^ reg2[31]) & (reg1[31] ^ sub_u[31]);
 
 // CP0 operation
@@ -144,10 +143,8 @@ begin
 		cp0_rdata_safe = `ZERO_DWORD;
 	end else if(wb_cp0_reg_wr.we && wb_cp0_reg_wr.waddr == cp0_raddr && wb_cp0_reg_wr.sel == cp0_rsel) begin
 		cp0_rdata_safe = (cp0_wmask & wb_cp0_reg_wr.wdata) | (~cp0_wmask & cp0_rdata_unsafe);
-	end else if(mem_cp0_reg_wr_b.we && mem_cp0_reg_wr_b.waddr == cp0_raddr && mem_cp0_reg_wr_b.sel == cp0_rsel) begin
-		cp0_rdata_safe = (cp0_wmask & mem_cp0_reg_wr_b.wdata) | (~cp0_wmask & cp0_rdata_unsafe);
-	end else if(mem_cp0_reg_wr_a.we && mem_cp0_reg_wr_a.waddr == cp0_raddr && mem_cp0_reg_wr_a.sel == cp0_rsel) begin
-		cp0_rdata_safe = (cp0_wmask & mem_cp0_reg_wr_a.wdata) | (~cp0_wmask & cp0_rdata_unsafe);
+	end else if(mem_cp0_reg_wr.we && mem_cp0_reg_wr.waddr == cp0_raddr && mem_cp0_reg_wr.sel == cp0_rsel) begin
+		cp0_rdata_safe = (cp0_wmask & mem_cp0_reg_wr.wdata) | (~cp0_wmask & cp0_rdata_unsafe);
 	end else begin
 		cp0_rdata_safe = cp0_rdata_unsafe;
 	end
@@ -269,7 +266,7 @@ begin
 		endcase
 
 		unique case(op)
-			OP_LW, OP_LL, OP_SW:
+			OP_LW, OP_LL, OP_SW, OP_SC:
 				except.daddr_unaligned = mem_addr[0] | mem_addr[1];
 			OP_LH, OP_LHU, OP_SH:
 				except.daddr_unaligned = mem_addr[0];

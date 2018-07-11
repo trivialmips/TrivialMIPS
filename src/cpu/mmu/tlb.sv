@@ -23,20 +23,22 @@ TLBFlatEntries_t flat_entries;
 TLBEntry_t entries[`TLB_ENTRIES_NUM - 1:0];
 
 assign tlbrw_rdata = entries[tlbrw_index];
+`define MMU_TLB_GET_ENTRY(id) \
+	flat_entries[i * $bits(TLBEntry_t) +: $bits(TLBEntry_t)]
 
 genvar i;
 generate
 	for(i = 0; i < `TLB_ENTRIES_NUM; i = i + 1)
 	begin: gen_for_tlb
-		assign entries[i] = flat_entries[i * $bits(TLBEntry_t) +: $bits(TLBEntry_t)];
+		assign entries[i] = `MMU_TLB_GET_ENTRY(i);
 		always @(posedge clk)
 		begin
 			if(rst)
 			begin
-				entries[i] <= {$bits(TLBEntry_t){1'b0}};
+				`MMU_TLB_GET_ENTRY(i) <= {$bits(TLBEntry_t){1'b0}};
 			end else begin
 				if(tlbrw_we && i == tlbrw_index)
-					entries[i] <= tlbrw_wdata;
+					`MMU_TLB_GET_ENTRY(i) <= tlbrw_wdata;
 			end
 		end
 	end

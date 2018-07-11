@@ -102,7 +102,7 @@ begin
 		end
 		6'b011100: // SPECIAL2
 		begin 
-			case(inst[5:0])
+			unique case(inst[5:0])
 			6'b100000: `INST_W(OP_CLZ, rs, 5'b0, rd)
 			6'b100001: `INST_W(OP_CLO, rs, 5'b0, rd)
 
@@ -117,26 +117,19 @@ begin
 		end
 		6'b010000:  // COP0
 		begin
-			case(inst[25:21])
-			5'b00000:
-			begin
-				op = OP_MFC0;
-				reg_we     = 1'b1;
-				reg_waddr  = rt;
-				reg_raddr1 = 5'b0;
-				reg_raddr2 = 5'b0;
-			end
-			5'b00100: 
-			begin
-				op = OP_MTC0;
-				reg_we     = 1'b0;
-				reg_raddr1 = 5'b0;
-			end
+			unique case(inst[25:21])
+			5'b00000: `INST_W(OP_MFC0, 5'b0, 5'b0, rt)
+			5'b00100: `INST_R(OP_MTC0, 5'b0, rt)
 			5'b10000:
 			begin
-				op = (inst[5:0] == 6'b011000) ? OP_ERET : OP_INVALID;
-				reg_we     = 1'b0;
-				reg_raddr1 = 5'b0;
+				unique case(inst[5:0])
+				6'b000001: `INST_R(OP_TLBR,  5'b0, 5'b0)
+				6'b000010: `INST_R(OP_TLBWI, 5'b0, 5'b0)
+				6'b000110: `INST_R(OP_TLBWR, 5'b0, 5'b0)
+				6'b001000: `INST_R(OP_TLBP,  5'b0, 5'b0)
+				6'b011000: `INST_R(OP_ERET,  5'b0, 5'b0)
+				default: op = OP_INVALID;
+				endcase
 			end
 			default: op = OP_INVALID;
 			endcase

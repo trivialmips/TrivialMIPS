@@ -39,12 +39,14 @@ task judge(input integer fans, input integer cycle, input string out, input chec
 	string ans, out_with_cyc;
 	$fscanf(fans, "%s\n", ans);
 	$sformat(out_with_cyc, "[%0d]%s", cycle, out);
-	$display("[%0d] %s", cycle, out);
 	if(check_cyc) out = out_with_cyc;
 	if(out != ans && ans != "skip")
 	begin
+		$display("[%0d] %s", cycle, out);
 		$display("[Error] Expected: %0s, Got: %0s", ans, out);
 		$stop;
+	end else begin
+		$display("[%0d] %s [%s]", cycle, out, ans == "skip" ? "skip" : "pass");
 	end
 endtask
 
@@ -136,7 +138,6 @@ begin
 	unittest("inst_logical", 0);
 	unittest("inst_move", 0);
 	unittest("inst_shift", 0);
-	unittest("inst_except", 0);
 	unittest("inst_trap", 0);
 	unittest("inst_arith", 0);
 	unittest("inst_mem_aligned", 0);
@@ -144,6 +145,8 @@ begin
 	unittest("inst_llsc", 0);
 	unittest("inst_jump", 0);
 	unittest("inst_multicyc", 0);
+	unittest("except_delayslot", 0);
+	unittest("except_addr", 0);
 	unittest("superscalar", 1);
 	$display("[Done]");
 	$finish;

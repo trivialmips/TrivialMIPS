@@ -24,16 +24,6 @@ module cpu_mem(
 	output Bit_t  stall_req
 );
 
-assign req_mem_a.llbit_set  = req_ex_a.llbit_set;
-assign req_mem_a.memory_req = req_ex_a.memory_req;
-assign req_mem_a.hilo_wr    = req_ex_a.hilo_wr;
-assign req_mem_a.cp0_reg_wr = req_ex_a.cp0_reg_wr;
-
-assign req_mem_b.llbit_set  = req_ex_b.llbit_set;
-assign req_mem_b.memory_req = req_ex_b.memory_req;
-assign req_mem_b.hilo_wr    = req_ex_b.hilo_wr;
-assign req_mem_b.cp0_reg_wr = req_ex_b.cp0_reg_wr;
-
 Oper_t op;
 MemAccessReq_t memory_req;
 RegWriteReq_t wr_i, wr_o;
@@ -42,6 +32,9 @@ assign memory_data_we = (memory_req.ce & memory_req.we);
 
 always_comb
 begin
+	req_mem_a = req_ex_a;
+	req_mem_b = req_ex_b;
+
 	// Only one of pipe-a and pipe-b may access memory
 	if(req_ex_b.memory_req.ce)
 	begin
@@ -118,6 +111,8 @@ begin
 end
 
 assign data_bus.address = mmu_data_result.phy_addr;
+assign data_bus.data_wr = memory_req.wdata;
+assign data_bus.mask    = memory_req.sel;
 
 always_comb
 begin
@@ -129,25 +124,12 @@ begin
 
 		data_bus.read    = `ZERO_BIT;
 		data_bus.write   = `ZERO_BIT;
-		data_bus.data_wr = `ZERO_WORD;
-		data_bus.mask    = 4'b0000;
 	end else if(memory_req.ce) begin
-		if(except_already_occur)
+		if(memory_req.we)
 		begin
-			wr_o.we    = 1'b0;
-			wr_o.waddr = `ZERO_WORD;
-			wr_o.wdata = `ZERO_WORD;
-
-			data_bus.read    = `ZERO_BIT;
-			data_bus.write   = `ZERO_BIT;
-			data_bus.data_wr = `ZERO_WORD;
-			data_bus.mask    = 4'b0000;
-		end else if(memory_req.we) begin
 			// write memory
 			data_bus.read    = `ZERO_BIT;
 			data_bus.write   = 1'b1;
-			data_bus.data_wr = memory_req.wdata;
-			data_bus.mask    = memory_req.sel;
 
 			if(op == OP_SC)
 			begin
@@ -164,8 +146,6 @@ begin
 			// read memory
 			data_bus.read    = 1'b1;
 			data_bus.write   = `ZERO_BIT;
-			data_bus.data_wr = `ZERO_WORD;
-			data_bus.mask    = memory_req.sel;
 
 			wr_o.we    = 1'b1;
 			wr_o.waddr = wr_i.waddr;
@@ -178,13 +158,21 @@ begin
 				default: wr_o.wdata = aligned_data_rd;
 			endcase
 		end
+
+		if(except_already_occur)
+		begin
+		/* If update 'wr_o' at this time, the data-forward will
+		 * result a long data-path. At stage MEM/WB, when an exception
+		 * occurs, the 'flush' signal will make the request empty. */
+		// TODO: unittest
+			data_bus.read    = `ZERO_BIT;
+			data_bus.write   = `ZERO_BIT;
+		end
 	end else begin
 		wr_o = wr_i;
 
 		data_bus.read    = `ZERO_BIT;
 		data_bus.write   = `ZERO_BIT;
-		data_bus.data_wr = `ZERO_WORD;
-		data_bus.mask    = 4'b0000;
 	end
 end
 

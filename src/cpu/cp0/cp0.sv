@@ -134,7 +134,13 @@ begin
 			regs_new.cause.exc_code = except_req.code;
 
 			if(except_req.code == `EXCCODE_ADEL || except_req.code == `EXCCODE_ADES)
+			begin
 				regs_new.bad_vaddr = except_req.extra;
+			end else if(except_req.code == `EXCCODE_TLBL || except_req.code == `EXCCODE_TLBS) begin
+				regs_new.bad_vaddr = except_req.extra;
+				regs_new.context_[22:4] = except_req.extra[31:13];   // context.bad_vpn2
+				regs_new.entry_hi[31:13] = except_req.extra[31:13];  // entry_hi.vpn2
+			end
 		end
 	end
 end

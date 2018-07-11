@@ -39,6 +39,7 @@ module ex_mem(
 
 `define RST_DATA_EXMEM(d) \
 	d.pc         <= `ZERO_WORD; \
+	d.inst       <= `ZERO_WORD; \
 	d.op         <= OP_NOP;     \
 	d.delayslot  <= 1'b0; 
 
