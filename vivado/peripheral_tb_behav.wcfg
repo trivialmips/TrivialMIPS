@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="peripheral_tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="\$unit_c__users_harry_chen_documents_workspace_trivialmips_src_peripheral_bootrom_controller_sv " />
+            <top_module name="glbl" />
+            <top_module name="peripheral_tb" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="207500000fs"></ZoomStartTime>
+      <ZoomEndTime time="288500001fs"></ZoomEndTime>
+      <Cursor1Time time="275000000fs"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="175"></NameColumnWidth>
+      <ValueColumnWidth column_width="108"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="9" />
+   <wvobject fp_name="/peripheral_tb/clk.rst" type="logic">
+      <obj_property name="ElementShortName">.rst</obj_property>
+      <obj_property name="ObjectShortName">.rst</obj_property>
+   </wvobject>
+   <wvobject fp_name="group264" type="group">
+      <obj_property name="label">gpio</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject fp_name="/peripheral_tb/dip_sw" type="array">
+         <obj_property name="ElementShortName">dip_sw[31:0]</obj_property>
+         <obj_property name="ObjectShortName">dip_sw[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/leds" type="array">
+         <obj_property name="ElementShortName">leds[15:0]</obj_property>
+         <obj_property name="ObjectShortName">leds[15:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/dpy0" type="array">
+         <obj_property name="ElementShortName">dpy0[7:0]</obj_property>
+         <obj_property name="ObjectShortName">dpy0[7:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/dpy1" type="array">
+         <obj_property name="ElementShortName">dpy1[7:0]</obj_property>
+         <obj_property name="ObjectShortName">dpy1[7:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group228" type="group">
+      <obj_property name="label">data_bus</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject fp_name="/peripheral_tb/cpu_data_if/address" type="array">
+         <obj_property name="ElementShortName">address[31:0]</obj_property>
+         <obj_property name="ObjectShortName">address[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="group227" type="group">
+         <obj_property name="label">data_bus_config</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject fp_name="/peripheral_tb/cpu_data_if/read" type="logic">
+            <obj_property name="ElementShortName">read</obj_property>
+            <obj_property name="ObjectShortName">read</obj_property>
+         </wvobject>
+         <wvobject fp_name="/peripheral_tb/cpu_data_if/write" type="logic">
+            <obj_property name="ElementShortName">write</obj_property>
+            <obj_property name="ObjectShortName">write</obj_property>
+         </wvobject>
+         <wvobject fp_name="/peripheral_tb/cpu_data_if/stall" type="logic">
+            <obj_property name="ElementShortName">stall</obj_property>
+            <obj_property name="ObjectShortName">stall</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/cpu_data_if/data_rd" type="array">
+         <obj_property name="ElementShortName">data_rd[31:0]</obj_property>
+         <obj_property name="ObjectShortName">data_rd[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/cpu_data_if/data_wr" type="array">
+         <obj_property name="ElementShortName">data_wr[31:0]</obj_property>
+         <obj_property name="ObjectShortName">data_wr[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/cpu_data_if/mask" type="array">
+         <obj_property name="ElementShortName">mask[3:0]</obj_property>
+         <obj_property name="ObjectShortName">mask[3:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group230" type="group">
+      <obj_property name="label">inst_bus</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject fp_name="/peripheral_tb/cpu_inst_if/address" type="array">
+         <obj_property name="ElementShortName">address[31:0]</obj_property>
+         <obj_property name="ObjectShortName">address[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/cpu_inst_if/read" type="logic">
+         <obj_property name="ElementShortName">read</obj_property>
+         <obj_property name="ObjectShortName">read</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/cpu_inst_if/data_rd" type="array">
+         <obj_property name="ElementShortName">data_rd[31:0]</obj_property>
+         <obj_property name="ObjectShortName">data_rd[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/cpu_inst_if/data_rd_2" type="array">
+         <obj_property name="ElementShortName">data_rd_2[31:0]</obj_property>
+         <obj_property name="ObjectShortName">data_rd_2[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/cpu_inst_if/data_wr" type="array">
+         <obj_property name="ElementShortName">data_wr[31:0]</obj_property>
+         <obj_property name="ObjectShortName">data_wr[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/cpu_inst_if/mask" type="array">
+         <obj_property name="ElementShortName">mask[3:0]</obj_property>
+         <obj_property name="ObjectShortName">mask[3:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="/peripheral_tb/clk.base" type="logic">
+      <obj_property name="ElementShortName">.base</obj_property>
+      <obj_property name="ObjectShortName">.base</obj_property>
+   </wvobject>
+   <wvobject fp_name="/peripheral_tb/clk.base_2x" type="logic">
+      <obj_property name="ElementShortName">.base_2x</obj_property>
+      <obj_property name="ObjectShortName">.base_2x</obj_property>
+   </wvobject>
+   <wvobject fp_name="group277" type="group">
+      <obj_property name="label">base_ram</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject fp_name="/peripheral_tb/sram_controller_instance/base_ram/address" type="array">
+         <obj_property name="ElementShortName">address[19:0]</obj_property>
+         <obj_property name="ObjectShortName">address[19:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/sram_controller_instance/base_ram/be_n" type="array">
+         <obj_property name="ElementShortName">be_n[3:0]</obj_property>
+         <obj_property name="ObjectShortName">be_n[3:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/sram_controller_instance/base_ram/ce_n" type="logic">
+         <obj_property name="ElementShortName">ce_n</obj_property>
+         <obj_property name="ObjectShortName">ce_n</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/sram_controller_instance/base_ram/oe_n" type="logic">
+         <obj_property name="ElementShortName">oe_n</obj_property>
+         <obj_property name="ObjectShortName">oe_n</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/sram_controller_instance/base_ram/we_n" type="logic">
+         <obj_property name="ElementShortName">we_n</obj_property>
+         <obj_property name="ObjectShortName">we_n</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/sram_controller_instance/base_ram/data" type="array">
+         <obj_property name="ElementShortName">data[31:0]</obj_property>
+         <obj_property name="ObjectShortName">data[31:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group278" type="group">
+      <obj_property name="label">ext_ram</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject fp_name="/peripheral_tb/sram_controller_instance/ext_ram/address" type="array">
+         <obj_property name="ElementShortName">address[19:0]</obj_property>
+         <obj_property name="ObjectShortName">address[19:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/sram_controller_instance/ext_ram/be_n" type="array">
+         <obj_property name="ElementShortName">be_n[3:0]</obj_property>
+         <obj_property name="ObjectShortName">be_n[3:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/sram_controller_instance/ext_ram/ce_n" type="logic">
+         <obj_property name="ElementShortName">ce_n</obj_property>
+         <obj_property name="ObjectShortName">ce_n</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/sram_controller_instance/ext_ram/oe_n" type="logic">
+         <obj_property name="ElementShortName">oe_n</obj_property>
+         <obj_property name="ObjectShortName">oe_n</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/sram_controller_instance/ext_ram/we_n" type="logic">
+         <obj_property name="ElementShortName">we_n</obj_property>
+         <obj_property name="ObjectShortName">we_n</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/sram_controller_instance/ext_ram/data" type="array">
+         <obj_property name="ElementShortName">data[31:0]</obj_property>
+         <obj_property name="ObjectShortName">data[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/sram_controller_instance/ram_write" type="logic">
+         <obj_property name="ElementShortName">ram_write</obj_property>
+         <obj_property name="ObjectShortName">ram_write</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/sram_controller_instance/base_ram_data" type="array">
+         <obj_property name="ElementShortName">base_ram_data[31:0]</obj_property>
+         <obj_property name="ObjectShortName">base_ram_data[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/sram_controller_instance/ext_ram_data" type="array">
+         <obj_property name="ElementShortName">ext_ram_data[31:0]</obj_property>
+         <obj_property name="ObjectShortName">ext_ram_data[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/sram_controller_instance/inst_even" type="logic">
+         <obj_property name="ElementShortName">inst_even</obj_property>
+         <obj_property name="ObjectShortName">inst_even</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/sram_controller_instance/data_even" type="logic">
+         <obj_property name="ElementShortName">data_even</obj_property>
+         <obj_property name="ObjectShortName">data_even</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/sram_controller_instance/last_data_even" type="logic">
+         <obj_property name="ElementShortName">last_data_even</obj_property>
+         <obj_property name="ObjectShortName">last_data_even</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/sram_controller_instance/last_data_bus_read" type="logic">
+         <obj_property name="ElementShortName">last_data_bus_read</obj_property>
+         <obj_property name="ObjectShortName">last_data_bus_read</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/sram_controller_instance/last_stall" type="logic">
+         <obj_property name="ElementShortName">last_stall</obj_property>
+         <obj_property name="ObjectShortName">last_stall</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/sram_controller_instance/data_read" type="array">
+         <obj_property name="ElementShortName">data_read[31:0]</obj_property>
+         <obj_property name="ObjectShortName">data_read[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/sram_controller_instance/inst_addr_half" type="array">
+         <obj_property name="ElementShortName">inst_addr_half[19:0]</obj_property>
+         <obj_property name="ObjectShortName">inst_addr_half[19:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/sram_controller_instance/data_addr_half" type="array">
+         <obj_property name="ElementShortName">data_addr_half[19:0]</obj_property>
+         <obj_property name="ObjectShortName">data_addr_half[19:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/sram_controller_instance/ram_write" type="logic">
+         <obj_property name="ElementShortName">ram_write</obj_property>
+         <obj_property name="ObjectShortName">ram_write</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/sram_controller_instance/base_ram_data" type="array">
+         <obj_property name="ElementShortName">base_ram_data[31:0]</obj_property>
+         <obj_property name="ObjectShortName">base_ram_data[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/sram_controller_instance/ext_ram_data" type="array">
+         <obj_property name="ElementShortName">ext_ram_data[31:0]</obj_property>
+         <obj_property name="ObjectShortName">ext_ram_data[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/sram_controller_instance/inst_even" type="logic">
+         <obj_property name="ElementShortName">inst_even</obj_property>
+         <obj_property name="ObjectShortName">inst_even</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/sram_controller_instance/data_even" type="logic">
+         <obj_property name="ElementShortName">data_even</obj_property>
+         <obj_property name="ObjectShortName">data_even</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/sram_controller_instance/last_data_even" type="logic">
+         <obj_property name="ElementShortName">last_data_even</obj_property>
+         <obj_property name="ObjectShortName">last_data_even</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/sram_controller_instance/last_data_bus_read" type="logic">
+         <obj_property name="ElementShortName">last_data_bus_read</obj_property>
+         <obj_property name="ObjectShortName">last_data_bus_read</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/sram_controller_instance/last_stall" type="logic">
+         <obj_property name="ElementShortName">last_stall</obj_property>
+         <obj_property name="ObjectShortName">last_stall</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/sram_controller_instance/data_read" type="array">
+         <obj_property name="ElementShortName">data_read[31:0]</obj_property>
+         <obj_property name="ObjectShortName">data_read[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/sram_controller_instance/inst_addr_half" type="array">
+         <obj_property name="ElementShortName">inst_addr_half[19:0]</obj_property>
+         <obj_property name="ObjectShortName">inst_addr_half[19:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/sram_controller_instance/data_addr_half" type="array">
+         <obj_property name="ElementShortName">data_addr_half[19:0]</obj_property>
+         <obj_property name="ObjectShortName">data_addr_half[19:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group312" type="group">
+      <obj_property name="label">sram_controller</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject fp_name="/peripheral_tb/sram_controller_instance/ram_write" type="logic">
+         <obj_property name="ElementShortName">ram_write</obj_property>
+         <obj_property name="ObjectShortName">ram_write</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/sram_controller_instance/base_ram_data" type="array">
+         <obj_property name="ElementShortName">base_ram_data[31:0]</obj_property>
+         <obj_property name="ObjectShortName">base_ram_data[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/sram_controller_instance/ext_ram_data" type="array">
+         <obj_property name="ElementShortName">ext_ram_data[31:0]</obj_property>
+         <obj_property name="ObjectShortName">ext_ram_data[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/sram_controller_instance/inst_even" type="logic">
+         <obj_property name="ElementShortName">inst_even</obj_property>
+         <obj_property name="ObjectShortName">inst_even</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/sram_controller_instance/data_even" type="logic">
+         <obj_property name="ElementShortName">data_even</obj_property>
+         <obj_property name="ObjectShortName">data_even</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/sram_controller_instance/last_data_even" type="logic">
+         <obj_property name="ElementShortName">last_data_even</obj_property>
+         <obj_property name="ObjectShortName">last_data_even</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/sram_controller_instance/last_data_bus_read" type="logic">
+         <obj_property name="ElementShortName">last_data_bus_read</obj_property>
+         <obj_property name="ObjectShortName">last_data_bus_read</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/sram_controller_instance/last_stall" type="logic">
+         <obj_property name="ElementShortName">last_stall</obj_property>
+         <obj_property name="ObjectShortName">last_stall</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/sram_controller_instance/data_read" type="array">
+         <obj_property name="ElementShortName">data_read[31:0]</obj_property>
+         <obj_property name="ObjectShortName">data_read[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/sram_controller_instance/inst_addr_half" type="array">
+         <obj_property name="ElementShortName">inst_addr_half[19:0]</obj_property>
+         <obj_property name="ObjectShortName">inst_addr_half[19:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/peripheral_tb/sram_controller_instance/data_addr_half" type="array">
+         <obj_property name="ElementShortName">data_addr_half[19:0]</obj_property>
+         <obj_property name="ObjectShortName">data_addr_half[19:0]</obj_property>
+      </wvobject>
+   </wvobject>
+</wave_config>
