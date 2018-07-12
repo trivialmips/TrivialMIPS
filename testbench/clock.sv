@@ -13,8 +13,13 @@ module clock(
     end
 
     initial begin
+        clk.rst = 1'b0;
+        @(posedge clk.base_2x) 
+        @(posedge clk.base_2x) 
         clk.rst = 1'b1;
-        # 50000 clk.rst = 1'b0;
+        @(posedge clk.base_2x) 
+        @(posedge clk.base_2x) 
+        clk.rst = 1'b0;
     end
 
     always #10000   clk._50M = ~clk._50M;

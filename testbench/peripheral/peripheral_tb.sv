@@ -7,7 +7,7 @@ module peripheral_tb();
 
     Sram_if     base_ram();
     Sram_if     ext_ram(); 
-    Uart_if     uart();
+    UART_if     uart();
     Flash_if    flash();
     USB_if      usb();
     Ethernet_if ethernet();
@@ -148,6 +148,13 @@ module peripheral_tb();
         .data_bus(timer_if.slave)
     );
 
+    uart_controller #(
+        .IRQ_NUMBER(`IRQ_UART)
+    ) uart_controller_instance(
+        .data_bus(uart_if.slave),
+        .uart(uart.master)
+    );
+
     task test_data_bus(
         input Word_t address,
         input Word_t data,
@@ -187,7 +194,15 @@ module peripheral_tb();
 
     endtask
 
+    reg[7:0] next_data[7:0];
+    reg[2:0] data_ptr;
+
+    always @(uart.txd) begin
+        uart.rxd <= uart.txd;
+    end
+
     initial begin
+        wait (clk.rst == 1'b1);
         wait (clk.rst == 1'b0);
 
         // bootrom
@@ -346,8 +361,83 @@ module peripheral_tb();
 
         $display("[SRAM] test ended");
 
-        $display("[Timer] test begin");
 
+        // uart
+        $display("[UART] test begin");
+
+        data_ptr = 0;
+        next_data[0] = 8'haa;
+        next_data[1] = 8'h00;
+        next_data[2] = 8'h55;
+        next_data[3] = 8'hff;
+        next_data[4] = 8'h01;
+        next_data[5] = 8'h80;
+        next_data[6] = 8'h92;
+        next_data[7] = 8'ha7;
+
+        do begin
+            do begin
+                @(posedge clk.base);
+                test_data_bus(
+                    .address(32'h03000000),
+                    .data(32'h11223344),
+                    .read(1),
+                    .write(0),
+                    .mask(4'b1111)
+                );
+                @(negedge clk.base);
+                @(negedge clk.base_2x);
+            end while(cpu_data_if.data_rd[0]!=1'b1);
+
+            $display("[UART] writing one byte");
+
+            @(posedge clk.base);
+            test_data_bus(
+                .address(32'h03000004),
+                .data(next_data[data_ptr]),
+                .read(0),
+                .write(1),
+                .mask(4'b1111)
+            );
+            @(negedge clk.base);
+            @(negedge clk.base_2x);
+
+            
+            $display("[UART] waiting for data to write back");
+
+            do begin
+                @(posedge clk.base);
+                test_data_bus(
+                    .address(32'h03000000),
+                    .data(32'h11223344),
+                    .read(1),
+                    .write(0),
+                    .mask(4'b1111)
+                );
+                @(negedge clk.base);
+                @(negedge clk.base_2x);
+            end while(cpu_data_if.data_rd[1]!=1'b1);
+            assert_value("UART interrupt", 1'b1, cpu_data_if.interrupt[`IRQ_UART]);
+            
+            @(posedge clk.base);
+            test_data_bus(
+                .address(32'h03000004),
+                .data(32'h11223344),
+                .read(1),
+                .write(0),
+                .mask(4'b1111)
+            );
+            @(negedge clk.base);
+            @(negedge clk.base_2x);
+            assert_value("UART received", next_data[data_ptr], cpu_data_if.data_rd);
+            data_ptr = data_ptr+1;
+        end while(data_ptr!=3'd7);
+
+        $display("[UART] test ended");
+
+
+        // timer
+        $display("[Timer] test begin");
         @(negedge clk.base);
         begin
             test_data_bus(
