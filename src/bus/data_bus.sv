@@ -13,7 +13,8 @@ module data_bus(
 );
 
     // interrupt
-    assign cpu.interrupt = uart.interrupt | ethernet.interrupt | usb.interrupt;
+    //assign cpu.interrupt = uart.interrupt | ethernet.interrupt | usb.interrupt;
+    assign cpu.interrupt = uart.interrupt;
 
     // sram
     assign ram.data_wr = cpu.data_wr;

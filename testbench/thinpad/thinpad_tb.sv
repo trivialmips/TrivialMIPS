@@ -102,8 +102,50 @@ module thinpad_sv();
         $stop;
     end
 
+    wire uart_clk;
+    assign uart_clk = clk.base_2x;
+
+    integer count;
+
+    task uart_send_char(
+        input Byte_t char
+    );
+        count = 0;
+        @(negedge uart_clk);
+        uart.rxd = 1;
+        while (count < 8) begin
+            @(negedge uart_clk);
+            uart.rxd = char[count];
+            count = count + 1;
+        end
+        @(negedge uart_clk);
+        uart.rxd = 1;
+        @(negedge uart_clk);
+        uart.rxd = 1;
+
+    endtask
+
+    integer wait_clock;
+
     initial begin
         wait(thinpad_instance.clk.rst == 0);
+        uart.rxd = 1;
+
+        wait_clock = 0;
+        while (wait_clock < 20) begin
+            @(posedge clk.base);
+            wait_clock = wait_clock + 1;
+        end
+
+        $stop;
+        
+        uart_send_char("H");
+        uart_send_char("E");
+        uart_send_char("L");
+        uart_send_char("L");
+        uart_send_char("O");
+
+
         $stop;
     end
 
