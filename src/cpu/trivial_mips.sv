@@ -151,7 +151,7 @@ InstPair_t if_inst_pair;
 InstPair_t inst_pair_forward;
 InstAddr_t if_pc, jump_to;
 Bit_t is_branch, jump, pc_ce;
-Bit_t is_pc_ahead, is_pc_hard_reset;
+Bit_t is_pc_hard_reset;
 
 reg_pc pc_instance(
 	.clk,
@@ -162,7 +162,6 @@ reg_pc pc_instance(
 	.jump_to,
 	.except_req,
 	.ce(pc_ce),
-	.is_ahead(is_pc_ahead),
 	.is_hard_reset(is_pc_hard_reset),
 	.hold_pc(stall.hold_pc)
 );
@@ -204,7 +203,6 @@ if_id stage_if_id(
 	.keep_inst(ifid_keep_inst),
 	.set_empty_inst(ifid_set_empty_inst),
 	.inst_pair_forward,
-	.is_ahead(is_pc_ahead),
 	.is_hard_reset(is_pc_hard_reset),
 	.stall,
 	.flush

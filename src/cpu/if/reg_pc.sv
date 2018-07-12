@@ -8,7 +8,6 @@ module reg_pc(
 	input  InstAddr_t  jump_to,
 	input  ExceptReq_t except_req,
 	output Bit_t       ce,
-	output Bit_t       is_ahead,
 	output Bit_t       is_hard_reset,
 	output InstAddr_t  pc
 );
@@ -24,10 +23,9 @@ begin
 end
 
 enum logic [1:0] {
-	ST_HARD_SET, ST_MATCH, ST_AHEAD
+	ST_HARD_SET, ST_AHEAD, ST_MATCH
 } cur_status, next_status;
 
-assign is_ahead = (cur_status == ST_AHEAD || next_status == ST_AHEAD);
 assign is_hard_reset = (cur_status == ST_HARD_SET);
 
 always_comb
@@ -41,7 +39,7 @@ begin
 		case(cur_status)
 			ST_HARD_SET: next_status = ST_MATCH;
 			ST_MATCH: next_status = inst2_taken ? ST_MATCH : ST_AHEAD;
-			ST_AHEAD: next_status = ST_AHEAD;
+			ST_AHEAD: next_status = inst2_taken ? ST_MATCH : ST_AHEAD;
 			default: next_status = ST_HARD_SET;
 		endcase
 	end
@@ -68,10 +66,10 @@ begin
 		if(jump)
 		begin
 			pc <= jump_to;
-		end else if(cur_status == ST_HARD_SET || inst2_taken) begin
-			pc <= pc + 32'h8;
-		end else begin
+		end else if(next_status == ST_AHEAD) begin
 			pc <= pc + 32'h4;
+		end else begin
+			pc <= pc + 32'h8;
 		end
 	end
 end
