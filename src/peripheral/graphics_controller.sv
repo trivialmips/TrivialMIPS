@@ -15,7 +15,8 @@ module graphics_controller(
 
     Word_t mem_data;
 
-    Word_t pixel_offset_reg[0:1];
+    Word_t pixel_offset_reg_i[0:1];
+    Word_t pixel_offset_reg_o[0:1];
     Word_t pixel_offset;
     Word_t pixel_count;
 
@@ -47,15 +48,19 @@ module graphics_controller(
     );
 
     assign data_bus.data_rd = rst ? `ZERO_WORD : 
-           ((data_bus.read && data_bus.address == `GRAPHICS_CONFIG_ADDRESS) ? pixel_offset : data_read_gmem);
+           ((data_bus.read && data_bus.address == `GRAPHICS_CONFIG_ADDRESS) ? pixel_offset_reg_o[1] : data_read_gmem);
 
 
     always_ff @(posedge bus_clk or posedge rst) begin
         if (rst) begin
-            pixel_offset_reg[0] <= `ZERO_WORD;
+            pixel_offset_reg_i[0] <= `ZERO_WORD;
+            pixel_offset_reg_o[0] <= `ZERO_WORD;
+            pixel_offset_reg_o[1] <= `ZERO_WORD;
         end else begin
+            pixel_offset_reg_o[0] <= pixel_count;
+            pixel_offset_reg_o[1] <= pixel_offset_reg_o[0];
             if (data_bus.write && data_bus.address == `GRAPHICS_CONFIG_ADDRESS) begin
-                pixel_offset_reg[0] <= data_bus.data_wr;
+                pixel_offset_reg_i[0] <= data_bus.data_wr;
             end
         end
     end
@@ -63,11 +68,11 @@ module graphics_controller(
     // cross clock domain synchronization
     always_ff @(posedge vga_clk or posedge rst) begin
         if (rst) begin
-            pixel_offset_reg[1] <= `ZERO_WORD;
+            pixel_offset_reg_i[1] <= `ZERO_WORD;
             pixel_offset <= `ZERO_WORD;
         end else begin
-            pixel_offset_reg[1] <= pixel_offset_reg[0];
-            pixel_offset <= pixel_offset_reg[1];
+            pixel_offset_reg_i[1] <= pixel_offset_reg_i[0];
+            pixel_offset <= pixel_offset_reg_i[1];
         end
     end
 
