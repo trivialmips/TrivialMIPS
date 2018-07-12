@@ -12,6 +12,10 @@ module data_bus(
     Bus_if.master usb
 );
 
+    // interrupt
+    assign cpu.interrupt = uart.interrupt | ethernet.interrupt | usb.interrupt;
+
+    // sram
     assign ram.data_wr = cpu.data_wr;
     assign ram.address = cpu.address[2 +: `RAM_ADDRESS_WIDTH];
     assign ram.mask = cpu.mask;

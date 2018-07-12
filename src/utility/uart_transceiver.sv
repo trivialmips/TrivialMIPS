@@ -11,7 +11,7 @@
 
 ////////////////////////////////////////////////////////
 `default_nettype wire
-module AsyncUartTransmitter(
+module uart_transmitter(
 	input clk,
 	input TxD_start,
 	input [7:0] TxD_data,
@@ -30,7 +30,7 @@ generate
 endgenerate
 
 ////////////////////////////////
-`ifdef SIMULATION
+`ifdef XILINX_SIMULATOR
 wire BitTick = 1'b1;  // output one bit per clock cycle
 `else
 wire BitTick;
@@ -72,7 +72,7 @@ endmodule
 
 
 ////////////////////////////////////////////////////////
-module AsyncUartReceiver(
+module uart_receiver(
 	input clk,
 	input RxD,
 	output reg RxD_data_ready = 0,
@@ -101,7 +101,7 @@ endgenerate
 ////////////////////////////////
 reg [3:0] RxD_state = 0;
 
-`ifdef SIMULATION
+`ifdef XILINX_SIMULATOR
 wire RxD_bit = RxD;
 wire sampleNow = 1'b1;  // receive one bit per clock cycle
 
@@ -140,7 +140,7 @@ wire sampleNow = OversamplingTick && (OversamplingCnt==Oversampling/2-1);
 // now we can accumulate the RxD bits in a shift-register
 always @(posedge clk)
 case(RxD_state)
-	4'b0000: if(~RxD_bit) RxD_state <= `ifdef SIMULATION 4'b1000 `else 4'b0001 `endif;  // start bit found?
+	4'b0000: if(~RxD_bit) RxD_state <= `ifdef XILINX_SIMULATOR 4'b1000 `else 4'b0001 `endif;  // start bit found?
 	4'b0001: if(sampleNow) RxD_state <= 4'b1000;  // sync start bit to sampleNow
 	4'b1000: if(sampleNow) RxD_state <= 4'b1001;  // bit 0
 	4'b1001: if(sampleNow) RxD_state <= 4'b1010;  // bit 1
@@ -163,11 +163,11 @@ begin
 	if(RxD_clear)
 		RxD_data_ready <= 0;
 	else
-		RxD_data_ready <= RxD_data_ready | (sampleNow && RxD_state==4'b0010 && RxD_bit);  // make sure a stop bit is received
+		RxD_data_ready <= sampleNow && RxD_state==4'b0010 && RxD_bit;  // make sure a stop bit is received
 	//RxD_data_error <= (sampleNow && RxD_state==4'b0010 && ~RxD_bit);  // error if a stop bit is not received
 end
 
-`ifdef SIMULATION
+`ifdef XILINX_SIMULATOR
 assign RxD_idle = 0;
 `else
 reg [l2o+1:0] GapCnt = 0;

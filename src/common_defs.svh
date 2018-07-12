@@ -93,25 +93,36 @@ typedef struct packed {
     logic rst;
 } Clock_t;
 
+
+// interrupt numebr
+
+typedef logic [5:0] Interrupt_t;
+
+`define IRQ_UART     0
+`define IRQ_ETHERNET 1
+`define IRQ_USB      2
+
+
 // interface for bus
 
 interface Bus_if (
     input Clock_t clk
 );
-    Word_t address;
-    Bit_t  read, write;
-    Bit_t  stall;
-    Word_t data_rd, data_rd_2, data_wr;
-    ByteMask_t mask;
+    Word_t      address;
+    Bit_t       read, write;
+    Bit_t       stall;
+    Word_t      data_rd, data_rd_2, data_wr;
+    ByteMask_t  mask;
+    Interrupt_t interrupt;
 
     modport master (
         output address, read, write, data_wr, mask,
-        input  stall, data_rd, data_rd_2,
+        input  stall, data_rd, data_rd_2, interrupt,
         input  clk
     );
 
     modport slave (
-        output stall, data_rd, data_rd_2,
+        output stall, data_rd, data_rd_2, interrupt,
         input  address, read, write, data_wr, mask,
         input  clk
     );
@@ -152,7 +163,7 @@ interface Flash_if();
 endinterface
 
 
-interface Uart_if();
+interface UART_if();
     logic txd, rxd;
 
     modport master(

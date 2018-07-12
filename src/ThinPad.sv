@@ -11,7 +11,7 @@ module ThinPad(
 
     Sram_if.master     base_ram,
     Sram_if.master     ext_ram, 
-    Uart_if.master     uart,
+    UART_if.master     uart,
     Flash_if.master    flash,
     USB_if.master      usb,
     Ethernet_if.master ethernet,
@@ -110,6 +110,13 @@ module ThinPad(
 
     timer_controller timer_controller_instance(
         .data_bus(timer_if.slave)
+    );
+
+    uart_controller #(
+        .IRQ_NUMBER(`IRQ_UART)
+    ) uart_controller_instance(
+        .data_bus(uart_if.slave),
+        .uart
     );
 
 endmodule

@@ -2,8 +2,7 @@
 
 module trivial_mips(
 	Bus_if.master inst_bus,
-	Bus_if.master data_bus,
-	input wire [5:0] int_req
+	Bus_if.master data_bus
 );
 
 parameter mmu_enabled = 1;
@@ -86,7 +85,7 @@ cp0 cp0_instance(
 	.rsel(cp0_rsel),
 	.wr(cp0_reg_wr),
 	.except_req,
-	.int_req,
+	.int_req(data_bus.interrupt),
 
 	.tlbp_req(req_memwb_a.tlbp),
 	.tlbp_res(tlbp_index),
