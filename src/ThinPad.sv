@@ -50,8 +50,7 @@ module ThinPad(
     // cpu
     trivial_mips cpu(
         .inst_bus(cpu_inst_if.master),
-        .data_bus(cpu_data_if.master),
-        .int_req(6'b0)
+        .data_bus(cpu_data_if.master)
     );
 
 
