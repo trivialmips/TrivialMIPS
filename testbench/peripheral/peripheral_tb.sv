@@ -347,17 +347,22 @@ module peripheral_tb();
                 .mask(4'b1010)
             );
             test_inst_bus(
-                .address(32'h00000004)
+                .address(32'h00000000)
             );
         end
 
         @(posedge clk.base);
         assert_value("Data bus stall this clock", 1'b1, cpu_data_if.stall);
-        assert_value("Inst 1 read this clock", 32'h77777777, cpu_inst_if.data_rd);
+        assert_value("Inst 1 read this clock", 32'h66666666, cpu_inst_if.data_rd);
+        assert_value("Inst 2 read this clock", 32'h77777777, cpu_inst_if.data_rd_2);
 
         @(posedge clk.base);
         assert_value("Data bus stall next clock", 1'b0, cpu_data_if.stall);
-        assert_value("Inst 1 read next clock", 32'h11773377, cpu_inst_if.data_rd);
+        assert_value("Inst 1 read next clock", 32'h66666666, cpu_inst_if.data_rd);
+        assert_value("Inst 2 read next clock", 32'h11773377, cpu_inst_if.data_rd_2);
+
+        @(negedge clk.base_2x);
+        cpu_data_if.write = 1'b0;
 
         $display("[SRAM] test ended");
 

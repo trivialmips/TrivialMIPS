@@ -7,7 +7,7 @@ module thinpad_sv();
 
     Sram_if     base_ram();
     Sram_if     ext_ram(); 
-    Uart_if     uart();
+    UART_if     uart();
     Flash_if    flash();
     USB_if      usb();
     Ethernet_if ethernet();

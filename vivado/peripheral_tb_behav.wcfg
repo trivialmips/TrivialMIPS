@@ -6,21 +6,22 @@
       <db_ref path="peripheral_tb_behav.wdb" id="1">
          <top_modules>
             <top_module name="\$unit_c__users_harry_chen_documents_workspace_trivialmips_src_peripheral_bootrom_controller_sv " />
+            <top_module name="\$unit_c__users_harry_chen_documents_workspace_trivialmips_testbench_clock_sv " />
             <top_module name="glbl" />
             <top_module name="peripheral_tb" />
          </top_modules>
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="168166666fs"></ZoomStartTime>
-      <ZoomEndTime time="356366667fs"></ZoomEndTime>
-      <Cursor1Time time="325000000fs"></Cursor1Time>
+      <ZoomStartTime time="2702083333fs"></ZoomStartTime>
+      <ZoomEndTime time="2986583334fs"></ZoomEndTime>
+      <Cursor1Time time="3250000000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="175"></NameColumnWidth>
-      <ValueColumnWidth column_width="108"></ValueColumnWidth>
+      <ValueColumnWidth column_width="104"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="9" />
+   <WVObjectSize size="41" />
    <wvobject fp_name="/peripheral_tb/clk.rst" type="logic">
       <obj_property name="ElementShortName">.rst</obj_property>
       <obj_property name="ObjectShortName">.rst</obj_property>
@@ -123,7 +124,6 @@
    <wvobject fp_name="group277" type="group">
       <obj_property name="label">base_ram</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="isExpanded"></obj_property>
       <wvobject fp_name="/peripheral_tb/sram_controller_instance/base_ram/address" type="array">
          <obj_property name="ElementShortName">address[19:0]</obj_property>
          <obj_property name="ObjectShortName">address[19:0]</obj_property>
@@ -152,7 +152,6 @@
    <wvobject fp_name="group278" type="group">
       <obj_property name="label">ext_ram</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="isExpanded"></obj_property>
       <wvobject fp_name="/peripheral_tb/sram_controller_instance/ext_ram/address" type="array">
          <obj_property name="ElementShortName">address[19:0]</obj_property>
          <obj_property name="ObjectShortName">address[19:0]</obj_property>
@@ -181,7 +180,6 @@
    <wvobject fp_name="group312" type="group">
       <obj_property name="label">sram_controller</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="isExpanded"></obj_property>
       <wvobject fp_name="/peripheral_tb/sram_controller_instance/ram_write" type="logic">
          <obj_property name="ElementShortName">ram_write</obj_property>
          <obj_property name="ObjectShortName">ram_write</obj_property>
@@ -226,5 +224,133 @@
          <obj_property name="ElementShortName">data_addr_half[19:0]</obj_property>
          <obj_property name="ObjectShortName">data_addr_half[19:0]</obj_property>
       </wvobject>
+   </wvobject>
+   <wvobject fp_name="/peripheral_tb/uart_controller_instance/interrupt" type="logic">
+      <obj_property name="ElementShortName">interrupt</obj_property>
+      <obj_property name="ObjectShortName">interrupt</obj_property>
+   </wvobject>
+   <wvobject fp_name="/peripheral_tb/uart_controller_instance/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/peripheral_tb/uart_controller_instance/clk_bus" type="logic">
+      <obj_property name="ElementShortName">clk_bus</obj_property>
+      <obj_property name="ObjectShortName">clk_bus</obj_property>
+   </wvobject>
+   <wvobject fp_name="/peripheral_tb/uart_controller_instance/rst" type="logic">
+      <obj_property name="ElementShortName">rst</obj_property>
+      <obj_property name="ObjectShortName">rst</obj_property>
+   </wvobject>
+   <wvobject fp_name="/peripheral_tb/uart_controller_instance/tx_fifo_full" type="logic">
+      <obj_property name="ElementShortName">tx_fifo_full</obj_property>
+      <obj_property name="ObjectShortName">tx_fifo_full</obj_property>
+   </wvobject>
+   <wvobject fp_name="/peripheral_tb/uart_controller_instance/tx_fifo_empty" type="logic">
+      <obj_property name="ElementShortName">tx_fifo_empty</obj_property>
+      <obj_property name="ObjectShortName">tx_fifo_empty</obj_property>
+   </wvobject>
+   <wvobject fp_name="/peripheral_tb/uart_controller_instance/tx_fifo_read" type="logic">
+      <obj_property name="ElementShortName">tx_fifo_read</obj_property>
+      <obj_property name="ObjectShortName">tx_fifo_read</obj_property>
+   </wvobject>
+   <wvobject fp_name="/peripheral_tb/uart_controller_instance/tx_fifo_write" type="logic">
+      <obj_property name="ElementShortName">tx_fifo_write</obj_property>
+      <obj_property name="ObjectShortName">tx_fifo_write</obj_property>
+   </wvobject>
+   <wvobject fp_name="/peripheral_tb/uart_controller_instance/tx_fifo_out" type="array">
+      <obj_property name="ElementShortName">tx_fifo_out[7:0]</obj_property>
+      <obj_property name="ObjectShortName">tx_fifo_out[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/peripheral_tb/uart_controller_instance/tx_fifo_in" type="array">
+      <obj_property name="ElementShortName">tx_fifo_in[7:0]</obj_property>
+      <obj_property name="ObjectShortName">tx_fifo_in[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/peripheral_tb/uart_controller_instance/tx_start" type="logic">
+      <obj_property name="ElementShortName">tx_start</obj_property>
+      <obj_property name="ObjectShortName">tx_start</obj_property>
+   </wvobject>
+   <wvobject fp_name="/peripheral_tb/uart_controller_instance/tx_busy" type="logic">
+      <obj_property name="ElementShortName">tx_busy</obj_property>
+      <obj_property name="ObjectShortName">tx_busy</obj_property>
+   </wvobject>
+   <wvobject fp_name="/peripheral_tb/uart_controller_instance/currentState" type="array">
+      <obj_property name="ElementShortName">currentState[31:0]</obj_property>
+      <obj_property name="ObjectShortName">currentState[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/peripheral_tb/uart_controller_instance/rx_fifo_in" type="array">
+      <obj_property name="ElementShortName">rx_fifo_in[7:0]</obj_property>
+      <obj_property name="ObjectShortName">rx_fifo_in[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/peripheral_tb/uart_controller_instance/rx_fifo_out" type="array">
+      <obj_property name="ElementShortName">rx_fifo_out[7:0]</obj_property>
+      <obj_property name="ObjectShortName">rx_fifo_out[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/peripheral_tb/uart_controller_instance/rx_fifo_write" type="logic">
+      <obj_property name="ElementShortName">rx_fifo_write</obj_property>
+      <obj_property name="ObjectShortName">rx_fifo_write</obj_property>
+   </wvobject>
+   <wvobject fp_name="/peripheral_tb/uart_controller_instance/rx_fifo_empty" type="logic">
+      <obj_property name="ElementShortName">rx_fifo_empty</obj_property>
+      <obj_property name="ObjectShortName">rx_fifo_empty</obj_property>
+   </wvobject>
+   <wvobject fp_name="/peripheral_tb/uart_controller_instance/rx_fifo_read" type="logic">
+      <obj_property name="ElementShortName">rx_fifo_read</obj_property>
+      <obj_property name="ObjectShortName">rx_fifo_read</obj_property>
+   </wvobject>
+   <wvobject fp_name="/peripheral_tb/uart_controller_instance/IRQ_NUMBER" type="array">
+      <obj_property name="ElementShortName">IRQ_NUMBER[31:0]</obj_property>
+      <obj_property name="ObjectShortName">IRQ_NUMBER[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/peripheral_tb/uart_controller_instance/receiver/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/peripheral_tb/uart_controller_instance/receiver/RxD" type="logic">
+      <obj_property name="ElementShortName">RxD</obj_property>
+      <obj_property name="ObjectShortName">RxD</obj_property>
+   </wvobject>
+   <wvobject fp_name="/peripheral_tb/uart_controller_instance/receiver/RxD_data_ready" type="logic">
+      <obj_property name="ElementShortName">RxD_data_ready</obj_property>
+      <obj_property name="ObjectShortName">RxD_data_ready</obj_property>
+   </wvobject>
+   <wvobject fp_name="/peripheral_tb/uart_controller_instance/receiver/RxD_clear" type="logic">
+      <obj_property name="ElementShortName">RxD_clear</obj_property>
+      <obj_property name="ObjectShortName">RxD_clear</obj_property>
+   </wvobject>
+   <wvobject fp_name="/peripheral_tb/uart_controller_instance/receiver/RxD_data" type="array">
+      <obj_property name="ElementShortName">RxD_data[7:0]</obj_property>
+      <obj_property name="ObjectShortName">RxD_data[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/peripheral_tb/uart_controller_instance/receiver/RxD_idle" type="logic">
+      <obj_property name="ElementShortName">RxD_idle</obj_property>
+      <obj_property name="ObjectShortName">RxD_idle</obj_property>
+   </wvobject>
+   <wvobject fp_name="/peripheral_tb/uart_controller_instance/receiver/RxD_endofpacket" type="logic">
+      <obj_property name="ElementShortName">RxD_endofpacket</obj_property>
+      <obj_property name="ObjectShortName">RxD_endofpacket</obj_property>
+   </wvobject>
+   <wvobject fp_name="/peripheral_tb/uart_controller_instance/receiver/RxD_state" type="array">
+      <obj_property name="ElementShortName">RxD_state[3:0]</obj_property>
+      <obj_property name="ObjectShortName">RxD_state[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/peripheral_tb/uart_controller_instance/receiver/RxD_bit" type="logic">
+      <obj_property name="ElementShortName">RxD_bit</obj_property>
+      <obj_property name="ObjectShortName">RxD_bit</obj_property>
+   </wvobject>
+   <wvobject fp_name="/peripheral_tb/uart_controller_instance/receiver/sampleNow" type="logic">
+      <obj_property name="ElementShortName">sampleNow</obj_property>
+      <obj_property name="ObjectShortName">sampleNow</obj_property>
+   </wvobject>
+   <wvobject fp_name="/peripheral_tb/uart_controller_instance/receiver/ClkFrequency" type="array">
+      <obj_property name="ElementShortName">ClkFrequency[31:0]</obj_property>
+      <obj_property name="ObjectShortName">ClkFrequency[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/peripheral_tb/uart_controller_instance/receiver/Baud" type="array">
+      <obj_property name="ElementShortName">Baud[31:0]</obj_property>
+      <obj_property name="ObjectShortName">Baud[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/peripheral_tb/uart_controller_instance/receiver/Oversampling" type="array">
+      <obj_property name="ElementShortName">Oversampling[31:0]</obj_property>
+      <obj_property name="ObjectShortName">Oversampling[31:0]</obj_property>
    </wvobject>
 </wave_config>
