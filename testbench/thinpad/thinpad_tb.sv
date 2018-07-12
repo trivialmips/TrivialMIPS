@@ -112,7 +112,7 @@ module thinpad_sv();
     );
         count = 0;
         @(negedge uart_clk);
-        uart.rxd = 1;
+        uart.rxd = 0;
         while (count < 8) begin
             @(negedge uart_clk);
             uart.rxd = char[count];
@@ -139,6 +139,7 @@ module thinpad_sv();
 
         $stop;
         
+
         uart_send_char("H");
         uart_send_char("E");
         uart_send_char("L");
