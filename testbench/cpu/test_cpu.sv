@@ -60,6 +60,8 @@ begin
 	dbus_data_delay <= fake_data_bus_instance.data_w;
 end
 
+assign data_bus_if.interrupt[5:1] = 5'b0;
+
 task unittest(
 	input [128 * 8 - 1:0] name,
 	input check_cyc
@@ -93,6 +95,7 @@ task unittest(
 	while(!$feof(fans))
 	begin @(negedge clk.base);
 		cycle = cycle + 1;
+		data_bus_if.interrupt[0] = (40 <= cycle && cycle <= 45);
 
 		if(dbus_we_delay && mem_access_path1) begin
 			$sformat(out, "[0x%x]=0x%x", dbus_addr_delay[15:0], dbus_data_delay);
@@ -147,6 +150,7 @@ begin
 	unittest("inst_multicyc", 0);
 	unittest("except", 0);
 	unittest("except_delayslot", 0);
+	unittest("interrupt", 0);
 	unittest("superscalar", 1);
 	$display("[Done]");
 	$finish;

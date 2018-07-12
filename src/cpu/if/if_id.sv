@@ -62,7 +62,7 @@ begin
 //		id_inst_pair_old <= inst_pair_forward;
 //		id_inst_left <= ~inst_pair_forward.inst2_taken & ~is_hard_reset;
 
-		if(is_ahead)
+		if(is_ahead && ~inst_pair_forward.inst2_taken)
 		begin
 			id_pc <= if_pc - 32'h4;
 		end else begin

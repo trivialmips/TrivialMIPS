@@ -11,6 +11,7 @@ module except(
 	input  MemAddr_t     data_vaddr,
 	input  Bit_t         memory_data_we,
 	input  CP0RegWriteReq_t wb_cp0_reg_wr,
+	input  wire [7:0]    interrupt_flag,
 	output ExceptReq_t   except_req
 );
 
@@ -42,7 +43,7 @@ assign interrupt_occur = (
 	// TODO: check whether DM bit in debug is zero
 	cp0_regs.status.ie &&
 	~cp0_regs.status.exl && ~cp0_regs.status.erl &&
-	(cp0_regs.cause.ip & cp0_regs.status.im) != 8'b0
+	interrupt_flag != 8'b0
 );
 
 Bit_t except_occur;
@@ -51,7 +52,7 @@ always_comb
 begin
 	except = except_a | except_b;
 	except.priv_inst = except.priv_inst & is_user_mode;
-	except_occur = |except;
+	except_occur = (|except) | interrupt_occur;
 	except_req.extra = `ZERO_WORD;
 
 	// see MIPS32 Spec Vol3 Sec6.2.1 for exception priority
@@ -59,6 +60,7 @@ begin
 	begin
 		except_code = `EXCCODE_INT;
 		except_req.alpha_taken = 1'b1;
+		except_req.extra = interrupt_flag;
 		//$display("[Exception] Interrupt");
 	end else if(except.iaddr_illegal) begin
 		except_code = `EXCCODE_ADEL;
