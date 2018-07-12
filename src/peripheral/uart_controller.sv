@@ -12,6 +12,7 @@ module uart_controller(
 
     logic interrupt;
     assign data_bus.interrupt[IRQ_NUMBER] = interrupt;
+    assign data_bus.interrupt[5:1] = 1'b0;
 
 
     wire clk, clk_bus, rst;
