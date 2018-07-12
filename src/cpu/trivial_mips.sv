@@ -85,7 +85,6 @@ cp0 cp0_instance(
 	.rsel(cp0_rsel),
 	.wr(cp0_reg_wr),
 	.except_req,
-	.int_req(data_bus.interrupt),
 
 	.tlbp_req(req_memwb_a.tlbp),
 	.tlbp_res(tlbp_index),
@@ -423,6 +422,15 @@ cpu_mem stage_mem(
 assign data_mem_a = data_exmem_a;
 assign data_mem_b = data_exmem_b;
 
+logic [7:0] mem_interrupt_flag;
+Interrupt_t hardware_int_in_sync, hardware_int;
+always @(posedge clk)
+begin
+	hardware_int_in_sync <= data_bus.interrupt;
+	hardware_int <= hardware_int_in_sync;
+	mem_interrupt_flag <= { hardware_int, cp0_regs.cause.ip[1:0] };
+end
+
 except except_handler(
 	.rst,
 	.data_a(data_mem_a),
@@ -434,6 +442,7 @@ except except_handler(
 	.data_vaddr(mem_mmu_data_result.virt_addr),
 	.cp0_regs_unsafe(cp0_regs),
 	.is_user_mode(cp0_user_mode),
+	.interrupt_flag(mem_interrupt_flag),
 	.wb_cp0_reg_wr(cp0_reg_wr)
 );
 

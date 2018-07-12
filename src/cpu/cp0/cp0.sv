@@ -7,7 +7,6 @@ module cp0(
 	input  wire [2:0]    rsel,
 	input  CP0RegWriteReq_t wr,
 	input  ExceptReq_t   except_req,
-	input  wire [5:0]    int_req,
 
 	input  Bit_t         tlbr_req,
 	input  TLBEntry_t    tlbr_res,
@@ -74,7 +73,6 @@ always_comb
 begin
 	regs_new = regs_inner;
 	regs_new.count = regs_new.count + 32'b1;
-	regs_new.cause.ip[7:2] = int_req;
 
 	/* write register (WB stage) */
 	if(wr.we)
@@ -123,6 +121,9 @@ begin
 			regs_new.status.exl = 1'b1;
 			regs_new.cause.ce   = except_req.extra[1:0];
 			regs_new.cause.exc_code = except_req.code;
+
+			if(except_req.code == `EXCCODE_INT)
+				regs_new.cause.ip = except_req.extra[7:0];
 
 			if(except_req.code == `EXCCODE_ADEL || except_req.code == `EXCCODE_ADES)
 			begin
