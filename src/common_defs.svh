@@ -149,6 +149,7 @@ endinterface
 
 
 typedef logic [`FLASH_CHIP_ADDRESS_WIDTH-1 : 0] FlashChipAddress_t;
+`define FLASH_OP_READ 16'h00FF
 
 interface Flash_if();
     FlashChipAddress_t address;
