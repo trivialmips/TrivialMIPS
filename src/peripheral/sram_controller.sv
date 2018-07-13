@@ -70,7 +70,7 @@ always_ff @(posedge clk or posedge rst) begin
             base_ram.oe_n <= 1'b0;
             ext_ram.ce_n <= 1'b0;
             ext_ram.we_n <= 1'b1;
-            ext_ram.oe_n <= 0'b0;
+            ext_ram.oe_n <= 1'b0;
 
             if (data_bus.stall) begin // unprocessed r/w request
                 // do the real r/w on dbus
