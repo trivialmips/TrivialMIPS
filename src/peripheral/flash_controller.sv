@@ -11,7 +11,7 @@ module flash_controller(
 
     assign flash.vpen = 1'b0; // enable write protection
     assign flash.byte_n = 1'b1; // use 16-bit mode instead byte mode
-    assign flash.rp_n = 1'b0; // a reset cause 150 ns delay!
+    assign flash.rp_n = 1'b1; // a reset cause 150 ns delay!
 
     wire clk, clk_bus, rst;
     assign clk = data_bus.clk.base_2x;
@@ -28,6 +28,9 @@ module flash_controller(
     FlashState_t currentState;
 
     Word_t data_read;
+
+    FlashChipAddress_t chip_base_address;
+    assign chip_base_address = FlashChipAddress_t'(data_bus.address << 2);
 
     logic write_flash;
     assign flash.data = write_flash ? `FLASH_OP_READ : `HIGHZ_HWORD;
@@ -80,7 +83,7 @@ end \
                             data_bus.stall <= 1'b1;
                             flash.ce_n <= 1'b0;
                             flash.oe_n <= 1'b0;
-                            flash.address <= {data_bus.address, 2'b0};
+                            flash.address <= chip_base_address;
                             currentState <= STATE_READ_BYTE_0_0;
                         end
                     end
@@ -89,7 +92,7 @@ end \
 
                     STATE_READ_BYTE_0_3: begin
                         data_read[15:0] <= flash.data;
-                        flash.address <= {data_bus.address, 2'b10};
+                        flash.address <= chip_base_address + 2'h2;
                         currentState <= STATE_READ_BYTE_1_0;
                     end
                     
