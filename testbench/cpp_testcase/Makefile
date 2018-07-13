@@ -5,13 +5,13 @@ CXX=$(ARCH)-gcc
 LD=$(ARCH)-ld
 OBJCOPY=$(ARCH)-objcopy
 
-CXXFLAGS=-c -ffreestanding -Wall -Werror -EB -mips32 -O2 -std=c++11
-LDFLAGS=-static -EB -T linker.ld --oformat elf32-big -nostdlib --nmagic
+CXXFLAGS=-c -ffreestanding -Wall -Werror -mxgot -EB -mips32 -O2 -std=c++11
+LDFLAGS=-static -EB -T linker.ld -nostdlib --nmagic
 
 info:
 	@echo "Please use ./build.sh, do not make directly"
 
-coe: $(COES) $(MEM)
+coe: $(COES)
 
 %.coe: %.mem
 	./mem_to_coe.sh $< > $@
