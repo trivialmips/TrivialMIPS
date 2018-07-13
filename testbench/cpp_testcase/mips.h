@@ -13,6 +13,19 @@ inline void send_serial_char(unsigned char c)
 	if(c) serial_entry[1] = c;
 }
 
+inline bool is_serial_ready_to_read()
+{
+	LOAD_SERIAL_ENTRY(serial_entry);
+	return serial_entry[0] & 2;
+}
+
+inline unsigned read_serial_char()
+{
+	LOAD_SERIAL_ENTRY(serial_entry);
+	while(!is_serial_ready_to_read());
+	return serial_entry[1];
+}
+
 inline void send_serial_hex(unsigned v)
 {
 	send_serial_char('0');

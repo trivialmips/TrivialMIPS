@@ -16,6 +16,13 @@ int _entry()
 			send_serial_integer(now_val);
 			send_serial_char('\n');
 		}
+
+		if(is_serial_ready_to_read())
+		{
+			send_serial_str("Received: ");
+			send_serial_hex(read_serial_char());
+			send_serial_char('\n');
+		}
 	}
 	return 0;
 }
