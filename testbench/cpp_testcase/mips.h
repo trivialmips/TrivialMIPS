@@ -10,7 +10,7 @@ inline void send_serial_char(unsigned char c)
 {
 	LOAD_SERIAL_ENTRY(serial_entry);
 //	while(!(serial_entry[0] & 1));
-	serial_entry[1] = c;
+	if(c) serial_entry[1] = c;
 }
 
 inline void send_serial_hex(unsigned v)
@@ -23,6 +23,48 @@ inline void send_serial_hex(unsigned v)
 		c = (c < 10) ? c + '0' : c + 'a' - 10;
 		send_serial_char(c);
 	}
+}
+
+namespace __impl
+{
+	template<unsigned... I> struct unsigned_sequence { };
+	
+	template<unsigned N, unsigned... I>
+	struct maker {
+		typedef typename maker<N - 1, N - 1, I...>::type type;
+	};
+
+	template<unsigned... I>
+	struct maker<0, I...> {
+		typedef unsigned_sequence<I...> type;
+	};
+
+	template<typename... Pack>
+	inline void send_serial_str_unpack(unsigned char a, Pack... pack)
+	{
+		send_serial_char(a);
+		send_serial_str_unpack(pack...);
+	}
+
+	template<>
+	inline void send_serial_str_unpack(unsigned char a)
+	{
+		send_serial_char(a);
+	}
+
+	template<unsigned N, unsigned... I>
+	inline void send_serial_str_arr(const char (&str)[N], unsigned_sequence<I...>)
+	{
+		send_serial_str_unpack(str[I]...);
+	}
+}
+
+/* send a literal string without using memory to store it */
+template<unsigned N>
+inline void send_serial_str(const char (&str)[N])
+{
+	typedef typename __impl::maker<N>::type type;
+	__impl::send_serial_str_arr(str, type{});
 }
 
 inline unsigned get_switches()

@@ -1,4 +1,4 @@
-mips-elf-gcc -c -ffreestanding -Wall -Werror -o test.o test.cpp -mips32 -O2
+mips-elf-gcc -c -ffreestanding -Wall -Werror -o test.o test.cpp -mips32 -O2 -std=c++11
 mips-elf-gcc -c -ffreestanding -Wall -Werror -o startup.o startup.s -mips32 -O2
 mips-elf-ld -static -T linker.ld -nostdlib --nmagic -o test.elf test.o startup.o
 mips-elf-objcopy --dump-section .text=/dev/stdout test.elf | xxd -c 4 -g 32 | cut -f 2 -d " " > test.mem
