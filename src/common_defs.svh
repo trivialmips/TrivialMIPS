@@ -47,7 +47,8 @@ typedef logic [`REG_ADDR_WIDTH - 1:0] RegAddr_t;
 typedef Word_t  MemAddr_t;
 
 `define ADDRESS_WIDTH 32
-`define HIGHZ_WORD {32{1'bZ}}
+`define HIGHZ_WORD  {32{1'bZ}}
+`define HIGHZ_HWORD {16{1'bZ}}
 
 `define SRAM_CHIP_ADDRESS_WIDTH 20
 `define FLASH_CHIP_ADDRESS_WIDTH 23

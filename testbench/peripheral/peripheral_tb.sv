@@ -463,6 +463,41 @@ module peripheral_tb();
 
         $display("[UART] test ended");
 
+        // flash
+        $display("[Flash] test begin");
+        
+        @(posedge clk.base);
+        @(negedge clk.base_2x);
+            test_data_bus(
+                .address(32'h01000000),
+                .data(32'h11223344),
+                .read(1),
+                .write(0),
+                .mask(4'b1111)
+            );
+        @(posedge clk.base);
+        assert_value("Data bus stall", 1'b1, cpu_data_if.stall);
+        wait(cpu_data_if.stall == 1'b0);
+        @(posedge clk.base);
+        assert_value("Data read from flash", 32'h3c04bfc0, cpu_data_if.data_rd);
+
+        @(posedge clk.base);
+        @(negedge clk.base_2x);
+            test_data_bus(
+                .address(32'h01000004),
+                .data(32'h11223344),
+                .read(1),
+                .write(0),
+                .mask(4'b1111)
+            );
+        @(posedge clk.base);
+        assert_value("Data bus stall", 1'b1, cpu_data_if.stall);
+        wait(cpu_data_if.stall == 1'b0);
+        @(posedge clk.base);
+        assert_value("Data read from flash", 32'h3c01a600, cpu_data_if.data_rd);
+
+        $display("[Flash] test ended");
+
 
         // timer
         $display("[Timer] test begin");
