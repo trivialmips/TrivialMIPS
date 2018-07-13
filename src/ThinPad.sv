@@ -111,9 +111,7 @@ module ThinPad(
         .data_bus(timer_if.slave)
     );
 
-    uart_controller #(
-        .IRQ_NUMBER(`IRQ_UART)
-    ) uart_controller_instance(
+    uart_controller uart_controller_instance(
         .data_bus(uart_if.slave),
         .uart
     );

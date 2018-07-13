@@ -40,9 +40,9 @@ module thinpad_sv();
     assign dpy0 = gpio.dpy0;
     assign dpy1 = gpio.dpy1;
 
-    parameter BASE_RAM_INIT_FILE = "../../../../../testbench/thinpad/base.bin";
-    parameter EXT_RAM_INIT_FILE = "../../../../../testbench/thinpad/ext.bin";
-    parameter FLASH_INIT_FILE = "";
+    parameter BASE_RAM_INIT_FILE = "../../../../../testbench/mem_init/base.bin";
+    parameter EXT_RAM_INIT_FILE = "../../../../../testbench/mem_init/ext.bin";
+    parameter FLASH_INIT_FILE = "../../../../../testbench/mem_init/flash.bin";
 
     sram_model base1(
         .DataIO(base_ram.data[15:0]),

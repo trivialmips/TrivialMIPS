@@ -9,6 +9,15 @@
 `default_nettype wire
 `timescale 1ns / 1ps
 
+`ifdef XILINX_SIMULATOR
+`define BUS_CLK_POSEDGE 1'b1
+`else
+`define BUS_CLK_POSEDGE 1'b0
+`endif
+
+`define MAIN_CLOCK_FREQUENCY 60_000_000
+`define UART_BAUD_RATE 115200
+
 // data formats
 typedef logic           Bit_t;
 typedef logic [7:0]     Byte_t;
@@ -101,6 +110,13 @@ typedef logic [5:0] Interrupt_t;
 `define IRQ_UART     0
 `define IRQ_ETHERNET 1
 `define IRQ_USB      2
+
+`define REGISTER_IRQ(MODULE, NAME, SOURCE) genvar i; \
+generate \
+    for (i = 0; i < $bits(Interrupt_t); i++) begin \
+        assign SOURCE[i] = (i == `EVAL(IRQ_``MODULE)) ? NAME : 1'b0; \
+    end \
+endgenerate
 
 
 // interface for bus

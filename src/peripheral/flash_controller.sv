@@ -5,9 +5,11 @@ module flash_controller(
     Flash_if.master flash
 );
 
-    localparam WAIT_CYCLES = 3;
+    // read requires 75ns, write requires 60ns
+    // it is safe to wait for 3 cycles both, when bus_clk is at 40MHz or slower
+    `define WAIT_CYCLES 3 
 
-    assign flash.vpen = 1'b1; // enable write protect
+    assign flash.vpen = 1'b0; // enable write protection
     assign flash.byte_n = 1'b1; // use 16-bit mode instead byte mode
     assign flash.rp_n = 1'b0; // a reset cause 150 ns delay!
 
@@ -18,10 +20,10 @@ module flash_controller(
 
     typedef enum {
         STATE_INIT,
-        STATE_WRITE_BYTE_0_[WAIT_CYCLES],
-        STATE_WRITE_BYTE_1_[WAIT_CYCLES],
-        STATE_READ_BYTE_0_[WAIT_CYCLES],
-        STATE_READ_BYTE_1_[WAIT_CYCLES]
+        STATE_WRITE_BYTE_0_[`WAIT_CYCLES],
+        STATE_WRITE_BYTE_1_[`WAIT_CYCLES],
+        STATE_READ_BYTE_0_[`WAIT_CYCLES],
+        STATE_READ_BYTE_1_[`WAIT_CYCLES]
     } FlashState_t;
 
     FlashState_t currentState;
@@ -44,7 +46,7 @@ module flash_controller(
             flash.we_n <= 1'b1;
             flash.oe_n <= 1'b1;
         end else begin
-            if (clk_bus == 1'b1) begin // falling edge of clk_bus
+            if (clk_bus == ~`BUS_CLK_POSEDGE) begin // falling edge of clk_bus
                 case (currentState)
                     STATE_INIT: begin
                         flash.ce_n <= 1'b1;

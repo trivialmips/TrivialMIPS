@@ -26,9 +26,7 @@ module peripheral_tb();
     assign dpy0 = gpio.dpy0;
     assign dpy1 = gpio.dpy1;
 
-    parameter BASE_RAM_INIT_FILE = "";
-    parameter EXT_RAM_INIT_FILE = "";
-    parameter FLASH_INIT_FILE = "";
+    parameter FLASH_INIT_FILE = "../../../../../testbench/mem_init/flash.bin";
 
     sram_model base1(
         .DataIO(base_ram.data[15:0]),
@@ -148,11 +146,14 @@ module peripheral_tb();
         .data_bus(timer_if.slave)
     );
 
-    uart_controller #(
-        .IRQ_NUMBER(`IRQ_UART)
-    ) uart_controller_instance(
+    uart_controller uart_controller_instance(
         .data_bus(uart_if.slave),
         .uart(uart.master)
+    );
+
+    flash_controller flash_controller_instance (
+        .data_bus(flash_if.slave),
+        .flash(flash.master)
     );
 
     task test_data_bus(
@@ -215,8 +216,8 @@ module peripheral_tb();
         end
 
         @(posedge clk.base);
-        assert_value("Read instruction 1", 32'h3C04BFC0, cpu_inst_if.data_rd);
-        assert_value("Read instruction 2", 32'h3C038000, cpu_inst_if.data_rd_2);
+        assert_value("Read instruction 1", 32'h40046000, cpu_inst_if.data_rd);
+        assert_value("Read instruction 2", 32'h3c03fbff, cpu_inst_if.data_rd_2);
         $display("[Bootrom] test ended");
 
 

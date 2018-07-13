@@ -57,7 +57,7 @@ module sram_controller(
             data_bus.stall <= 1'b0;
 
         end else begin
-            if (bus_clk == 1'b0) begin // rising edge of bus_clk, latch the request of last clock
+            if (bus_clk == `BUS_CLK_POSEDGE) begin // rising edge of bus_clk, latch the request of last clock
                 
                 // latch the dbus request
                 last_data_even <= data_even;
@@ -65,25 +65,25 @@ module sram_controller(
                 last_stall <= data_bus.stall;
 
                 // disable r/w if no requests come last clock
-                base_ram.ce_n <= 1'b1;
+                base_ram.ce_n <= 1'b0;
                 base_ram.we_n <= 1'b1;
-                base_ram.oe_n <= 1'b1;
-                ext_ram.ce_n <= 1'b1;
+                base_ram.oe_n <= 1'b0;
+                ext_ram.ce_n <= 1'b0;
                 ext_ram.we_n <= 1'b1;
-                ext_ram.oe_n <= 1'b1;
+                ext_ram.oe_n <= 1'b0;
 
                 if (data_bus.stall) begin // unprocessed r/w request
                     // do the real r/w on dbus
                     ram_write <= data_bus.write;
 
-                    base_ram.ce_n <= ~data_even;
+                    base_ram.ce_n <= 1'b0;
                     base_ram.oe_n <= ~(data_bus.read & data_even);
                     base_ram.we_n <= ~(data_bus.write & data_even);
                     base_ram.be_n <= ~data_bus.mask;
                     base_ram_data <= data_bus.data_wr;
                     base_ram.address <= data_addr_half;
         
-                    ext_ram.ce_n <= data_even;
+                    ext_ram.ce_n <= 1'b0;
                     ext_ram.oe_n <= ~(data_bus.read & ~data_even);
                     ext_ram.we_n <= ~(data_bus.write & ~data_even);
                     ext_ram.be_n <= ~data_bus.mask;

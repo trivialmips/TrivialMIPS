@@ -5,14 +5,9 @@ module uart_controller(
     UART_if.master uart
 );
 
-    parameter IRQ_NUMBER = 0;
-
-    localparam ClkFrequency = 60_000_000;
-    localparam Baud = 115200;
-
     logic interrupt;
-    assign data_bus.interrupt[IRQ_NUMBER] = interrupt;
-    assign data_bus.interrupt[5:1] = 1'b0;
+
+    `REGISTER_IRQ(UART, interrupt, data_bus.interrupt)
 
 
     wire clk, clk_bus, rst;
@@ -39,8 +34,8 @@ module uart_controller(
     logic tx_start, tx_busy;
 
     uart_transmitter #(
-        .ClkFrequency(ClkFrequency),
-        .Baud(Baud)
+        .ClkFrequency(`MAIN_CLOCK_FREQUENCY),
+        .Baud(`UART_BAUD_RATE)
     ) transmitter(
         .clk,
         .TxD_start(tx_start),
@@ -87,7 +82,7 @@ module uart_controller(
             tx_fifo_write <= `ZERO_BIT;
         end else begin
             tx_fifo_write <= `ZERO_BIT;
-            if(clk_bus == 1'b1) begin // falling edge of clk_bus
+            if(clk_bus == ~`BUS_CLK_POSEDGE) begin // falling edge of clk_bus
                 if (data_bus.write && data_bus.address[0] == 1'b1 && !tx_fifo_full) begin
                     tx_fifo_in <= Byte_t'(data_bus.data_wr);
                     tx_fifo_write <= 1'b1;
@@ -104,8 +99,8 @@ module uart_controller(
     assign interrupt = ~rx_fifo_empty;
 
     uart_receiver #(
-        .ClkFrequency(ClkFrequency),
-        .Baud(Baud)
+        .ClkFrequency(`MAIN_CLOCK_FREQUENCY),
+        .Baud(`UART_BAUD_RATE)
     ) receiver (
         .clk,
         .RxD(uart.rxd),
@@ -135,7 +130,7 @@ module uart_controller(
             rx_fifo_read <= `ZERO_BIT;
         end else begin
             rx_fifo_read <= `ZERO_BIT;
-            if (clk_bus == 1'b1) begin // falling edge of clk_bus
+            if (clk_bus == `BUS_CLK_POSEDGE) begin // falling edge of clk_bus
                 if (data_bus.read && data_bus.address[0] == 1'b1 && !rx_fifo_empty) begin
                     data_bus.data_rd <= rx_fifo_out;
                     rx_fifo_read <= 1'b1;
