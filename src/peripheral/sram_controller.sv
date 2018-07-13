@@ -40,9 +40,11 @@ assign data_addr_half = SramChipAddress_t'(data_bus.address >> 1);
 assign inst_bus.data_rd = inst_even ? base_ram.data : ext_ram.data;
 assign inst_bus.data_rd_2 = inst_even ? ext_ram.data : base_ram.data;
 
+logic state;
 
 always_ff @(posedge clk or posedge rst) begin
     if (rst) begin
+        state <= 1'b0;
         base_ram.ce_n <= 1'b1;
         base_ram.oe_n <= 1'b1;
         base_ram.we_n <= 1'b1;
@@ -57,7 +59,8 @@ always_ff @(posedge clk or posedge rst) begin
         data_bus.stall <= 1'b0;
 
     end else begin
-        if (bus_clk == 1'b1) begin // rising edge of bus_clk, latch the request of last clock
+        state <= ~state;
+        if (state == 1'b1) begin // rising edge of bus_clk, latch the request of last clock
             
             // latch the dbus request
             last_data_even <= data_even;
@@ -113,13 +116,8 @@ always_ff @(posedge clk or posedge rst) begin
             ext_ram.be_n <= 4'b0000;
             ext_ram.oe_n <= 1'b0;
 
-            if (inst_even) begin
-                base_ram.address <= inst_addr_half;
-                ext_ram.address <= inst_addr_half;
-            end else begin
-                base_ram.address <= inst_addr_half + 1'b1;
-                ext_ram.address <= inst_addr_half;
-            end
+            base_ram.address <= inst_even ? inst_addr_half : (inst_addr_half + 1'b1);
+            ext_ram.address <= inst_addr_half;
 
         end
     end

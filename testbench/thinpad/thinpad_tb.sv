@@ -40,8 +40,8 @@ module thinpad_sv();
     assign dpy0 = gpio.dpy0;
     assign dpy1 = gpio.dpy1;
 
-    parameter BASE_RAM_INIT_FILE = "";
-    parameter EXT_RAM_INIT_FILE = "";
+    parameter BASE_RAM_INIT_FILE = "../../../../../testbench/thinpad/base.bin";
+    parameter EXT_RAM_INIT_FILE = "../../../../../testbench/thinpad/ext.bin";
     parameter FLASH_INIT_FILE = "";
 
     sram_model base1(
@@ -102,6 +102,48 @@ module thinpad_sv();
         $stop;
     end
 
+    initial begin 
+        reg [31:0] tmp_array[0:1048575];
+        integer n_File_ID, n_Init_Size;
+        n_File_ID = $fopen(BASE_RAM_INIT_FILE, "rb");
+        if(!n_File_ID)begin 
+            n_Init_Size = 0;
+            $display("Failed to open BaseRAM init file");
+        end else begin
+            n_Init_Size = $fread(tmp_array, n_File_ID);
+            n_Init_Size /= 4;
+            $fclose(n_File_ID);
+        end
+        $display("BaseRAM Init Size(words): %d",n_Init_Size);
+        for (integer i = 0; i < n_Init_Size; i++) begin
+            base1.mem_array0[i] = tmp_array[i][24+:8];
+            base1.mem_array1[i] = tmp_array[i][16+:8];
+            base2.mem_array0[i] = tmp_array[i][8+:8];
+            base2.mem_array1[i] = tmp_array[i][0+:8];
+        end
+    end
+    
+    initial begin 
+        reg [31:0] tmp_array[0:1048575];
+        integer n_File_ID, n_Init_Size;
+        n_File_ID = $fopen(EXT_RAM_INIT_FILE, "rb");
+        if(!n_File_ID)begin 
+            n_Init_Size = 0;
+            $display("Failed to open ExtRAM init file");
+        end else begin
+            n_Init_Size = $fread(tmp_array, n_File_ID);
+            n_Init_Size /= 4;
+            $fclose(n_File_ID);
+        end
+        $display("ExtRAM Init Size(words): %d",n_Init_Size);
+        for (integer i = 0; i < n_Init_Size; i++) begin
+            ext1.mem_array0[i] = tmp_array[i][24+:8];
+            ext1.mem_array1[i] = tmp_array[i][16+:8];
+            ext2.mem_array0[i] = tmp_array[i][8+:8];
+            ext2.mem_array1[i] = tmp_array[i][0+:8];
+        end
+    end
+
     wire uart_clk;
     assign uart_clk = clk.base_2x;
 
@@ -131,23 +173,20 @@ module thinpad_sv();
         wait(thinpad_instance.clk.rst == 0);
         uart.rxd = 1;
 
+        $stop;
+
         wait_clock = 0;
         while (wait_clock < 20) begin
             @(posedge clk.base);
             wait_clock = wait_clock + 1;
         end
 
-        $stop;
-        
+        // uart_send_char("H");
+        // uart_send_char("E");
+        // uart_send_char("L");
+        // uart_send_char("L");
+        // uart_send_char("O");
 
-        uart_send_char("H");
-        uart_send_char("E");
-        uart_send_char("L");
-        uart_send_char("L");
-        uart_send_char("O");
-
-
-        $stop;
     end
 
 
