@@ -87,7 +87,7 @@ module uart_controller(
             tx_fifo_write <= `ZERO_BIT;
         end else begin
             tx_fifo_write <= `ZERO_BIT;
-            if(clk_bus == 1'b0) begin
+            if(clk_bus == 1'b1) begin // falling edge of clk_bus
                 if (data_bus.write && data_bus.address[0] == 1'b1 && !tx_fifo_full) begin
                     tx_fifo_in <= Byte_t'(data_bus.data_wr);
                     tx_fifo_write <= 1'b1;
@@ -135,7 +135,7 @@ module uart_controller(
             rx_fifo_read <= `ZERO_BIT;
         end else begin
             rx_fifo_read <= `ZERO_BIT;
-            if (clk_bus == 1'b0) begin
+            if (clk_bus == 1'b1) begin // falling edge of clk_bus
                 if (data_bus.read && data_bus.address[0] == 1'b1 && !rx_fifo_empty) begin
                     data_bus.data_rd <= rx_fifo_out;
                     rx_fifo_read <= 1'b1;
