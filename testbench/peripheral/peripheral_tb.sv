@@ -479,6 +479,7 @@ module peripheral_tb();
         assert_value("Data bus stall", 1'b1, cpu_data_if.stall);
         wait(cpu_data_if.stall == 1'b0);
         @(posedge clk.base);
+        cpu_data_if.read = 0;
         assert_value("Data read from flash", 32'h3c04bfc0, cpu_data_if.data_rd);
 
         @(posedge clk.base);
