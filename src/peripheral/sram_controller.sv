@@ -64,22 +64,31 @@ always_ff @(posedge clk or posedge rst) begin
             last_data_bus_read <= data_bus.read;
             last_stall <= data_bus.stall;
 
-            // do the real r/w on dbus
-            ram_write <= 1'b1;
+            // disable r/w if no requests come last clock
+            base_ram.ce_n <= 1'b0;
+            base_ram.we_n <= 1'b1;
+            base_ram.oe_n <= 1'b0;
+            ext_ram.ce_n <= 1'b0;
+            ext_ram.we_n <= 1'b1;
+            ext_ram.oe_n <= 0'b0;
 
-            base_ram.ce_n <= ~data_even;
-            base_ram.oe_n <= ~data_bus.read;
-            base_ram.we_n <= ~data_bus.write;
-            base_ram.be_n <= ~data_bus.mask;
-            base_ram_data <= data_bus.data_wr;
-            base_ram.address <= data_addr_half;
+            if (data_bus.stall) begin // unprocessed r/w request
+                // do the real r/w on dbus
+                ram_write <= data_bus.write;
 
-            ext_ram.ce_n <= data_even;
-            ext_ram.oe_n <= ~data_bus.read;
-            ext_ram.we_n <= ~data_bus.write;
-            ext_ram.be_n <= ~data_bus.mask;
-            ext_ram_data <= data_bus.data_wr;
-            ext_ram.address <= data_addr_half;
+                base_ram.oe_n <= ~(data_bus.read & data_even);
+                base_ram.we_n <= ~(data_bus.write & data_even);
+                base_ram.be_n <= ~data_bus.mask;
+                base_ram_data <= data_bus.data_wr;
+                base_ram.address <= data_addr_half;
+    
+                ext_ram.oe_n <= ~(data_bus.read & ~data_even);
+                ext_ram.we_n <= ~(data_bus.write & ~data_even);
+                ext_ram.be_n <= ~data_bus.mask;
+                ext_ram_data <= data_bus.data_wr;
+                ext_ram.address <= data_addr_half;
+            end
+
 
         end else begin // falling edge of bus_clk, read instruction
 
@@ -97,12 +106,12 @@ always_ff @(posedge clk or posedge rst) begin
             base_ram.we_n <= 1'b1;
             base_ram.ce_n <= 1'b0;
             base_ram.be_n <= 4'b0000;
-            base_ram.oe_n <= ~inst_bus.read;
+            base_ram.oe_n <= 1'b0;
 
             ext_ram.we_n <= 1'b1;
             ext_ram.ce_n <= 1'b0;
             ext_ram.be_n <= 4'b0000;
-            ext_ram.oe_n <= ~inst_bus.read;
+            ext_ram.oe_n <= 1'b0;
 
             if (inst_even) begin
                 base_ram.address <= inst_addr_half;
