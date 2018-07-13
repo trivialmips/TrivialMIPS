@@ -30,15 +30,16 @@ gen_bin: utility/gen_bin.cpp
 
 %.mem: %.elf
 	$(OBJCOPY) --dump-section .text=/dev/stdout $< | xxd -c 4 -g 32 | cut -f 2 -d " " > $@
+	cp test.elf a.elf
 
 %.elf: %.o startup.o
 	$(LD) $(LDFLAGS) -o $@ $^
 
-%.o: %.cpp 
+%.o: %.cpp mips.h
 	$(CXX) $(CXXFLAGS) -o $@ $<
 
 startup.o: utility/startup.s
 	$(CXX) $(CXXFLAGS) -o $@ $<
 
 clean:
-	rm *.mem *.elf *.o || true
+	rm *.elf *.mem *.o gen_bin || true

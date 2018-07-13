@@ -9,7 +9,7 @@
 inline void send_serial_char(unsigned char c)
 {
 	LOAD_SERIAL_ENTRY(serial_entry);
-//	while(!(serial_entry[0] & 1));
+	while(!(serial_entry[0] & 1));
 	if(c) serial_entry[1] = c;
 }
 
@@ -25,13 +25,13 @@ inline void send_serial_hex(unsigned v)
 	}
 }
 
-inline void send_serial_integer(int v)
+void __attribute__ ((noinline)) send_serial_integer(int v)
 {
 	if(v < 0) 
 	{
 		send_serial_char('-');
 		send_serial_integer(-v);
-	} else if(v) {
+	} else if(v != 0) {
 		send_serial_integer(v / 10);
 		send_serial_char((v % 10) + '0');
 	}
