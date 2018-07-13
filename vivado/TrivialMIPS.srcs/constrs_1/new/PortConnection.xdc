@@ -327,9 +327,10 @@ set_property CONFIG_VOLTAGE 3.3 [current_design]
 
 
 
+
 create_clock -period 20.000 -name clk_50M -waveform {0.000 10.000} [get_ports clk_50M]
 create_clock -period 90.422 -name clk_11M0592 -waveform {0.000 45.211} [get_ports clk_11M0592]
-create_clock -period 12.500 -name VIRTUAL_clk_out1_top_clk_wiz -waveform {0.000 6.250}
+create_clock -period 16.667 -name VIRTUAL_clk_out1_top_clk_wiz -waveform {0.000 8.334}
 set_input_delay -clock [get_clocks VIRTUAL_clk_out1_top_clk_wiz] -min -add_delay 8.000 [get_ports {base_ram\.data[*]}]
 set_input_delay -clock [get_clocks VIRTUAL_clk_out1_top_clk_wiz] -max -add_delay 10.000 [get_ports {base_ram\.data[*]}]
 set_input_delay -clock [get_clocks VIRTUAL_clk_out1_top_clk_wiz] -min -add_delay 8.000 [get_ports {ext_ram\.data[*]}]
