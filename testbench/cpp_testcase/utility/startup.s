@@ -7,7 +7,7 @@
 	.type _start, @function
 _start:
 	# setup stack pointer
-	la $sp, 0x80001000
+	la $sp, 0x807ffff0
 	jal _Z6_entryv
 	nop
 

@@ -25,6 +25,18 @@ inline void send_serial_hex(unsigned v)
 	}
 }
 
+inline void send_serial_integer(int v)
+{
+	if(v < 0) 
+	{
+		send_serial_char('-');
+		send_serial_integer(-v);
+	} else if(v) {
+		send_serial_integer(v / 10);
+		send_serial_char((v % 10) + '0');
+	}
+}
+
 namespace __impl
 {
 	template<unsigned... I> struct unsigned_sequence { };

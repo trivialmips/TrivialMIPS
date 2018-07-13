@@ -18,7 +18,10 @@ _wait_int:
 	nop
 
 .org 0x400
+	lui $3, 0x8000
 	lui $1, 0xa300
 	lw $2, 0x04($1)
+	sw $2, 0x00($3)
 	sw $2, 0x04($1)
+	ori $2, $0, 0x0000
 	eret

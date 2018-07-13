@@ -1,8 +1,8 @@
 ENTRY(_start);
 SECTIONS
 {    
-    . = 0xBFC00000;    
-    .text :  AT(0xBFC00000)
+    . = 0x80000000;    
+    .text :  AT(0x80000000)
     {
         _text = .;
         *(.text.startup);
@@ -10,7 +10,7 @@ SECTIONS
         _text_end = .;
     }
 
-    . = 0x80000000;    
+    . = 0x80100000;    
     .data :
     {
         _data = .;

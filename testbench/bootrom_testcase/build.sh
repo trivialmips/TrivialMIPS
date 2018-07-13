@@ -4,10 +4,9 @@
 
 case $NAME in
 "Arch Linux")
-    ARCH=mips-elf make sram
+    ARCH=mips-elf make coe
     ;;
 "Ubuntu")
-    ARCH=mipsel-linux-gnu make sram
+    ARCH=mipsel-linux-gnu make coe
     ;;
 esac
-

@@ -3,7 +3,7 @@
 	.set noat
 _start:
 	lui $4, 0x8000
-	ori $4, $4, 0x0010
+	ori $4, $4, 0x0100
 	ori $1, 0x0001
 	sw  $1, 0x00($4)
 	add $1, $1, $1

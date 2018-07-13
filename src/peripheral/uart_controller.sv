@@ -7,7 +7,7 @@ module uart_controller(
 
     parameter IRQ_NUMBER = 0;
 
-    localparam ClkFrequency = 80_000_000;
+    localparam ClkFrequency = 60_000_000;
     localparam Baud = 115200;
 
     logic interrupt;
