@@ -28,8 +28,9 @@ module ThinPad(
 
 
     Clock_t clk;
+    reg rst_reg_1, rst_reg_2;
     wire rst_n;
-    assign clk.rst = ~rst_n;
+    assign clk.rst = rst_reg_2;
     assign clk._50M = clk_50M;
     assign clk._11M0592 = clk_11M0592;
 
@@ -41,6 +42,17 @@ module ThinPad(
         .locked(rst_n),
         .clk_in1(clk._50M)
     );
+
+    // reset bridge
+    always_ff @(posedge clk.base_2x or negedge rst_n) begin
+        if (~rst_n) begin
+            rst_reg_1 <= 1'b1;
+            rst_reg_2 <= 1'b1;
+        end else begin
+            rst_reg_1 <= ~rst_n;
+            rst_reg_2 <= rst_reg_1;
+        end
+    end
 
 
     Bus_if cpu_data_if(.clk);
@@ -84,8 +96,8 @@ module ThinPad(
         .bootrom(bootrom_if.master)
     );
 
-    // pheripheral
 
+    // pheripheral
     bootrom_controller bootrom_controller_instance(
         .inst_bus(bootrom_if.slave)
     );
@@ -114,6 +126,11 @@ module ThinPad(
     uart_controller uart_controller_instance(
         .data_bus(uart_if.slave),
         .uart
+    );
+
+    flash_controller flash_controller_instance(
+        .data_bus(flash_if.slave),
+        .flash
     );
 
 endmodule
