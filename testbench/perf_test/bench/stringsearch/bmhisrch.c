@@ -14,7 +14,8 @@
 **  10/21/93 rdg  Fixed bugs found by Jeff Dunlop
 */
 
-#include <limits.h>
+//#include <limits.h>
+#define UCHAR_MAX 255
 #include <stdlib.h>
 #include <string.h>
 typedef unsigned char uchar;

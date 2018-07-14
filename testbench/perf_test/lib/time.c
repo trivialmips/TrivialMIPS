@@ -2,16 +2,19 @@
 
 unsigned long _get_count()
 {
-    unsigned long _contval;
-    asm volatile(
-        "lui  $1,0xbfd0\n\t"
-        "ori  $1,$1,0xe000\n\t"
-        "lw %0,0($1)\n\t"
-        :"=r"(_contval)
-        :
-        :"$1"
-        );
-    return  _contval;
+    // TODO: the function now returns timer data, we should use CP0 to obtain accurate clock count
+    volatile unsigned *const timer = (void *) 0xA4000000;
+    return timer[0];
+    // unsigned long _contval;
+    // asm volatile(
+    //     "lui  $1,0xbfd0\n\t"
+    //     "ori  $1,$1,0xe000\n\t"
+    //     "lw %0,0($1)\n\t"
+    //     :"=r"(_contval)
+    //     :
+    //     :"$1"
+    //     );
+    // return  _contval;
 }
 
 unsigned long get_count()

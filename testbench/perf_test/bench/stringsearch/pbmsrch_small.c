@@ -14,7 +14,8 @@
 
 #include <stddef.h>
 #include <string.h>
-#include <limits.h>
+//#include <limits.h>
+#define UCHAR_MAX 255
 #include <stdio.h>
 
 static size_t table[UCHAR_MAX + 1];

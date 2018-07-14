@@ -3,7 +3,7 @@ ENTRY(_start)
 SECTIONS
 {
   /* Read-only sections, merged into text segment: */
-  . = 0x800000;
+  . = 0x80000000;
   .text      : 
   {
     _ftext = . ;
@@ -13,7 +13,7 @@ SECTIONS
   _etext = .;
   PROVIDE (etext = .);
   .fini      : { *(.fini)    } =0
-  . = MEMSTART;
+/*  . = MEMSTART; */
   .data    : AT(rodata_end)
   {
     *(.rodata*)
@@ -36,15 +36,15 @@ SECTIONS
                *(.dtors)
                 LONG(0)
                 __DTOR_END__ = .;
-  _gp = ALIGN(16) + 0x7ff0;
-    *(.got.plt) *(.got)
-  /* We want the small data sections together, so single-instruction offsets
-     can access them all, and initialized data all before uninitialized, so
-     we can shorten the on-disk segment size.  */
-  *(.sdata) 
-   *(.lit8) 
-   *(.lit4) 
-}
+    _gp = ALIGN(16) + 0x7ff0;
+      *(.got.plt) *(.got)
+    /* We want the small data sections together, so single-instruction offsets
+      can access them all, and initialized data all before uninitialized, so
+      we can shorten the on-disk segment size.  */
+    *(.sdata) 
+    *(.lit8) 
+    *(.lit4)
+  }
   _edata  =  .;
   PROVIDE (edata = .);
 
@@ -86,4 +86,7 @@ SECTIONS
   /* These must appear regardless of  .  */
   .gptab.sdata : { *(.gptab.data) *(.gptab.sdata) }
   .gptab.sbss : { *(.gptab.bss) *(.gptab.sbss) }
+
+  .MIPS.abiflags : {}
+
 }
