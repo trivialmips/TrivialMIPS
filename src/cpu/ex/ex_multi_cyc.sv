@@ -37,7 +37,8 @@ begin
 		cyc_number = 1;
 	end else begin
 		unique case(op)
-		OP_MADD, OP_MADDU, OP_MSUB, OP_MSUBU, OP_MUL, OP_MULT:
+		OP_MADD, OP_MADDU, OP_MSUB, OP_MSUBU,
+		OP_MUL, OP_MULT, OP_MULTU:
 			cyc_number = 2;
 		OP_DIV, OP_DIVU:
 			cyc_number = DIV_CYC;
