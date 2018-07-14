@@ -1,5 +1,7 @@
 `include "common_defs.svh"
 
+`define ACCURATE_CLOCK
+
 module peripheral_tb();
 
     Clock_t clk;

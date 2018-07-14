@@ -9,7 +9,7 @@
 `default_nettype wire
 `timescale 1ns / 1ps
 
-`ifdef XILINX_SIMULATOR
+`ifdef ACCURATE_CLOCK
 `define BUS_CLK_POSEDGE 1'b1
 `else
 `define BUS_CLK_POSEDGE 1'b0
