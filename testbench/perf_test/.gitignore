@@ -1,0 +1,15 @@
+*.o
+*.bin
+*.elf
+*.a
+testbin
+*.o64
+*.bin64
+*.elf64
+*.s
+*.vlog
+convert
+*.coe
+*.data
+bin.lds
+*.mif
