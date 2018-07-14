@@ -30,9 +30,9 @@ module bootrom_controller(
             base_address_2 <= BootroomAddress_t'(`ZERO_WORD);
         end else begin
             if (clk_bus == ~`BUS_CLK_POSEDGE) begin // falling edge
-                base_address <= BootroomAddress_t'(data_bus.address);
+                base_address <= BootroomAddress_t'(inst_bus.address);
                 // the trailing 2 bit has already been stripped by inst bus
-                base_address_2 <= BootroomAddress_t'(data_bus.address + 1'h1);
+                base_address_2 <= BootroomAddress_t'(inst_bus.address + 1'h1);
             end
         end
     end
