@@ -29,17 +29,20 @@ module graphics_controller(
                              (mem_address_overflow - `GRAPHICS_CONFIG_ADDRESS) : mem_address_overflow);
 
 
+    assign data_bus.stall = `ZERO_BIT;
 
-    Word_t data_read_gmem;
+    Word_t gmem_data_out_a, gmem_data_in_a;
+    GraphicsMemoryAddress_t gmem_address_a;
+    logic gmem_write_a;
 
     // port a for read/write request from bus
     // port b for read request from vga
     blk_mem_graphics blk_mem_graphics_instance (
         .clka(bus_clk_2x),
-        .wea(data_bus.write),
-        .addra(GraphicsMemoryAddress_t'(data_bus.address)),
-        .dina(data_bus.data_wr),
-        .douta(data_read_gmem),
+        .wea(gmem_write_a),
+        .addra(gmem_address_a),
+        .dina(gmem_data_in_a),
+        .douta(gmem_data_out_a),
         .clkb(vga_clk),
         .web(`ZERO_BIT),
         .addrb(mem_address),
@@ -47,8 +50,22 @@ module graphics_controller(
         .doutb(mem_data)
     );
 
+    always_ff @(posedge bus_clk_2x or posedge rst) begin
+        if (rst) begin
+            gmem_data_in_a <= `ZERO_WORD;
+            gmem_write_a <= `ZERO_BIT;
+            gmem_address_a <= GraphicsMemoryAddress_t'(`ZERO_WORD);
+        end else begin
+            if (bus_clk == ~`BUS_CLK_POSEDGE) begin// falling edge
+                gmem_data_in_a <= data_bus.data_wr;
+                gmem_write_a <= data_bus.write;
+                gmem_address_a <= GraphicsMemoryAddress_t'(data_bus.address);
+            end
+        end
+    end
+
     assign data_bus.data_rd = rst ? `ZERO_WORD : 
-           ((data_bus.read && data_bus.address == `GRAPHICS_CONFIG_ADDRESS) ? pixel_offset_reg_o[1] : data_read_gmem);
+           ((data_bus.read && data_bus.address == `GRAPHICS_CONFIG_ADDRESS) ? pixel_offset_reg_o[1] : gmem_data_out_a);
 
 
     always_ff @(posedge bus_clk or posedge rst) begin
