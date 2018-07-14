@@ -37,9 +37,6 @@ module sram_controller(
     assign inst_addr_half = SramChipAddress_t'(inst_bus.address >> 1);
     assign data_addr_half = SramChipAddress_t'(data_bus.address >> 1);
 
-    assign inst_bus.data_rd = inst_even ? base_ram.data : ext_ram.data;
-    assign inst_bus.data_rd_2 = inst_even ? ext_ram.data : base_ram.data;
-
 
     always_ff @(posedge clk or posedge rst) begin
         if (rst) begin
@@ -55,6 +52,9 @@ module sram_controller(
             last_data_bus_read <= `ZERO_WORD;
             data_bus.data_rd <= `ZERO_WORD;
             data_bus.stall <= 1'b0;
+            inst_bus.data_rd <= `ZERO_WORD;
+            inst_bus.data_rd_2 <= `ZERO_WORD;
+
 
         end else begin
             if (bus_clk == `BUS_CLK_POSEDGE) begin // rising edge of bus_clk, latch the request of last clock
@@ -63,6 +63,10 @@ module sram_controller(
                 last_data_even <= data_even;
                 last_data_bus_read <= data_bus.read;
                 last_stall <= data_bus.stall;
+
+                // send instructions
+                inst_bus.data_rd <= inst_even ? base_ram.data : ext_ram.data;
+                inst_bus.data_rd_2 <= inst_even ? ext_ram.data : base_ram.data;
 
                 // disable r/w if no requests come last clock
                 base_ram.ce_n <= 1'b0;
