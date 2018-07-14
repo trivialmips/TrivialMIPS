@@ -12,6 +12,7 @@ module graphics_controller(
     assign vga_clk = data_bus.clk._50M;
     assign bus_clk = data_bus.clk.base;
     assign bus_clk_2x = data_bus.clk.base_2x;
+    assign rst = data_bus.clk.rst;
 
     Word_t mem_data;
 

@@ -10,6 +10,8 @@ module gpio_controller(
     assign clk = data_bus.clk.base_2x;
     assign rst = data_bus.clk.rst;
 
+    assign data_bus.stall = `ZERO_BIT;
+
     Word_t raw_data_display;
 
     logic decode;

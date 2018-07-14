@@ -11,6 +11,7 @@ module timer_controller(
 
     Word_t timer, timer_reg[0:1];
 
+    assign data_bus.stall = `ZERO_BIT;
     assign data_bus.data_rd = data_bus.read ? timer_reg[1] : `ZERO_WORD;
 
     // cross clock domian synchronization
