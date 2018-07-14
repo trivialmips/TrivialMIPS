@@ -18,23 +18,15 @@ int _entry()
 	send_serial_char('\n');
 
 	int lc = la + lb;
-	send_serial_integer(lc);
-	send_serial_char('\n');
 	for(int k = 0; k < lc; ++k)
 	{
-		send_serial_integer(k);
-		send_serial_str("k\n");
 		int v = 0;
 		for(int i = 0; i < la; ++i)
 		{
-			send_serial_integer(i);
-			send_serial_str("i\n");
 			if(0 <= k - i && k - i < lb)
 				v += (A[la - i - 1] - '0') * (B[lb - (k - i) - 1] - '0');
 		}
 
-		send_serial_integer(v);
-		send_serial_char('\n');
 		C[k] = v;
 	}
 
