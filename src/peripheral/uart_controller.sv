@@ -15,6 +15,8 @@ module uart_controller(
     assign clk_bus = data_bus.clk.base;
     assign rst = data_bus.clk.rst;
 
+    assign data_bus.stall = `ZERO_BIT;
+
 
     // transmitter
     logic tx_fifo_full, tx_fifo_empty, tx_fifo_read, tx_fifo_write;
@@ -79,6 +81,7 @@ module uart_controller(
 
     always_ff @(posedge clk or posedge rst) begin
         if (rst) begin
+            tx_fifo_in <= `ZERO_BYTE;
             tx_fifo_write <= `ZERO_BIT;
         end else begin
             tx_fifo_write <= `ZERO_BIT;
