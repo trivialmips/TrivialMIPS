@@ -41,4 +41,4 @@ startup.o: utility/startup.s
 	$(CXX) $(CXXFLAGS) -o $@ $<
 
 clean:
-	rm *.elf *.mem *.o gen_bin || true
+	rm *.elf *.mem *.o *.bin gen_bin || true
