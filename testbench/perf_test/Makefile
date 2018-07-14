@@ -1,12 +1,13 @@
-#export LD_PRELOAD =
-
-CFLAGS := -D_KERNEL -DCONFIG_PAGE_SIZE_16KB -fno-builtin -mips1 -DCACHELOCK_MEM -DMEMSTART=0x80000000 -DMEMSIZE=0x04000 -DCPU_COUNT_PER_US=1000 -I include -include common.h -DAPB_CLK=33333333
+CFLAGS := -D_KERNEL -DCONFIG_PAGE_SIZE_16KB -fno-builtin -mips1 -DCACHELOCK_MEM -DMEMSTART=0x80400000 -DMEMSIZE=0x0400000 -DCPU_COUNT_PER_US=1000 -I include -include common.h -DAPB_CLK=33333333
 CFLAGS += -DLS1FSOC  -DCPU_MULT=6 -DDDR_MULT=6 -msoft-float
 
 export AR CFLAGS
 export CROSS_COMPILE ?= mipsel-linux-
 
 OBJDIR = obj
+
+info:
+	@echo "Please use ./build.sh, do not make directly"
 
 all: bitcount stringsearch coremark dhrystone sha crc32 quick_sort bubble_sort select_sort stream_copy
 

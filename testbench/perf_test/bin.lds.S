@@ -3,7 +3,7 @@ ENTRY(_start)
 SECTIONS
 {
   /* Read-only sections, merged into text segment: */
-  . = 0xbfc00000;
+  . = 0x800000;
   .text      : 
   {
     _ftext = . ;

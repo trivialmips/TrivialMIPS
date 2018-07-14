@@ -1,11 +1,9 @@
-#define LED_ADDR                0xbfd0f000
-#define LED_RG0_ADDR            0xbfd0f004
-#define LED_RG1_ADDR            0xbfd0f008
-#define NUM_ADDR                0xbfd0f010
-
 #include <time.h>
+#include <machine.h>
+
 unsigned long get_count(void);
 unsigned long get_ns(void);
+
 void shell(void)
 {
     unsigned long start_count = 0;
