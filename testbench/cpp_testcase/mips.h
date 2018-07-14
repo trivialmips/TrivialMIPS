@@ -1,6 +1,7 @@
 
 #define SERIAL_ADDR 0xa3000000
 #define GPIO_ADDR 0xa6000000
+#define TIMER_ADDR 0xa4000000
 #define MEM_ADDR 0x80000000
 #define LOAD_ENTRY(var, addr) \
 	volatile unsigned *const var = reinterpret_cast<volatile unsigned *const>(addr)
@@ -55,17 +56,28 @@ inline void send_serial_hex(unsigned v)
 	}
 }
 
-void __attribute__ ((noinline)) send_serial_integer(int v)
+
+void __attribute__ ((noinline)) send_serial_integer_unsigned(unsigned v)
 {
-	if(v < 0) 
-	{
-		send_serial_char('-');
-		send_serial_integer(-v);
-	} else if(v != 0) {
-		send_serial_integer(v / 10);
+	if (v != 0){
+		send_serial_integer_unsigned(v / 10);
 		send_serial_char((v % 10) + '0');
 	}
 }
+
+
+void __attribute__ ((noinline)) send_serial_integer(int v)
+{
+	if(v < 0) {
+		send_serial_char('-');
+		send_serial_integer_unsigned(-v);
+	} else if(v > 0) {
+		send_serial_integer_unsigned(v);
+	} else {
+		send_serial_char('0');
+	}
+}
+
 
 namespace __impl
 {

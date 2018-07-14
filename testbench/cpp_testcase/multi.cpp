@@ -17,25 +17,56 @@ int _entry()
 	send_serial_string(B);
 	send_serial_char('\n');
 
+	LOAD_ENTRY(timer, TIMER_ADDR);
+
+	unsigned start = timer[0];
+
+	const int TIMES = 100;
+
 	int lc = la + lb;
-	for(int k = 0; k < lc; ++k)
-	{
-		int v = 0;
-		for(int i = 0; i < la; ++i)
-		{
-			if(0 <= k - i && k - i < lb)
-				v += (A[la - i - 1] - '0') * (B[lb - (k - i) - 1] - '0');
+
+	for (int n = 0; n < TIMES; ++n) {
+		for(int k = 0; k < lc; ++k) {
+			int v = 0;
+			for(int i = 0; i < la; ++i) {
+				if(0 <= k - i && k - i < lb) {
+					v += (A[la - i - 1] - '0') * (B[lb - (k - i) - 1] - '0');
+				}
+			}
+			C[k] = v;
 		}
 
-		C[k] = v;
+		for(int i = 0; i != lc; ++i) {
+			if(C[i] > 10){
+				C[i + 1] += C[i] / 10;
+				C[i] %= 10;
+			}
+		}
 	}
 
-	for(int i = 0; i != lc; ++i)
-		if(C[i] > 10)
-		{
-			C[i + 1] += C[i] / 10;
-			C[i] %= 10;
-		}
+	unsigned end = timer[0];
+	unsigned total = end - start;
+	unsigned average = total / TIMES;
+
+	send_serial_str("Start time = ");
+	send_serial_hex(start);
+	send_serial_str(" ms");
+	send_serial_char('\n');
+	send_serial_str("End time = ");
+	send_serial_hex(end);
+	send_serial_str(" ms");
+	send_serial_char('\n');
+	send_serial_str("Elapsed time = ");
+	send_serial_hex(total);
+	send_serial_str(" ms");
+	send_serial_char('\n');
+	send_serial_str("Execution times = ");
+	send_serial_hex(TIMES);
+	send_serial_char('\n');
+	send_serial_str("Average elapsed time = ");
+	send_serial_hex(average);
+	send_serial_str(" ms");
+	send_serial_char('\n');
 
 	send_serial_str("A * B = ");
 	for(int i = lc - 1; i >= 0; --i)
