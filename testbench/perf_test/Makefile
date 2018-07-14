@@ -63,14 +63,16 @@ target_bench:
 	mkdir -p $(OBJDIR)/$(BENCH_DIR)
 	make generate
 
-generate: main.bin main.data convert
-	./convert main.bin main.data $(OBJDIR)/$(BENCH_DIR)/
+generate: main.base.bin main.ext.bin split
+
+main.base.bin: main.bin split
+		./split $(OBJDIR)/$(BENCH_DIR)/main.bin $(OBJDIR)/$(BENCH_DIR)/main.ext.bin $(OBJDIR)/$(BENCH_DIR)/main.base.bin
+
+main.ext.bin: main.base.bin
 
 main.bin: main.elf
-	${CROSS_COMPILE}objcopy -O binary -j .text $(OBJDIR)/$(BENCH_DIR)/$< $(OBJDIR)/$(BENCH_DIR)/$@ 
+	${CROSS_COMPILE}objcopy -O binary -j .text -j .data -j .bss $(OBJDIR)/$(BENCH_DIR)/$< $(OBJDIR)/$(BENCH_DIR)/$@
 
-main.data: main.elf
-	${CROSS_COMPILE}objcopy -O binary -j .data $(OBJDIR)/$(BENCH_DIR)/$< $(OBJDIR)/$(BENCH_DIR)/$@ 
 
 main.elf: start.o libtinyc.a bin.lds
 	${CROSS_COMPILE}ld -g -T bin.lds start.o bench/$(BENCH_DIR)/$(BENCH_LIB) lib/libtinyc.a -o $(OBJDIR)/$(BENCH_DIR)/$@
@@ -82,10 +84,11 @@ bin.lds: bin.lds.S
 start.o: start.S
 	${CROSS_COMPILE}gcc -O2 $(CFLAGS) -fno-pic -mno-abicalls -g -DGUEST -I ../include -c $< -nostdinc -nostdlib
 
-convert: convert.c
-	gcc -o convert convert.c
+split: split.cpp
+	g++ -std=c++11 -o split split.cpp
+
 clean:
-	rm -f *.o *.bin *.elf *.a testbin *.o64 *.bin64 *.elf64 *.s *.vlog convert *.coe *.data bin.lds *.mif
+	rm -f *.o *.bin *.elf *.a testbin *.o64 *.bin64 *.elf64 *.s *.vlog convert split *.coe *.data bin.lds *.mif
 	rm -rf obj
 	make -C lib clean
 	make -C bench clean
