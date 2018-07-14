@@ -56,6 +56,8 @@ start:
 
 	bal	shell			/* Get current execute address */
 	nop
+loop:
+	j loop
 
 exit:
     ori t1,zero,0x00ff
