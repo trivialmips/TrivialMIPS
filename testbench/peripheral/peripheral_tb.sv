@@ -1,7 +1,5 @@
 `include "common_defs.svh"
 
-`define ACCURATE_CLOCK
-
 module peripheral_tb();
 
     Clock_t clk;
@@ -153,9 +151,14 @@ module peripheral_tb();
         .uart(uart.master)
     );
 
-    flash_controller flash_controller_instance (
+    flash_controller flash_controller_instance(
         .data_bus(flash_if.slave),
         .flash(flash.master)
+    );
+
+    ethernet_controller ethernet_controller_instance(
+        .data_bus(ethernet_if.slave),
+        .ethernet
     );
 
     task test_data_bus(
