@@ -130,7 +130,7 @@ module uart_controller(
             rx_fifo_read <= `ZERO_BIT;
         end else begin
             rx_fifo_read <= `ZERO_BIT;
-            if (clk_bus == `BUS_CLK_POSEDGE) begin // falling edge of clk_bus
+            if (clk_bus == ~`BUS_CLK_POSEDGE) begin // falling edge of clk_bus
                 if (data_bus.read && data_bus.address[0] == 1'b1 && !rx_fifo_empty) begin
                     data_bus.data_rd <= rx_fifo_out;
                     rx_fifo_read <= 1'b1;

@@ -133,4 +133,9 @@ module ThinPad(
         .flash
     );
 
+    ethernet_controller ethernet_controller_instance(
+        .data_bus(ethernet_if.slave),
+        .ethernet
+    );
+
 endmodule
