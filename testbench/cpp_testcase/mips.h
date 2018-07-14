@@ -1,10 +1,13 @@
 
 #define SERIAL_ADDR 0xa3000000
 #define GPIO_ADDR 0xa6000000
+#define MEM_ADDR 0x80000000
 #define LOAD_ENTRY(var, addr) \
 	volatile unsigned *const var = reinterpret_cast<volatile unsigned *const>(addr)
 #define LOAD_SERIAL_ENTRY(var) LOAD_ENTRY(var, SERIAL_ADDR)
 #define LOAD_GPIO_ENTRY(var) LOAD_ENTRY(var, GPIO_ADDR)
+#define LOAD_MEMORY_ENTRY(var) \
+	unsigned char *const var = reinterpret_cast<unsigned char *const>(MEM_ADDR)
 
 inline void send_serial_char(unsigned char c)
 {
@@ -24,6 +27,20 @@ inline unsigned read_serial_char()
 	LOAD_SERIAL_ENTRY(serial_entry);
 	while(!is_serial_ready_to_read());
 	return serial_entry[1];
+}
+
+inline int read_serial_line(char *buf, char terminator='\0')
+{
+	int num = 0;
+	while((buf[num] = read_serial_char()) != terminator) ++num;
+	buf[num] = 0;
+	return num;
+}
+
+inline void send_serial_string(const char *str)
+{
+	for(int i = 0; str[i]; ++i)
+		send_serial_char(str[i]);
 }
 
 inline void send_serial_hex(unsigned v)
