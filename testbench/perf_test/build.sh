@@ -7,7 +7,7 @@ case $NAME in
     CROSS_COMPILE=mips-elf- make
     ;;
 "Ubuntu")
-    CROSS_COMPILE-=mipsel-linux-gnu- make
+    CROSS_COMPILE=mipsel-linux-gnu- make
     ;;
 esac
 
