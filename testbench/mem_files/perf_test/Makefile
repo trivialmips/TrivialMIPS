@@ -81,7 +81,7 @@ bin.lds: bin.lds.S
 start.o: start.S
 	${CROSS_COMPILE}gcc -O2 $(CFLAGS) -fno-pic -mno-abicalls -g -DGUEST -I ../include -c $< -nostdinc -nostdlib
 
-split_bin: ../../utility/split_bin.cpp
+split_bin: ../utility/split_bin.cpp
 	g++ -std=c++11 -Wall -Werror -O2 -o $@ $<
 
 clean:
