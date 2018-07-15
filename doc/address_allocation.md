@@ -23,7 +23,7 @@ This section describes the allocation of physical addresses that used in instruc
 | Flash    | `0x01000000` | `0x011FFFFF` | 8 MB              | Stroage  |
 | Graphics | `0x02000000` | `0x0203A980` | 240004 Bytes      | Hybrid*  |
 | UART     | `0x03000000` | `0x03000004` | 2 Addresses       | Register |
-| Timer    | `0x04000000` | `0x04000000` | 1 Address         | Register |
+| Timer    | `0x04000000` | `0x04000000` | 2 Addresses         | Register |
 | Ethernet | `0x05000000` | `0x05000004` | 2 Addresses       | Register |
 | GPIO     | `0x06000000` | `0x0600000C` | 3 Addresses       | Register |
 | USB      | `0x07000000` | `0x07000004` | 2 Addresses       | Register |
@@ -59,11 +59,11 @@ The first register(`0x06000000`) of GPIO contains the status of switches and is 
 
 ### Timer
 
-The only register(`0x04000000`) of Timer contains an integer that automatically increases every 1ms. It can be used to meter the accurate executing time of some instructions, without being affected by the actual frequency of CPU. The register can be written and will be set to zero on hard-reset.
+The first register(`0x04000000`) of Timer contains an integer that automatically increases every 1 us, and can be modified to any value. It can be used to meter the accurate executing time of some instructions, without being affected by the actual frequency of CPU. The second register (`0x04000004`) contains the cycle count of main clock. These registers will be set to zero on hard-reset.
 
 ## Ethernet
 
-T.B.D.
+The first register (`0x0500000`) of Ethernet controller is address line, and the second register (`0x0500004`) is data line. They are both r/w, and their value are prone to change. The details are explained in the data sheet of DM9000A Controller.
 
 ## USB
 
