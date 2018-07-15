@@ -22,7 +22,7 @@ all: $(BASES) $(EXTS)
 %.o: %.s
 	$(AS) -mips32 -EL $< -o $@ 
 
-split_bin: ../split_bin.cpp
+split_bin: ../../utility/split_bin.cpp
 	g++ -Wall -Werror -o $@ $<
 
 clean:

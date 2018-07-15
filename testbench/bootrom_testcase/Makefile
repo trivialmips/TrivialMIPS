@@ -1,20 +1,24 @@
 SRCS=$(wildcard *.s)
 
+export CROSS_COMPILE ?= mipsel-linux-gnu-
+AS=${CROSS_COMPILE}as
+OBJCOPY=${CROSS_COMPILE}objcopy
+
 COES=$(SRCS:.s=.coe) 
 
-info:
-	@echo "Please use ./build.sh, do not make directly"
+all: $(COES) 
 
-coe: $(COES) 
+%.coe: %.bin convert_bin
+	./convert_bin $< $@
 
-%.om: %.s
-	$(ARCH)-as -mips32 -EB $< -o $@ 
+%.bin: %.o
+	$(OBJCOPY) -O binary -j .text -j .data -j .bss $< $@
 
-%.mem: %.om
-	$(ARCH)-objcopy --dump-section .text=/dev/stdout $< | xxd -c 4 -g 32 | cut -f 2 -d " " > $@
+%.o: %.s
+	$(AS) -mips32 -EL $< -o $@ 
 
-%.coe: %.mem
-	sh mem_to_coe.sh $< > $@
+convert_bin: ../utility/convert_bin.c
+	gcc -Wall -O2 -o $@ $<
 
 clean:
-	rm *.mem *.om *.coe || true
+	rm -f *.coe convert_bin

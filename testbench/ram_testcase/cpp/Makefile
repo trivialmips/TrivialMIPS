@@ -18,7 +18,7 @@ all: $(BASES) $(EXTS)
 
 %.ext.bin: %.base.bin
 
-split_bin: ../split_bin.cpp
+split_bin: ../../utility/split_bin.cpp
 	g++ -Wall -Werror -o $@ $<
 
 %.bin: %.elf

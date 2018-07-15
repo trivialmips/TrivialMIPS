@@ -60,10 +60,10 @@ target_bench:
 	mkdir -p $(OBJDIR)/$(BENCH_DIR)
 	make generate
 
-generate: main.base.bin main.ext.bin split
+generate: main.base.bin main.ext.bin split_bin
 
-main.base.bin: main.bin split
-		./split $(OBJDIR)/$(BENCH_DIR)/main.bin $(OBJDIR)/$(BENCH_DIR)/main.ext.bin $(OBJDIR)/$(BENCH_DIR)/main.base.bin
+main.base.bin: main.bin split_bin
+		./split_bin $(OBJDIR)/$(BENCH_DIR)/main.bin $(OBJDIR)/$(BENCH_DIR)/main.ext.bin $(OBJDIR)/$(BENCH_DIR)/main.base.bin
 
 main.ext.bin: main.base.bin
 
@@ -81,11 +81,11 @@ bin.lds: bin.lds.S
 start.o: start.S
 	${CROSS_COMPILE}gcc -O2 $(CFLAGS) -fno-pic -mno-abicalls -g -DGUEST -I ../include -c $< -nostdinc -nostdlib
 
-split: split.cpp
-	g++ -std=c++11 -o split split.cpp
+split_bin: ../utility/split_bin.cpp
+	g++ -std=c++11 -Wall -Werror -O2 -o $@ $<
 
 clean:
-	rm -f *.o *.bin *.elf *.a testbin *.o64 *.bin64 *.elf64 *.s *.vlog convert split *.coe *.data bin.lds *.mif
+	rm -f *.o *.bin *.elf *.a testbin *.o64 *.bin64 *.elf64 *.s *.vlog split_bin *.coe *.data bin.lds *.mif
 	rm -rf obj
 	make -C lib clean
 	make -C bench clean
