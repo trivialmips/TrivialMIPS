@@ -15,6 +15,7 @@
  ****************************************************************************
  */
 
+#include "time.h"
 #include "dhry.h"
 
 /* Global Variables: */
@@ -59,7 +60,7 @@ Rec_Type Rec_Glob;
 /* end of variables for time measurement */
 
 void* malloc(size_t);
-unsigned long get_ns(void);
+
 int
 dhrystone (REG int Number_Of_Runs)
 /*****/

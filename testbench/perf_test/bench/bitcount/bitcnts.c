@@ -9,13 +9,11 @@
 #include <stdio.h>
 #include "conio.h"
 #include "bitops.h"
+#include "time.h"
 
 #define FUNCS  7
 
 static int CDECL bit_shifter(long int x);
-
-unsigned long get_count(void);
-unsigned long get_ns(void);
 
 unsigned long myrand()
 {

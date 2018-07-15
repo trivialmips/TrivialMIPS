@@ -2,12 +2,9 @@ CFLAGS := -D_KERNEL -DCONFIG_PAGE_SIZE_16KB -fno-builtin -mips1 -DCACHELOCK_MEM 
 CFLAGS += -DLS1FSOC  -DCPU_MULT=6 -DDDR_MULT=6 -msoft-float -nostdlib
 
 export AR CFLAGS
-export CROSS_COMPILE ?= mipsel-linux-
+export CROSS_COMPILE ?= mipsel-linux-gnu-
 
 OBJDIR = obj
-
-info:
-	@echo "Please use ./build.sh, do not make directly"
 
 all: bitcount stringsearch coremark dhrystone sha crc32 quick_sort bubble_sort select_sort stream_copy
 
