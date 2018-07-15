@@ -62,8 +62,6 @@
 #   .set noat
 _start:
 start:
-    lui a2,0x0040
-	mtc0	a2, c0_status
 	mtc0	zero, c0_cause
 	la	sp, _stack
 	la	gp, _gp
