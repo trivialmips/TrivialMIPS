@@ -49,23 +49,23 @@ int _entry()
 	unsigned average = total / TIMES;
 
 	send_serial_str("Start time = ");
-	send_serial_hex(start);
-	send_serial_str(" ms");
+	send_serial_integer(start);
+	send_serial_str(" us");
 	send_serial_char('\n');
 	send_serial_str("End time = ");
-	send_serial_hex(end);
-	send_serial_str(" ms");
+	send_serial_integer(end);
+	send_serial_str(" us");
 	send_serial_char('\n');
 	send_serial_str("Elapsed time = ");
-	send_serial_hex(total);
-	send_serial_str(" ms");
+	send_serial_integer(total);
+	send_serial_str(" us");
 	send_serial_char('\n');
 	send_serial_str("Execution times = ");
-	send_serial_hex(TIMES);
+	send_serial_integer(TIMES);
 	send_serial_char('\n');
 	send_serial_str("Average elapsed time = ");
-	send_serial_hex(average);
-	send_serial_str(" ms");
+	send_serial_integer(average);
+	send_serial_str(" us");
 	send_serial_char('\n');
 
 	send_serial_str("A * B = ");
