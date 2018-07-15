@@ -21,7 +21,7 @@ module instruction_bus(
         cpu.data_rd_2 = `ZERO_WORD;
         cpu.stall     = `ZERO_BIT;
 
-        unique case (cpu.address[`ADDRESS_WIDTH - 1 -: `LONGEST_ADDRESS_PREFIX_WIDTH])
+        unique casez (cpu.address[`ADDRESS_WIDTH - 1 -: `LONGEST_ADDRESS_PREFIX_WIDTH])
             `CONCAT_PREFIX(RAM): begin
                 // instruction from ram
                 ram.read      = cpu.read;
