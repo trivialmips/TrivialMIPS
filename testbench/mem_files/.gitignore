@@ -1,0 +1,14 @@
+*.bin
+*.coe
+*.mif
+*.o
+*.a
+split_bin
+convert_bin
+obj/
+func_test/bin.lds
+func_test/main.elf
+func_test/test.s
+cpp/bootrom
+cpp/ram
+cpp/linker.*.ld
