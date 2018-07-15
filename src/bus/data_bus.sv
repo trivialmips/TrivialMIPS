@@ -71,8 +71,8 @@ module data_bus(
         cpu.data_rd_2 = `ZERO_WORD; // we only process one word of r/w on dbus at every clock
         cpu.stall     = `ZERO_BIT;
 
-        unique case (cpu.address[(`ADDRESS_WIDTH - 1) -: `LONGEST_ADDRESS_PREFIX_WIDTH])
-            `CONCAT_PREFIX(RAM): begin
+        unique casez (cpu.address[(`ADDRESS_WIDTH - 1) -: `LONGEST_ADDRESS_PREFIX_WIDTH])
+            12'h00?: begin
                 ram.read    = cpu.read;
                 ram.write   = cpu.write;
                 cpu.data_rd = ram.data_rd;
