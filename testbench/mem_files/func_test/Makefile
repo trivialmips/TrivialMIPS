@@ -1,10 +1,10 @@
 ver = test_hw
 #ver = sim
 
-TOPDIR=$(shell pwd)
+TOPDIR=$(shell pwd | sed 's: :\\ :g')
 
 export LD_PRELOAD =
-CFLAGS := -D_KERNEL -DCONFIG_PAGE_SIZE_16KB -fno-builtin -mips1 -DCACHELOCK_MEM -DMEMSTART=0x80000000 -DMEMSIZE=0x0200000 -DCPU_COUNT_PER_US=10 -I $(TOPDIR)/include -include common.h -DAPB_CLK=33333333
+CFLAGS := -D_KERNEL -DCONFIG_PAGE_SIZE_16KB -fno-builtin -mips32 -DCACHELOCK_MEM -DMEMSTART=0x80000000 -DMEMSIZE=0x0200000 -DCPU_COUNT_PER_US=10 -I $(TOPDIR)/include -include common.h -DAPB_CLK=33333333
 CFLAGS += -DLS1FSOC  -DCPU_MULT=6 -DDDR_MULT=6 $(ALIGNED) 
 #CFLAGS += -fno-reorder-blocks -fno-reorder-funcions
 
@@ -15,9 +15,14 @@ endif
 
 export TOPDIR AR CFLAGS
 
-export CROSS_COMPILE ?= mipsel-linux-
+export CROSS_COMPILE ?= mipsel-linux-gnu-
 
-all: main.bin main.text main.data
+all: main.base.bin main.ext.bin 
+
+main.base.bin: main.bin split_bin
+	./split_bin main.bin main.ext.bin main.base.bin
+
+main.ext.bin: main.bin
 
 libinst.a:
 	make -C inst $(TOPDIR)/$@
@@ -32,17 +37,11 @@ bin.lds: bin.lds.S
 main.bin:main.elf
 	${CROSS_COMPILE}objcopy -O binary -j .text -j .data $< $@ 
 
-main.text:main.elf
-	${CROSS_COMPILE}objcopy -O binary -j .text $< $@ 
-
-main.data:main.elf
-	${CROSS_COMPILE}objcopy -O binary -j .data $< $@ 
-
-convert:convert.c
-	gcc  $(ALIGNED) -o convert  convert.c
+split_bin: ../utility/split_bin.cpp
+	g++ -std=c++11 -Wall -Werror -O2 -o $@ $<
 
 clean:
-	rm -f *.o *.bin *.data *.elf *.a *.s *.vlog *.coe *.mif bin.lds convert
+	rm -f *.o *.bin *.data *.elf *.a *.s *.vlog *.coe *.mif bin.lds split_bin
 	make -C inst clean
 
 -include rules.make

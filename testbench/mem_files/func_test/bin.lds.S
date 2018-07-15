@@ -4,7 +4,6 @@ SECTIONS
 {
   /* Read-only sections, merged into text segment: */
   . = MEMSTART;
-  /*. = 0xbfc00000;*/
   .text      : 
   {
     _ftext = . ;
@@ -21,7 +20,6 @@ SECTIONS
   _etext = .;
   PROVIDE (etext = .);
   .fini      : { *(.fini)    } =0
-  /* . = MEMSTART; */
   .data    : AT(rodata_end)
   {
     _fdata = . ;
@@ -38,15 +36,12 @@ SECTIONS
                *(.dtors)
                 LONG(0)
                 __DTOR_END__ = .;
-  _gp = ALIGN(16) + 0x7ff0;
-    *(.got.plt) *(.got)
-  /* We want the small data sections together, so single-instruction offsets
-     can access them all, and initialized data all before uninitialized, so
-     we can shorten the on-disk segment size.  */
-  *(.sdata) 
-   *(.lit8) 
-   *(.lit4) 
-}
+    _gp = ALIGN(16) + 0x7ff0;
+      *(.got.plt) *(.got)
+    *(.sdata) 
+    *(.lit8) 
+    *(.lit4) 
+  }
   _edata  =  .;
   PROVIDE (edata = .);
 

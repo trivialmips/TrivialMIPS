@@ -52,8 +52,8 @@
 #include <ns16550.h>
 #include <asm/context.h>
 
-#define LED_ADDR                0xbfd0f000
-#define NUM_ADDR                0xbfd0f010
+#define LED_ADDR                0xA6000004
+#define NUM_ADDR                0xA6000008
 
 	.set	noreorder
 	.globl	_start
