@@ -42,5 +42,26 @@ struct timeval{
 	_clock_t tv_msec;
 };
 
-unsigned long get_count();
+unsigned get_count();
+
+unsigned get_us();
+
+unsigned long get_ns();
+
+#define TIMER_BEGIN unsigned start_count = 0;\
+    unsigned stop_count = 0; \
+    unsigned total_count = 0; \
+	unsigned start_us = 0; \
+	unsigned stop_us = 0; \
+    unsigned total_us = 0; \
+    start_count = get_count(); \
+	start_us = get_us();
+
+#define TIMER_END stop_count = get_count();\
+	stop_us = get_us(); \
+    total_count = stop_count - start_count; \
+	total_us = stop_us - start_us; \
+
+#define TIMER_PRINT printf("Time: %u cycles, %u us", total_count, total_us);
+
 #endif
