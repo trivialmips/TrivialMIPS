@@ -15,7 +15,7 @@ module gpio_controller(
     Word_t raw_data_display;
 
     logic decode;
-    assign decode = ~rst ? raw_data_display[31] : 1'b0;
+    assign decode = ~rst ? ~raw_data_display[31] : 1'b0;
 
     logic [3:0] lower_to_decoded, upper_to_decoded;
     SegmentDisplay_t lower_decoded, upper_decoded;

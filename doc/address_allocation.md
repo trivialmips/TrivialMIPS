@@ -55,7 +55,7 @@ The UART device will assert an external interruption when there is data coming.
 
 ### GPIO
 
-The first register(`0x06000000`) of GPIO contains the status of switches and is read-only. The second(`0x06000004`) and the third(`0x06000008`) can be written, respectively changing the status of 7-segment displays and leds, whose higher 16-bits are always ignored, except the highest bit of `0x06000004` incicating whether to decode the lowest 8 bits of itself.
+The first register(`0x06000000`) of GPIO contains the status of switches and is read-only. The second(`0x06000004`) and the third(`0x06000008`) can be written, respectively changing the status of 7-segment displays and leds, whose higher 16-bits are always ignored, except the highest bit of `0x06000004` incicating whether to decode the lowest 8 bits of itself (0 to decode, 1 to display raw data).
 
 ### Timer
 
