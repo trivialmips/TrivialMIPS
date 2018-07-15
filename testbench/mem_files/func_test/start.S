@@ -52,8 +52,8 @@
 #include <ns16550.h>
 #include <asm/context.h>
 
-#define LED_ADDR                0xA6000004
-#define NUM_ADDR                0xA6000008
+#define LED_ADDR                0xA6000008
+#define NUM_ADDR                0xA6000004
 
 	.set	noreorder
 	.globl	_start
@@ -78,7 +78,7 @@ start:
 /*
  *  exception handle
  */
-.org 0x380
+.org 0x180
     li  v1, 0x01 # syscall
     beq v0, v1, syscall_ex
     nop
