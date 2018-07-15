@@ -10,9 +10,21 @@ module timer_controller(
     assign rst = data_bus.clk.rst;
 
     Word_t timer, timer_reg[0:1];
+    Word_t cycle_count;
 
     assign data_bus.stall = `ZERO_BIT;
-    assign data_bus.data_rd = data_bus.read ? timer_reg[1] : `ZERO_WORD;
+
+    always_comb begin
+        if (rst || ~data_bus.read) begin
+            data_bus.data_rd = `ZERO_WORD;
+        end else begin
+            if (data_bus.address[0] == 1'b0) begin
+                data_bus.data_rd = timer_reg[1];
+            end else begin
+                data_bus.data_rd = cycle_count;
+            end
+        end
+    end
 
     // cross clock domian synchronization
     always_ff @(posedge clk_bus or posedge rst) begin
@@ -22,6 +34,14 @@ module timer_controller(
         end else begin
             timer_reg[0] <= timer;
             timer_reg[1] <= timer_reg[0];
+        end
+    end
+
+    always_ff @(posedge clk_bus or posedge rst) begin
+        if (rst) begin
+            cycle_count <= `ZERO_WORD;
+        end else begin
+            cycle_count <= cycle_count + 1'b1;
         end
     end
 
@@ -44,7 +64,7 @@ module timer_controller(
         end
     end
 
-    // downscale from 10MHz to 1KHz (not in simulation)
+    // downscale from 10MHz to 1MHz (not in simulation)
     HalfWord_t prescaler;
 
     always @(posedge clk_10M or posedge rst) begin
@@ -52,11 +72,11 @@ module timer_controller(
             timer <= `ZERO_WORD;
             prescaler <= `ZERO_HWORD;
         end else begin
-            prescaler <= (prescaler < 16'd9999) ? prescaler + 1'b1 : `ZERO_HWORD;
+            prescaler <= (prescaler < 16'd9) ? prescaler + 1'b1 : `ZERO_HWORD;
 `ifdef XILINX_SIMULATOR
             timer <= timer + 1'b1;
 `else
-            timer <= timer + (prescaler == 16'd9999);
+            timer <= timer + (prescaler == 16'd9);
 `endif
             // write new timer data
             if (data_bus_write_reg[0]) begin
