@@ -1,6 +1,6 @@
 `include "cpu_defs.svh"
 
-`define PATH_PREFIX "../../../../../testbench/testcase/"
+`define PATH_PREFIX "../../../../../testbench/cpu/testcase/"
 
 module test_cpu_one_tb();
 

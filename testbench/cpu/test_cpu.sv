@@ -1,7 +1,7 @@
 `include "cpu_defs.svh"
 
-`define PATH_PREFIX1 "../../../../../testbench/testcase/"
-`define PATH_PREFIX2 "../../../../../../testbench/testcase/"
+`define PATH_PREFIX1 "../../../../../testbench/cpu/testcase/"
+`define PATH_PREFIX2 "../../../../../../testbench/cpu/testcase/"
 
 module test_cpu_tb();
 
