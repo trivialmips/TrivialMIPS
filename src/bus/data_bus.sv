@@ -37,7 +37,6 @@ module data_bus(
     assign graphics.address = cpu.address[2 +: `GRAPHICS_ADDRESS_WIDTH];
     assign graphics.mask = cpu.mask;
 
-    // TODO: NOT implemented
     assign ethernet.data_wr = cpu.data_wr;
     assign ethernet.address = cpu.address[2 +: `ETHERNET_ADDRESS_WIDTH];
 
@@ -72,7 +71,7 @@ module data_bus(
         cpu.stall     = `ZERO_BIT;
 
         unique casez (cpu.address[(`ADDRESS_WIDTH - 1) -: `LONGEST_ADDRESS_PREFIX_WIDTH])
-            12'h00?: begin
+            `CONCAT_PREFIX(RAM): begin
                 ram.read    = cpu.read;
                 ram.write   = cpu.write;
                 cpu.data_rd = ram.data_rd;
