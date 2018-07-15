@@ -19,15 +19,15 @@ This section describes the allocation of physical addresses that used in instruc
 
 | Name     | Start        | End          | Valid Data Size   | Type     |
 | -------- | ------------ | ------------ | ----------------- | -------- |
-| RAM      | `0x00000000` | `0x001FFFFF` | 8 MB              | Stroage  |
-| Flash    | `0x01000000` | `0x011FFFFF` | 8 MB              | Stroage  |
+| RAM      | `0x00000000` | `0x007FFFFF` | 8 MB              | Stroage  |
+| Flash    | `0x01000000` | `0x017FFFFF` | 8 MB              | Stroage  |
 | Graphics | `0x02000000` | `0x0203A980` | 240004 Bytes      | Hybrid*  |
 | UART     | `0x03000000` | `0x03000004` | 2 Addresses       | Register |
-| Timer    | `0x04000000` | `0x04000000` | 2 Addresses         | Register |
+| Timer    | `0x04000000` | `0x04000004` | 2 Addresses       | Register |
 | Ethernet | `0x05000000` | `0x05000004` | 2 Addresses       | Register |
 | GPIO     | `0x06000000` | `0x0600000C` | 3 Addresses       | Register |
 | USB      | `0x07000000` | `0x07000004` | 2 Addresses       | Register |
-| Bootrom  | `0x1FC00000` | `0x1FC003FF` | 4 KB              | Storage  |
+| Bootrom  | `0x1FC00000` | `0x1FC00FFF` | 4 KB              | Storage  |
 
 All addresses are aligned in 4, a.k.a their last two bits must be zero, otherwise an 'Address Error' exception will be triggered. Any attempt to access addresses outside 'Valid Data Size' or write to an read-only address will cause an __UNPREDITABLE__ result. Please avoiding doing so.
 
@@ -35,7 +35,7 @@ All addresses are aligned in 4, a.k.a their last two bits must be zero, otherwis
 
 SRAM, flash and bootrom are storage devices, with only SRAM writable. SRAM and bootrom guarantees to give the result of a request for instruction on the next rising edge. The device controller will pull up the 'stall' signal on the bus until the operation it is processing can be done on the next rising edge.
 
-Each address of SRAM stores a word, so the last valid address of RAM is `0x001FFFFF`. The same stands for flash, whose last valid address is `0x011FFFFF`. Bootrom ends at `0x1FC003FF`, with one word at one address. Due to the limited speed and complex operation required to read from flash, a 'stall' bit will be set for several cycles.
+Each address of SRAM stores a word, so the last valid address of RAM is `0x007FFFFF`. The same stands for flash, whose last valid address is `0x017FFFFF`. Bootrom ends at `0x1FC00FFF`, with one word at one address. Due to the limited speed and complex operation required to read from flash, a 'stall' bit will be set for several cycles.
 
 The address and size of bootrom is special due to the hardcorded value `0xBFC00000` of register `PC` after reset, which will be mapped to `0x1FC00000`.
 
