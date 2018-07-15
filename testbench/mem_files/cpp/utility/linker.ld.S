@@ -1,8 +1,13 @@
 ENTRY(_start);
 SECTIONS
 {    
-    . = 0x80000000;    
-    .text :  AT(0x80000000)
+#ifdef BOOT_FROM_BOOTROM
+    . = 0xBFC00000;
+#else
+    . = 0x80000000;
+#endif
+
+    .text :
     {
         _text = .;
         *(.text.startup);
