@@ -17,7 +17,7 @@ all: $(COES)
 %.o: %.s
 	$(AS) -mips32 -EL $< -o $@ 
 
-convert_bin: ../utility/convert_bin.c
+convert_bin: ../../utility/convert_bin.c
 	gcc -Wall -O2 -o $@ $<
 
 clean:

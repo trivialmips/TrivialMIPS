@@ -5,24 +5,27 @@ export CROSS_COMPILE ?= mipsel-linux-gnu-
 CXX=${CROSS_COMPILE}gcc
 LD=${CROSS_COMPILE}ld
 OBJCOPY=${CROSS_COMPILE}objcopy
-BASES=$(SRCS:.cpp=.base.bin)
-EXTS=$(SRCS:.cpp=.ext.bin)
+OBJDUMP=${CROSS_COMPILE}objdump
+
+COES=$(SRCS:.cpp=.coe) 
+ASM=$(SRCS:.cpp=.s) 
 
 CXXFLAGS=-c -ffreestanding -Wall -Werror -mxgot -EL -mips32 -O2 -std=c++11 -I../../include
 LDFLAGS=-static -EL -T utility/linker.ld -nostdlib --nmagic
 
-all: $(BASES) $(EXTS)
+all: $(COES) $(ASM)
 
-%.base.bin: %.bin split_bin
-	./split_bin $< $(basename $<).ext.bin $(basename $<).base.bin
+%.coe: %.bin convert_bin
+	./convert_bin $< $@
 
-%.ext.bin: %.base.bin
-
-split_bin: ../../utility/split_bin.cpp
-	g++ -Wall -Werror -o $@ $<
+convert_bin: ../../utility/convert_bin.c
+	gcc -Wall -O2 -o $@ $<
 
 %.bin: %.elf
-	$(OBJCOPY) -O binary -j .text -j .data -j .bss $< $@
+	$(OBJCOPY) -O binary -j .text $< $@
+
+%.s: %.elf
+	$(OBJDUMP) -ald $< > $@
 
 %.elf: %.o startup.o
 	$(LD) $(LDFLAGS) -o $@ $^
@@ -34,4 +37,4 @@ startup.o: utility/startup.s
 	$(CXX) $(CXXFLAGS) -o $@ $<
 
 clean:
-	rm -f *.o *.bin split_bin
+	rm -f *.coe *.s *.o convert_bin

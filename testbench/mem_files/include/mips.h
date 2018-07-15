@@ -1,4 +1,7 @@
 
+#ifndef __MIPS_H__
+#define __MIPS_H__
+
 #define SERIAL_ADDR 0xa3000000
 #define GPIO_ADDR 0xa6000000
 #define TIMER_ADDR 0xa4000000
@@ -57,7 +60,7 @@ inline void send_serial_hex(unsigned v)
 }
 
 
-void __attribute__ ((noinline)) send_serial_integer_unsigned(unsigned v)
+inline void send_serial_integer_unsigned(unsigned v)
 {
 	if (v != 0){
 		send_serial_integer_unsigned(v / 10);
@@ -66,7 +69,7 @@ void __attribute__ ((noinline)) send_serial_integer_unsigned(unsigned v)
 }
 
 
-void __attribute__ ((noinline)) send_serial_integer(int v)
+inline void send_serial_integer(int v)
 {
 	if(v < 0) {
 		send_serial_char('-');
@@ -138,3 +141,5 @@ inline void set_leds(unsigned short v)
 	LOAD_GPIO_ENTRY(gpio_entry);
 	gpio_entry[2] = static_cast<unsigned>(v);
 }
+
+#endif
