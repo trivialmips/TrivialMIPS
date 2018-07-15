@@ -33,7 +33,7 @@ void shell(void)
         }
     }
     *((int *)NUM_ADDR) = total_count;  
-    printf("select sort: Count: %lu.\n", total_count);
+    printf("Selection sort: Time: %lu ms\n", total_count);
 
     return;
 }

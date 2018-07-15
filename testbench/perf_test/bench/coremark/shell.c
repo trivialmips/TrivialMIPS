@@ -23,6 +23,7 @@ void shell(void)
 	}
 
     *((int *)NUM_ADDR) = total_count;  
+	printf("Coremark: Time: %lu ms\n", total_count);
 
     return;
 }

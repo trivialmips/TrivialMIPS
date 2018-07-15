@@ -15,7 +15,7 @@ void shell(void)
     *((int *)LED_RG0_ADDR) = 1;  
     *((int *)LED_ADDR)     = 0xffff;  
     *((int *)NUM_ADDR) = total_count;  
-	printf(" Count: %lu ; Bits: %ld\n", total_count, n);
+	printf("Bit count: Time: %lu ms; Bits: %ld\n", total_count, n);
 
     return;
 }

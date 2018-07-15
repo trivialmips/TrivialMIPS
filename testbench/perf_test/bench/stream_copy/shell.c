@@ -33,7 +33,7 @@ void shell(void)
         }
     }
     *((int *)NUM_ADDR) = total_count;  
-    printf("stream copy: Count: %lu.\n", total_count);
+    printf("stream copy: Time: %lu ms\n", total_count);
 
     return;
 }

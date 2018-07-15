@@ -26,6 +26,7 @@ void shell(void)
 	}
 
 	printf("Error count: %d\n", err_cnt);
+	printf("String search: Time: %lu ms", total_count);
 
     return;
 }

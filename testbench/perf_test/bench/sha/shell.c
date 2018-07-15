@@ -25,6 +25,7 @@ void shell(void)
 	}
 
     *((int *)NUM_ADDR) = total_count;  
+	printf("SHA: Time: %lu ms", total_count);
 
     return;
 }

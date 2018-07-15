@@ -27,6 +27,7 @@ void shell(void)
 	}
 
     *((int *)NUM_ADDR) = total_count;  
+	printf("CRC32: Time: %lu ms\n", total_count);
 
     return;
 }

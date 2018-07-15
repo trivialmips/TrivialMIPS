@@ -33,7 +33,7 @@ void shell(void)
         }
     }
     *((int *)NUM_ADDR) = total_count;  
-    printf("bubble sort: Count: %lu.\n", total_count);
+    printf("Bubble sort: Time: %lu.\n", total_count);
 
     return;
 }
