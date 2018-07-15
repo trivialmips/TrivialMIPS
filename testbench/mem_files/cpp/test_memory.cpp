@@ -18,7 +18,7 @@ inline void test()
 
 	rand_seed = 23;
 	for(int i = 0; i != 8 * 1024 * 1024 / sizeof(Type); ++i)
-		if(mem[i] != rand(rand_seed))
+		if(mem[i] != static_cast<Type>(rand(rand_seed)))
 		{
 			send_serial_str("Error at ");
 			send_serial_hex(MEM_ADDR + i * sizeof(Type));
