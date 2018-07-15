@@ -54,8 +54,8 @@ typedef Word_t  MemAddr_t;
 `define FLASH_CHIP_ADDRESS_WIDTH 23
 
 // address prefixes
-`define RAM_ADDRESS_PREFIX      8'h00
-`define FLASH_ADDRESS_PREFIX    8'h01
+`define RAM_ADDRESS_PREFIX      12'h00?
+`define FLASH_ADDRESS_PREFIX    12'h01?
 `define GRAPHICS_ADDRESS_PREFIX 8'h02
 `define UART_ADDRESS_PREFIX     8'h03
 `define TIMER_ADDRESS_PREFIX    8'h04
