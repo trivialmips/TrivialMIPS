@@ -78,7 +78,7 @@ typedef struct packed {
 } CP0CauseReg_t;
 
 typedef struct packed {
-	Word_t config1;
+	Word_t ebase, config1;
 	/* The order of the following registers is important.
 	 * DO NOT change them. New registers must be added 
 	 * BEFORE this comment */

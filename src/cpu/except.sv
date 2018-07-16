@@ -164,24 +164,25 @@ begin
 				except_req.jump_pc = cp0_regs.error_epc;
 			else except_req.jump_pc = cp0_regs.epc;
 		end else begin
-			HalfWord_t offset;
+			logic [11:0] offset;
 			if(cp0_regs.status.exl == 1'b0)
 			begin
 				if(except_code == `EXCCODE_TLBL || except_code == `EXCCODE_TLBS)
 				begin
-					offset = 16'h000;
+					offset = 12'h000;
 				end else if(except_code == `EXCCODE_INT && cp0_regs.cause.iv) begin
-					offset = 16'h200;
+					offset = 12'h200;
 				end else begin
-					offset = 16'h180;
+					offset = 12'h180;
 				end
 			end else begin
-				offset = 16'h180;
+				offset = 12'h180;
 			end
 
 			if(cp0_regs.status.bev)
 				except_req.jump_pc = 32'hbfc00200 + offset;
-			else except_req.jump_pc = 32'h80000000 + offset;
+//			else except_req.jump_pc = 32'h80000000 + offset;
+			else except_req.jump_pc = { cp0_regs.ebase[31:12], offset };
 		end
 	end
 end

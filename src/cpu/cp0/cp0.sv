@@ -56,6 +56,7 @@ begin
 		regs_inner.prid      <= `ZERO_WORD;
 		regs_inner.config0   <= `ZERO_WORD;
 		regs_inner.error_epc <= `ZERO_WORD;
+		regs_inner.ebase     <= 32'h80000001;
 	end else begin
 		regs_inner <= regs_new;
 	end
@@ -77,9 +78,15 @@ begin
 	/* write register (WB stage) */
 	if(wr.we)
 	begin
-		wdata = regs_new[wr.waddr * `REG_DATA_WIDTH +: 32];
-		wdata = (wr.wdata & wmask) | (wdata & ~wmask);
-		regs_new[wr.waddr * `REG_DATA_WIDTH +: 32] = wdata;
+		if(wr.sel == 3'b0)
+		begin
+			wdata = regs_new[wr.waddr * `REG_DATA_WIDTH +: 32];
+			wdata = (wr.wdata & wmask) | (wdata & ~wmask);
+			regs_new[wr.waddr * `REG_DATA_WIDTH +: 32] = wdata;
+		end else if(wr.sel == 3'b1) begin
+			if(wr.waddr == 5'd15)
+				regs_new.ebase[29:12] = wr.wdata[29:12];
+		end
 	end
 
 	/* TLBR/TLBP instruction (WB stage) */

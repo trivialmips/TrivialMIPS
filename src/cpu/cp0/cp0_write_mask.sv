@@ -39,6 +39,11 @@ begin
 		5'd30: mask = 32'hffffffff;  // error_epc
 		default: mask = 32'b0;
 		endcase
+	end else if(sel == 3'd1) begin
+		unique case(addr)
+		5'd15: mask = 32'h3ffff000;  // ebase
+		default: mask = 32'b0;
+		endcase
 	end else begin
 		mask = 32'b0;
 	end
