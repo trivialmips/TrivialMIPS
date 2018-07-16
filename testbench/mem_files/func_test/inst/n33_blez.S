@@ -8,7 +8,7 @@
 
 LEAF(n33_blez_test)
     .set noreorder
-    lui  a0, 0x2100
+    li  a0, 0x21
     li  v0, 0x0
 ###test inst
     TEST_BLEZ(0x95b9206f, 0x6ad0a0b8, 0x8f08db03, 0x6ad0a0b8, 0x8f08db03)
@@ -219,8 +219,8 @@ LEAF(n33_blez_test)
     addiu s3, s3, 1
 ###output a0|s3
 inst_error:  
-    or t0, a0, s3 
-    sw t0, 0(s1)
+    sw s3, 0($23)
+    sw a0, 0(s1)
     jr ra
     nop
 END(n33_blez_test)

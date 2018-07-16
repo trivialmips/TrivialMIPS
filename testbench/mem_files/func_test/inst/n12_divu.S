@@ -8,7 +8,7 @@
 
 LEAF(n12_divu_test)
     .set noreorder
-    lui  a0, 0xC00
+    li  a0, 0xC
     li  v0, 0x0
 ###test inst
     TEST_DIVU(0x4e775a80, 0xb26795ec, 0x00000000, 0x4e775a80)
@@ -268,8 +268,8 @@ LEAF(n12_divu_test)
     addiu s3, s3, 1
 ###output a0|s3
 inst_error:  
-    or t0, a0, s3 
-    sw t0, 0(s1)
+    sw s3, 0($23)
+    sw a0, 0(s1)
     jr ra
     nop
 END(n12_divu_test)

@@ -8,7 +8,7 @@
 
 LEAF(n1_add_test)
     .set noreorder
-    lui  a0, 0x100
+    li  a0, 0x1
     li  v0, 0x0
 ###test inst
     TEST_ADD(0x0480ff04, 0x40933204, 0x45143108)
@@ -268,8 +268,8 @@ LEAF(n1_add_test)
     addiu s3, s3, 1
 ###output a0|s3
 inst_error:  
-    or t0, a0, s3 
-    sw t0, 0(s1)
+    sw s3, 0($23)
+    sw a0, 0(s1)
     jr ra
     nop
 END(n1_add_test)

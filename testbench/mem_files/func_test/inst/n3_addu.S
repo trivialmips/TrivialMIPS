@@ -8,7 +8,7 @@
 
 LEAF(n3_addu_test)
     .set noreorder
-    lui  a0, 0x300
+    li  a0, 0x3
     li  v0, 0x0
 ###test inst
     TEST_ADDU(0x1adef300, 0x51dd58de, 0x6cbc4bde)
@@ -319,8 +319,8 @@ LEAF(n3_addu_test)
     addiu s3, s3, 1
 ###output a0|s3
 inst_error:  
-    or t0, a0, s3 
-    sw t0, 0(s1)
+    sw s3, 0($23)
+    sw a0, 0(s1)
     jr ra
     nop
 END(n3_addu_test)

@@ -7,11 +7,10 @@
 #include <inst_ex_test.h>
 
 ####LEAF(n58_add_ex_test)
-    .data
     .globl n58_add_ex_test
 n58_add_ex_test:
     .set noreorder
-    lui  a0, 0x3A00
+    li  a0, 0x3A
 ###test inst
     TEST_ADD_EX(0x5afb47da, 0x6c8829f0, 0x7f490b93, 0x5afb47da)
     TEST_ADD_EX(0x1a376500, 0x2a3ca166, 0x797f30b9, 0x1a376500)
@@ -72,8 +71,8 @@ n58_add_ex_test:
     addiu s3, s3, 1
 ###output a0|s3
 inst_error:  
-    or t0, a0, s3 
-    sw t0, 0(s1)
+    sw s3, 0($23)
+    sw a0, 0(s1)
     jr ra
     nop
 ####END(n58_add_ex_test)

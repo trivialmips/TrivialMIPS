@@ -15,28 +15,36 @@ SECTIONS
     /* .gnu.warning sections are handled specially by elf32.em.  */
     *(.gnu.warning)
     *(.MIPS.abiflags)
+    . = ALIGN(0x1000);
+    *(.text.ebase)
     rodata_end = .;
   } =0
+
   _etext = .;
+
   PROVIDE (etext = .);
+
   .fini      : { *(.fini)    } =0
+
   .data    : AT(rodata_end)
   {
+    /*
     _fdata = . ;
     _stack = _fdata + MEMSIZE -32;
     *(.data)
     *(.data*) 
-                __CTOR_LIST__ = .;
-                LONG((__CTOR_END__ - __CTOR_LIST__) / 4 - 2)
-               *(.ctors)
-                LONG(0)
-                __CTOR_END__ = .;
-                __DTOR_LIST__ = .;
-                LONG((__DTOR_END__ - __DTOR_LIST__) / 4 - 2)
-               *(.dtors)
-                LONG(0)
-                __DTOR_END__ = .;
+    __CTOR_LIST__ = .;
+    LONG((__CTOR_END__ - __CTOR_LIST__) / 4 - 2)
+    *(.ctors)
+    LONG(0)
+    __CTOR_END__ = .;
+    __DTOR_LIST__ = .;
+    LONG((__DTOR_END__ - __DTOR_LIST__) / 4 - 2)
+    *(.dtors)
+    LONG(0)
+    __DTOR_END__ = .;
     _gp = ALIGN(16) + 0x7ff0;
+    */
       *(.got.plt) *(.got)
     *(.sdata) 
     *(.lit8) 

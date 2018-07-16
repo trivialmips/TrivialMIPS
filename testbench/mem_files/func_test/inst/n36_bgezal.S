@@ -8,7 +8,7 @@
 
 LEAF(n36_bgezal_test)
     .set noreorder
-    lui  a0, 0x2400
+    li  a0, 0x24
     li  v0, 0x0
 ###test inst
     TEST_BGEZAL(0x9ec9db66, 0x029aaf84, 0xb5a8cca0, 0x00000000, 0x00000000, 0xbfc0041c, 0xbfc003dc, 0xbfc00414)
@@ -219,8 +219,8 @@ LEAF(n36_bgezal_test)
     addiu s3, s3, 1
 ###output a0|s3
 inst_error:  
-    or t0, a0, s3 
-    sw t0, 0(s1)
+    sw s3, 0($23)
+    sw a0, 0(s1)
     jr ra
     nop
 END(n36_bgezal_test)

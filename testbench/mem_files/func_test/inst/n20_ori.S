@@ -8,7 +8,7 @@
 
 LEAF(n20_ori_test)
     .set noreorder
-    lui  a0, 0x1400
+    li  a0, 0x14
     li  v0, 0x0
 ###test inst
     TEST_ORI(0x0d48918a, 0x00007fe6, 0x0d48ffee)
@@ -319,8 +319,8 @@ LEAF(n20_ori_test)
     addiu s3, s3, 1
 ###output a0|s3
 inst_error:  
-    or t0, a0, s3 
-    sw t0, 0(s1)
+    sw s3, 0($23)
+    sw a0, 0(s1)
     jr ra
     nop
 END(n20_ori_test)

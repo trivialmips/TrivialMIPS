@@ -8,7 +8,7 @@
 
 LEAF(n14_multu_test)
     .set noreorder
-    lui  a0, 0xE00
+    li  a0, 0xE
     li  v0, 0x0
 ###test inst
     TEST_MULTU(0x99c9a500, 0x6c1a1b60, 0xb204e000, 0x40f0c088)
@@ -319,8 +319,8 @@ LEAF(n14_multu_test)
     addiu s3, s3, 1
 ###output a0|s3
 inst_error:  
-    or t0, a0, s3 
-    sw t0, 0(s1)
+    sw s3, 0($23)
+    sw a0, 0(s1)
     jr ra
     nop
 END(n14_multu_test)

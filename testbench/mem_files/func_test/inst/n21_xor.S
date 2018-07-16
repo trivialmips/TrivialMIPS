@@ -8,7 +8,7 @@
 
 LEAF(n21_xor_test)
     .set noreorder
-    lui  a0, 0x1500
+    li  a0, 0x15
     li  v0, 0x0
 ###test inst
     TEST_XOR(0x1773df80, 0xb5af51d2, 0xa2dc8e52)
@@ -319,8 +319,8 @@ LEAF(n21_xor_test)
     addiu s3, s3, 1
 ###output a0|s3
 inst_error:  
-    or t0, a0, s3 
-    sw t0, 0(s1)
+    sw s3, 0($23)
+    sw a0, 0(s1)
     jr ra
     nop
 END(n21_xor_test)

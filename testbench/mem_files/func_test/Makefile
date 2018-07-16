@@ -17,7 +17,7 @@ export TOPDIR AR CFLAGS
 
 export CROSS_COMPILE ?= mipsel-linux-gnu-
 
-all: main.base.bin main.ext.bin 
+all: main.base.bin main.ext.bin dump.s
 
 main.base.bin: main.bin split_bin
 	./split_bin main.bin main.ext.bin main.base.bin
@@ -27,9 +27,11 @@ main.ext.bin: main.bin
 libinst.a:
 	make -C inst $(TOPDIR)/$@
 
-%.elf: start.o libinst.a bin.lds
+dump.s: main.elf
+	${CROSS_COMPILE}objdump -alD $< > $@
+
+main.elf: start.o libinst.a bin.lds
 	${CROSS_COMPILE}ld -g -T  bin.lds  -o $@ start.o -L . -linst
-	${CROSS_COMPILE}objdump -alD $@ > test.s
 
 bin.lds: bin.lds.S
 	${CROSS_COMPILE}gcc -E -P -Umips -D_LOADER -U_MAIN $(CFLAGS) bin.lds.S -o bin.lds

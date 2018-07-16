@@ -8,7 +8,7 @@
 
 LEAF(n38_jal_test)
     .set noreorder
-    lui  a0, 0x2600
+    li  a0, 0x26
     li  v0, 0x0
 ###test inst
     TEST_JAL(0x8c3e1efa, 0xeb2bd57c, 0x8c3e1efa, 0xeb2bd57c)
@@ -218,8 +218,8 @@ LEAF(n38_jal_test)
     addiu s3, s3, 1
 ###output a0|s3
 inst_error:  
-    or t0, a0, s3 
-    sw t0, 0(s1)
+    sw s3, 0($23)
+    sw a0, 0(s1)
     jr ra
     nop
 END(n38_jal_test)

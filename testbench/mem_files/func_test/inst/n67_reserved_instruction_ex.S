@@ -7,11 +7,10 @@
 #include <inst_ex_test.h>
 
 ####LEAF(n67_reserved_instruction_ex_test)
-    .data
     .globl n67_reserved_instruction_ex_test
 n67_reserved_instruction_ex_test:
     .set noreorder
-    lui  a0, 0x4300
+    li  a0, 0x43
 ###test inst
     TEST_RESERVED_INSTRUCTION_EX(0x45df00e0)
     TEST_RESERVED_INSTRUCTION_EX(0x7a22db9c)
@@ -25,7 +24,6 @@ n67_reserved_instruction_ex_test:
     TEST_RESERVED_INSTRUCTION_EX(0x7d468520)
     TEST_RESERVED_INSTRUCTION_EX(0xd33bd844)
     TEST_RESERVED_INSTRUCTION_EX(0x71ac59bc)
-    TEST_RESERVED_INSTRUCTION_EX(0xbd78be2c)
     TEST_RESERVED_INSTRUCTION_EX(0xd193fd44)
     TEST_RESERVED_INSTRUCTION_EX(0xec6f06c8)
     TEST_RESERVED_INSTRUCTION_EX(0x75891917)
@@ -65,7 +63,6 @@ n67_reserved_instruction_ex_test:
     TEST_RESERVED_INSTRUCTION_EX(0x4e0b39e6)
     TEST_RESERVED_INSTRUCTION_EX(0x4862f047)
     TEST_RESERVED_INSTRUCTION_EX(0x6925a008)
-    TEST_RESERVED_INSTRUCTION_EX(0xbd2cc518)
     TEST_RESERVED_INSTRUCTION_EX(0x9c1f2675)
     TEST_RESERVED_INSTRUCTION_EX(0x47e3ca90)
     TEST_RESERVED_INSTRUCTION_EX(0x7454b800)
@@ -104,8 +101,8 @@ n67_reserved_instruction_ex_test:
     addiu s3, s3, 1
 ###output a0|s3
 inst_error:  
-    or t0, a0, s3 
-    sw t0, 0(s1)
+    sw s3, 0($23)
+    sw a0, 0(s1)
     jr ra
     nop
 ####END(n67_reserved_instruction_ex_test)

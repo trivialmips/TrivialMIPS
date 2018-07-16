@@ -7,11 +7,10 @@
 #include <inst_ex_test.h>
 
 ####LEAF(n59_addi_ex_test)
-    .data
     .globl n59_addi_ex_test
 n59_addi_ex_test:
     .set noreorder
-    lui  a0, 0x3B00
+    li  a0, 0x3B
 ###test inst
     TEST_ADDI_EX(0x60a71e30, 0x7fff9b21, 0x000071db, 0x60a71e30)
     TEST_ADDI_EX(0x6c5392aa, 0x7ffff480, 0x000054b0, 0x6c5392aa)
@@ -69,8 +68,8 @@ n59_addi_ex_test:
     addiu s3, s3, 1
 ###output a0|s3
 inst_error:  
-    or t0, a0, s3 
-    sw t0, 0(s1)
+    sw s3, 0($23)
+    sw a0, 0(s1)
     jr ra
     nop
 ####END(n59_addi_ex_test)

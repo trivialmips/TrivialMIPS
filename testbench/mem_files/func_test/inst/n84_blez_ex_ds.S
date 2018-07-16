@@ -7,11 +7,10 @@
 #include <inst_delay_slot_test.h>
 
 ###LEAF(n84_blez_ex_ds_test)
-    .data
     .globl n84_blez_ex_ds_test
 n84_blez_ex_ds_test:
     .set noreorder
-    lui  a0, 0x5400
+    li  a0, 0x54
 #    li  v0, 0x09
 ###test inst
     TEST_BLEZ_EX_DS_EX_ADDI
@@ -33,8 +32,8 @@ n84_blez_ex_ds_test:
     addiu s3, s3, 1
 ###output a0|s3
 inst_error:  
-    or t0, a0, s3 
-    sw t0, 0(s1)
+    sw s3, 0($23)
+    sw a0, 0(s1)
     jr ra
     nop
 ####END(n84_blez_ex_ds_test)

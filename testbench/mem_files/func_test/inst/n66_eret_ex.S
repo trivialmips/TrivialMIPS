@@ -7,11 +7,10 @@
 #include <inst_ex_test.h>
 
 ####LEAF(n66_eret_ex_test)
-    .data
     .globl n66_eret_ex_test
 n66_eret_ex_test:
     .set noreorder
-    lui  a0, 0x4200
+    li  a0, 0x42
 ###test inst
     TEST_ERET_EX(0x7f1bb123, 0x7f1bb123)
     TEST_ERET_EX(0x696202d1, 0x696202d1)
@@ -219,8 +218,8 @@ n66_eret_ex_test:
     addiu s3, s3, 1
 ###output a0|s3
 inst_error:  
-    or t0, a0, s3 
-    sw t0, 0(s1)
+    sw s3, 0($23)
+    sw a0, 0(s1)
     jr ra
     nop
 ####END(n66_eret_ex_test)

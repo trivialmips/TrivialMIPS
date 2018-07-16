@@ -8,7 +8,7 @@
 
 LEAF(n11_div_test)
     .set noreorder
-    lui  a0, 0xB00
+    li  a0, 0xB
     li  v0, 0x0
 ###test inst
     TEST_DIV(0x56bedfa4, 0x20831400, 0x00000002, 0x15b8b7a4)
@@ -269,8 +269,8 @@ LEAF(n11_div_test)
     addiu s3, s3, 1
 ###output a0|s3
 inst_error:  
-    or t0, a0, s3 
-    sw t0, 0(s1)
+    sw s3, 0($23)
+    sw a0, 0(s1)
     jr ra
     nop
 END(n11_div_test)

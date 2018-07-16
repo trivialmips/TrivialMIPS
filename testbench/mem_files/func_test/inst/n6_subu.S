@@ -8,7 +8,7 @@
 
 LEAF(n6_subu_test)
     .set noreorder
-    lui  a0, 0x600
+    li  a0, 0x6
     li  v0, 0x0
 ###test inst
     TEST_SUBU(0xd6fc0584, 0x5f9765a8, 0x77649fdc)
@@ -319,8 +319,8 @@ LEAF(n6_subu_test)
     addiu s3, s3, 1
 ###output a0|s3
 inst_error:  
-    or t0, a0, s3 
-    sw t0, 0(s1)
+    sw s3, 0($23)
+    sw a0, 0(s1)
     jr ra
     nop
 END(n6_subu_test)

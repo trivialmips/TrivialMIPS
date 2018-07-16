@@ -92,6 +92,7 @@
 #define c0_cause $13
 #define c0_epc $14
 #define c0_prid $15
+#define c0_ebase $15, 1
 #define c0_config $16
 #define c0_lladdr $17
 #define c0_watchlo $18
