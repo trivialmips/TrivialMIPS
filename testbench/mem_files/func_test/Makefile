@@ -43,7 +43,7 @@ split_bin: ../utility/split_bin.cpp
 	g++ -std=c++11 -Wall -Werror -O2 -o $@ $<
 
 clean:
-	rm -f *.o *.bin *.data *.elf *.a *.s *.vlog *.coe *.mif bin.lds split_bin
+	rm -f *.o *.bin *.elf *.a *.s bin.lds split_bin
 	make -C inst clean
 
 -include rules.make
