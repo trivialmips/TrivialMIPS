@@ -28,6 +28,7 @@ begin
 		`RST_REG_WR(reg_wr1)
 		`RST_REG_WR(reg_wr2)
 		`RST_REG_WR(cp0_reg_wr)
+		cp0_reg_wr.sel = 3'b0;
 		hilo_wr.we   = 1'b0;
 		hilo_wr.hilo = `ZERO_DWORD;
 	end else begin
