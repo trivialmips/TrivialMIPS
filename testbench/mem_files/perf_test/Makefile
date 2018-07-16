@@ -85,7 +85,7 @@ split_bin: ../utility/split_bin.cpp
 	g++ -std=c++11 -Wall -Werror -O2 -o $@ $<
 
 clean:
-	rm -f *.o *.bin *.elf *.a testbin *.o64 *.bin64 *.elf64 *.s *.vlog split_bin *.coe *.data bin.lds *.mif
+	rm -f *.o *.bin *.elf *.a *.s split_bin bin.lds
 	rm -rf obj
 	make -C lib clean
 	make -C bench clean

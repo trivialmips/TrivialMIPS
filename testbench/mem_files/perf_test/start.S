@@ -35,12 +35,7 @@
 #define _KERNEL
 #endif
 
-#include <asm/asm.h>
 #include <asm/regdef.h>
-#include <cpu.h>
-#include <machine.h>
-#include <ns16550.h>
-#include <asm/context.h>
 
 	.set	noreorder
 	.globl	_start
@@ -61,8 +56,6 @@ loop:
 
 exit:
     ori t1,zero,0x00ff
-#   lui at, 0x8000 
-#   sb t1,0x7ffc(at)
     lui AT, 0x8000 
     sb t1,0x7ffc(AT)
 

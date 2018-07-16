@@ -1,9 +1,9 @@
 #include <time.h>
+#include <machine.h>
 
 unsigned _get_count()
 {
-    volatile unsigned *const timer = (void *) 0xA4000000;
-    return timer[1];
+	return *((volatile unsigned *)TIMER_CYCLE_ADDR);
 }
 
 unsigned get_count()
@@ -31,8 +31,7 @@ unsigned long get_clock()
 }
 
 unsigned get_us() {
-    volatile unsigned *const timer = (void *) 0xA4000000;
-    return timer[0];
+    return *((volatile unsigned *)TIMER_MICROSEC_ADDR);
 }
 
 unsigned long get_ns() {
