@@ -1,8 +1,6 @@
 #include <asm/asm.h>
 #include <asm/regdef.h>
 #include <cpu.h>
-#include <machine.h>
-#include <ns16550.h>
 #include <asm/context.h>
 #include <inst_delay_slot_test.h>
 
