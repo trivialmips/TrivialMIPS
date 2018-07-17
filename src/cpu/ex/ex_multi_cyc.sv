@@ -93,7 +93,9 @@ div_uu #(
 	.z( { 32'b0, abs_reg1 } ),
 	.d(abs_reg2),
 	.q(abs_quotient),
-	.s(abs_remainder)
+	.s(abs_remainder),
+	.div0(),
+	.ovf()
 );
 
 /* |b| = |aq| + |r|

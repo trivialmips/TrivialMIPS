@@ -29,11 +29,11 @@ begin
 
 	if(rst == 1'b1 || ~pc_ce)
 	begin
-		inst_bus.read    = `ZERO_BIT;
+		inst_bus.read    = 1'b0;
 		inst_bus.mask    = 4'b0000;
 	end else begin
-		// TODO: danger!
-		inst_bus.read    = ~except.iaddr_miss; // & ~except.iaddr_illegal & ~except.iaddr_invalid;
+//		inst_bus.read    = ~except.iaddr_miss; // & ~except.iaddr_illegal & ~except.iaddr_invalid;
+		inst_bus.read    = 1'b1;
 		inst_bus.mask    = 4'b1111;
 	end
 end
