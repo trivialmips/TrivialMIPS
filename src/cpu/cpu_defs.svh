@@ -197,6 +197,11 @@ typedef enum {
 	FPU_OP_ADD, FPU_OP_SUB, FPU_OP_COND,
 	FPU_OP_MUL, FPU_OP_DIV, FPU_OP_SQRT,
 
+	/* FPU conversion */
+	FPU_OP_CVTW, FPU_OP_CVTS,
+	FPU_OP_TRUNC, FPU_OP_ROUND,
+	FPU_OP_CEIL, FPU_OP_FLOOR,
+
 	/* invalid */
 	FPU_OP_INVALID
 } FPUOper_t;

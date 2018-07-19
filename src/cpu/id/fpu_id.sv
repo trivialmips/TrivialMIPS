@@ -51,7 +51,13 @@ begin
 				6'b000010: `INST_W(FPU_OP_MUL,  fs, ft, fd)
 				6'b000011: `INST_W(FPU_OP_DIV,  fs, ft, fd)
 				6'b000100: `INST_W(FPU_OP_SQRT, fs, ft, fd)
-				6'b11????: `INST_R(FPU_OP_COND, fs, ft)
+				6'b001100: `INST_W(FPU_OP_ROUND, fs, ft, fd)
+				6'b001101: `INST_W(FPU_OP_TRUNC, fs, ft, fd)
+				6'b001110: `INST_W(FPU_OP_CEIL,  fs, ft, fd)
+				6'b001111: `INST_W(FPU_OP_FLOOR, fs, ft, fd)
+				6'b100000: `INST_W(FPU_OP_CVTS,  fs, ft, fd)
+				6'b100100: `INST_W(FPU_OP_CVTW,  fs, ft, fd)
+				6'b11????: `INST_R(FPU_OP_COND,  fs, ft)
 				default: op = FPU_OP_INVALID;
 				endcase
 			end

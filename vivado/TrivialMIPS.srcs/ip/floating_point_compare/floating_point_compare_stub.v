@@ -1,7 +1,7 @@
 // Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
 // --------------------------------------------------------------------------------
 // Tool Version: Vivado v.2018.1 (lin64) Build 2188600 Wed Apr  4 18:39:19 MDT 2018
-// Date        : Fri Jul 20 02:30:48 2018
+// Date        : Fri Jul 20 07:10:35 2018
 // Host        : miskcoo running 64-bit Arch Linux
 // Command     : write_verilog -force -mode synth_stub
 //               /home/miskcoo/WorkPlace/TrivialMIPS/vivado/TrivialMIPS.srcs/ip/floating_point_compare/floating_point_compare_stub.v
