@@ -8,6 +8,7 @@ module cpu_id(
 
 	input  Word_t     reg1_i,
 	input  Word_t     reg2_i,
+	input  FCSRReg_t  fpu_fcsr,
 
 	input  ExceptInfo_t ifid_except,
 
@@ -44,6 +45,7 @@ assign data_id.delayslot  = delayslot;
 assign req_id.reg_wr.we    = reg_we;
 assign req_id.reg_wr.waddr = reg_waddr;
 assign req_id.except = ifid_except;
+assign req_id.fcsr = fpu_fcsr;
 
 // 6-bit primary operation code
 logic [5:0] opcode;
@@ -144,6 +146,16 @@ id_type_r id_type_r_instance(
 	.reg_waddr(reg_waddr_r),
 	.reg_we(reg_we_r),
 	.op(op_type_r)
+);
+
+/* FPU instructions */
+fpu_id fpu_id_instance(
+	.inst,
+	.op(data_id.fpu_op),
+	.raddr1(data_id.fpu_raddr1),
+	.raddr2(data_id.fpu_raddr2),
+	.waddr(req_id.freg_wr.waddr),
+	.we(req_id.freg_wr.we)
 );
 
 Bit_t cond_move_not_taken, movz_not_taken, movn_not_taken;

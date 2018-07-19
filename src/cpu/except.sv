@@ -6,6 +6,8 @@ module except(
 	input  PipelineData_t data_b,
 	input  ExceptInfo_t  except_a,
 	input  ExceptInfo_t  except_b,
+	input  FPUExcept_t   fpu_except_a,
+	input  FPUExcept_t   fpu_except_b,
 	input  CP0Regs_t     cp0_regs_unsafe,
 	input  Bit_t         is_user_mode,
 	input  MemAddr_t     data_vaddr,
@@ -46,13 +48,19 @@ assign interrupt_occur = (
 	interrupt_flag != 8'b0
 );
 
+Bit_t fpu_except_occur;
+Bit_t fpu_except_occur_a, fpu_except_occur_b;
+assign fpu_except_occur_a = |fpu_except_a;
+assign fpu_except_occur_b = |fpu_except_b;
+assign fpu_except_occur = fpu_except_occur_a | fpu_except_occur_b;
+
 Bit_t except_occur;
 logic [4:0] except_code;
 always_comb
 begin
 	except = except_a | except_b;
 	except.priv_inst = except.priv_inst & is_user_mode;
-	except_occur = (|except) | interrupt_occur;
+	except_occur = (|except) | interrupt_occur | fpu_except_occur;
 	except_req.extra = `ZERO_WORD;
 
 	// see MIPS32 Spec Vol3 Sec6.2.1 for exception priority
@@ -93,6 +101,11 @@ begin
 		except_code = `EXCCODE_TR;
 		except_req.alpha_taken = except_a.trap;
 		//$display("[Exception] Trap");
+	end else if(fpu_except_occur) begin
+		except_code = `EXCCODE_FPE;
+		except_req.alpha_taken = fpu_except_occur_a;
+		except_req.extra = fpu_except_occur_a ? fpu_except_a : fpu_except_b;
+		//$display("[Exception] Floating-point");
 	end else if(except.eret) begin
 		except_code = 5'b0;
 		except_req.alpha_taken = except_a.eret;

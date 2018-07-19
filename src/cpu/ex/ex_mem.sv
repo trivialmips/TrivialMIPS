@@ -23,6 +23,11 @@ module ex_mem(
 	q.reg_wr.we        <= 1'b0;           \
 	q.reg_wr.waddr     <= `ZERO_WORD;     \
 	q.reg_wr.wdata     <= `ZERO_WORD;     \
+	q.fcsr_we          <= 1'b0;           \
+	q.fcsr             <= `ZERO_WORD;     \
+	q.freg_wr.we       <= 1'b0;           \
+	q.freg_wr.waddr    <= `ZERO_WORD;     \
+	q.freg_wr.wdata    <= {$bits(FPUReg_t){1'b0}};  \
 	q.cp0_reg_wr.we    <= 1'b0;           \
 	q.cp0_reg_wr.waddr <= `ZERO_WORD;     \
 	q.cp0_reg_wr.wdata <= `ZERO_WORD;     \
@@ -34,6 +39,7 @@ module ex_mem(
 	q.memory_req.addr  <= `ZERO_WORD;     \
 	q.memory_req.wdata <= `ZERO_WORD;     \
 	q.except           <= {$bits(ExceptInfo_t){1'b0}};  \
+	q.fpu_except       <= {$bits(FPUExcept_t){1'b0}};  \
 	q.llbit_set        <= 1'b0;           \
 	q.tlb_read         <= 1'b0;           \
 	q.tlbp             <= 1'b0;           \
@@ -44,6 +50,7 @@ module ex_mem(
 	d.pc         <= `ZERO_WORD; \
 	d.inst       <= `ZERO_WORD; \
 	d.op         <= OP_NOP;     \
+	d.fpu_op     <= FPU_OP_NOP; \
 	d.delayslot  <= 1'b0; 
 
 always @(posedge clk)

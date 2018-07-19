@@ -25,6 +25,7 @@ module cpu_mem(
 Oper_t op;
 MemAccessReq_t memory_req;
 RegWriteReq_t wr_i, wr_o;
+FPURegWriteReq_t fpu_wr_i, fpu_wr_o;
 ExceptInfo_t except_i, except_o;
 assign memory_data_we = (memory_req.ce & memory_req.we);
 
@@ -33,6 +34,13 @@ begin
 	req_mem_a = req_ex_a;
 	req_mem_b = req_ex_b;
 
+	req_mem_a.fcsr    = req_ex_a.fcsr;
+	req_mem_b.fcsr    = req_ex_b.fcsr;
+	req_mem_a.fcsr_we = req_ex_a.fcsr_we;
+	req_mem_b.fcsr_we = req_ex_b.fcsr_we;
+	req_mem_a.fpu_except = req_ex_a.fpu_except;
+	req_mem_b.fpu_except = req_ex_b.fpu_except;
+
 	// Only one of pipe-a and pipe-b may access memory
 	if(req_ex_b.memory_req.ce)
 	begin
@@ -40,19 +48,25 @@ begin
 		op               = data_ex_b.op;
 		except_i         = req_ex_b.except;
 		wr_i             = req_ex_b.reg_wr;
+		fpu_wr_i         = req_ex_b.freg_wr;
 		req_mem_b.except = except_o;
 		req_mem_a.except = req_ex_a.except;
 		req_mem_b.reg_wr = wr_o;
 		req_mem_a.reg_wr = req_ex_a.reg_wr;
+		req_mem_b.freg_wr = fpu_wr_o;
+		req_mem_a.freg_wr = req_ex_a.freg_wr;
 	end else begin
 		memory_req       = req_ex_a.memory_req;
 		op               = data_ex_a.op;
 		except_i         = req_ex_a.except;
 		wr_i             = req_ex_a.reg_wr;
+		fpu_wr_i         = req_ex_a.freg_wr;
 		req_mem_a.except = except_o;
 		req_mem_b.except = req_ex_b.except;
 		req_mem_a.reg_wr = wr_o;
 		req_mem_b.reg_wr = req_ex_b.reg_wr;
+		req_mem_a.freg_wr = fpu_wr_o;
+		req_mem_b.freg_wr = req_ex_b.freg_wr;
 	end
 end
 
@@ -119,6 +133,9 @@ begin
 		wr_o.waddr = `ZERO_WORD;
 		wr_o.wdata = `ZERO_WORD;
 
+		fpu_wr_o    = fpu_wr_i;
+		fpu_wr_o.we = 1'b0;
+
 		data_bus.read    = `ZERO_BIT;
 		data_bus.write   = `ZERO_BIT;
 	end else if(memory_req.ce) begin
@@ -135,16 +152,16 @@ begin
 				wr_o.wdata     = { 30'b0, ll_bit };
 				wr_o.waddr     = wr_i.waddr;
 			end else begin
-				wr_o.we    = 1'b0;
-				wr_o.waddr = `ZERO_WORD;
-				wr_o.wdata = `ZERO_WORD;
+				wr_o.we     = 1'b0;
+				wr_o.waddr  = `ZERO_WORD;
+				wr_o.wdata  = `ZERO_WORD;
 			end
 		end else begin
 			// read memory
 			data_bus.read    = 1'b1;
 			data_bus.write   = `ZERO_BIT;
 
-			wr_o.we    = 1'b1;
+			wr_o.we    = (op != OP_LWC1);
 			wr_o.waddr = wr_i.waddr;
 			unique case(op)
 				OP_LB:   wr_o.wdata = signed_ext_byte;
@@ -156,6 +173,11 @@ begin
 			endcase
 		end
 
+		fpu_wr_o.we        = (op == OP_LWC1);
+		fpu_wr_o.waddr     = fpu_wr_i.waddr;
+		fpu_wr_o.wdata.val = aligned_data_rd;
+		fpu_wr_o.wdata.fmt = `FPU_REG_UNINTERPRET;
+
 		if(except_already_occur)
 		begin
 		/* If update 'wr_o' at this time, the data-forward will
@@ -166,7 +188,8 @@ begin
 			data_bus.write   = `ZERO_BIT;
 		end
 	end else begin
-		wr_o = wr_i;
+		wr_o     = wr_i;
+		fpu_wr_o = fpu_wr_i;
 
 		data_bus.read    = `ZERO_BIT;
 		data_bus.write   = `ZERO_BIT;

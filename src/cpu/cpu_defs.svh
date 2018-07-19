@@ -97,11 +97,6 @@ typedef struct packed {
 	 entry_lo1, entry_lo0,  random,     index;
 } CP0Regs_t;
 
-`define CP0_REG_COUNT    5'd9
-`define CP0_REG_COMPARE  5'd11
-`define CP0_REG_STATUS   5'd12
-`define CP0_REG_CAUSE    5'd13
-
 // exception
 typedef struct packed {
 	Bit_t iaddr_miss, iaddr_illegal, iaddr_invalid;
@@ -132,6 +127,7 @@ typedef struct packed {
 `define EXCCODE_CpU   5'h0b  // coprocesser unusable exception
 `define EXCCODE_OV    5'h0c  // overflow
 `define EXCCODE_TR    5'h0d  // trap
+`define EXCCODE_FPE   5'h0f  // floating point exception
 
 // operation
 typedef enum {
@@ -152,7 +148,7 @@ typedef enum {
 	/* branch and jump instructions */
 	OP_BEQ, OP_BGEZ, OP_BGEZAL,
 	OP_BGTZ, OP_BLEZ, OP_BLTZ, OP_BLTZAL, OP_BNE,
-	OP_J, OP_JAL, OP_JALR, OP_JR,
+	OP_J, OP_JAL, OP_JALR, OP_JR, OP_BC1,
 	// OP_B,   the same as OP_BEQ with rs = rt = 0
 	// OP_BAL, the same as OP_BGEZAL with rs = 0
 
@@ -160,13 +156,12 @@ typedef enum {
 	OP_LB, OP_LBU, OP_LH, OP_LHU,
 	OP_LW, OP_LWL, OP_LWR, OP_SB,
 	OP_SH, OP_SW, OP_SWL, OP_SWR,
-	OP_LL, OP_SC,
+	OP_LL, OP_SC, OP_LWC1, OP_SWC1,
 	// OP_PERF, OP_SYNC, regarded as OP_NOP
 
 	/* move instructions */
 	OP_MFHI, OP_MFLO, OP_MTHI, OP_MTLO,
-	OP_MOVN, OP_MOVZ,
-	// OP_MOVF, OP_MOVT, floating-point involved
+	OP_MOVN, OP_MOVZ, OP_MOVCI,
 
 	/* shift instructions */
 	OP_SLL, OP_SLLV, OP_SRA, OP_SRAV, OP_SRL, OP_SRLV, 
@@ -179,9 +174,62 @@ typedef enum {
 	OP_CACHE, OP_ERET, OP_MFC0, OP_MTC0,
 	OP_TLBP, OP_TLBR, OP_TLBWI, OP_TLBWR, OP_WAIT,
 
+	/* FPU/CPU data transfer */
+	OP_CFC1, OP_CTC1, OP_MFC1, OP_MTC1,
+
+	/* FPU inner instructions */
+	OP_FPU,
+
 	/* invalid */
 	OP_INVALID
 } Oper_t;
+
+typedef enum {
+	FPU_OP_NOP,
+
+	/* load and store */
+	FPU_OP_LW, FPU_OP_SW,
+
+	/* FPU/CPU data transfer */
+	FPU_OP_CFC, FPU_OP_CTC, FPU_OP_MFC, FPU_OP_MTC,
+
+	/* invalid */
+	FPU_OP_INVALID
+} FPUOper_t;
+
+// FPU
+typedef struct packed {
+	logic unimpl;  // only used by 'cause'
+	logic invalid_op;
+	logic divide_by_zero;
+	logic overflow;
+	logic underflow;
+	logic inexact;
+} FPUExcept_t;
+
+typedef struct packed {
+	logic [7:0] fcc;
+	logic fs;
+	FPUExcept_t cause, enables, flags;
+	logic [1:0] rm;
+} FCSRReg_t;
+
+`define FPU_REG_UNKNOWN      2'b00
+`define FPU_REG_UNINTERPRET  2'b01
+`define FPU_REG_S            2'b10  // single floating point
+`define	FPU_REG_W            2'b11  // word fixed point
+typedef logic [1:0] FPURegFormat_t;
+
+typedef struct packed {
+	FPURegFormat_t fmt;
+	Word_t val;
+} FPUReg_t;
+
+typedef struct packed {
+	Bit_t     we;
+	RegAddr_t waddr;
+	FPUReg_t  wdata;
+} FPURegWriteReq_t;
 
 // pipeline
 typedef struct packed {
@@ -191,6 +239,9 @@ typedef struct packed {
 	Word_t reg1, reg2, imm;  // ID, EX
 	RegAddr_t reg_addr1, reg_addr2;  // ID, EX
 	Bit_t delayslot;         // IF, ID, EX, MEM
+
+	FPUOper_t fpu_op;        // ID, EX, MEM
+	RegAddr_t fpu_raddr1, fpu_raddr2;  // ID, EX
 } PipelineData_t;
 
 typedef struct packed {
@@ -201,6 +252,11 @@ typedef struct packed {
 	ExceptInfo_t except;         // ID, EX, MEM
 	Bit_t llbit_set;             // EX, MEM
 	Bit_t tlb_read, tlb_wr, tlb_wi, tlbp;  // EX, MEM, WB
+
+	Bit_t fcsr_we;               // EX, MEM, WB
+	FCSRReg_t fcsr;              // ID, EX, MEM, WB
+	FPURegWriteReq_t freg_wr;    // ID, EX, MEM, WB
+	FPUExcept_t fpu_except;      // EX, MEM
 } PipelineReq_t;
 
 // superscalar
