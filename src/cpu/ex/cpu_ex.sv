@@ -76,6 +76,7 @@ assign req_ex.tlb_wi    = (op == OP_TLBWI);
 assign req_ex.tlb_wr    = (op == OP_TLBWR);
 assign req_ex.tlb_read  = (op == OP_TLBR);
 assign data_ex.op = data_idex.op;
+assign data_ex.fpu_op = data_idex.fpu_op;
 assign data_ex.pc = data_idex.pc;
 assign data_ex.inst = data_idex.inst;
 assign data_ex.reg1 = reg1;
@@ -337,6 +338,8 @@ Word_t fpu_gpr_ret;
 fpu_ex fpu_ex_instance(
 	.clk,
 	.rst,
+	.flush,
+	.inst,
 	.op(data_idex.fpu_op),
 	.fcsr(req_idex.fcsr),
 	.gpr1(reg1),

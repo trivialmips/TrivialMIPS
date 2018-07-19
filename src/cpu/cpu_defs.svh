@@ -193,6 +193,9 @@ typedef enum {
 	/* FPU/CPU data transfer */
 	FPU_OP_CFC, FPU_OP_CTC, FPU_OP_MFC, FPU_OP_MTC,
 
+	/* FPU arithematic */
+	FPU_OP_ADD, FPU_OP_SUB,
+
 	/* invalid */
 	FPU_OP_INVALID
 } FPUOper_t;
