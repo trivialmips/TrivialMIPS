@@ -349,6 +349,8 @@ fpu_ex fpu_ex_instance(
 	.fpu_ret(req_ex.freg_wr.wdata),
 	.cpu_ret(fpu_gpr_ret),
 	.except(req_ex.fpu_except),
+	.fcsr_we(req_ex.fcsr_we),
+	.fcsr_wdata(req_ex.fcsr),
 	.is_busy(fpu_busy)
 );
 

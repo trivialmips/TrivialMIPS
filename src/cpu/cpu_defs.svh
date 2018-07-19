@@ -194,7 +194,8 @@ typedef enum {
 	FPU_OP_CFC, FPU_OP_CTC, FPU_OP_MFC, FPU_OP_MTC,
 
 	/* FPU arithematic */
-	FPU_OP_ADD, FPU_OP_SUB,
+	FPU_OP_ADD, FPU_OP_SUB, FPU_OP_COND,
+	FPU_OP_MUL, FPU_OP_DIV, FPU_OP_SQRT,
 
 	/* invalid */
 	FPU_OP_INVALID

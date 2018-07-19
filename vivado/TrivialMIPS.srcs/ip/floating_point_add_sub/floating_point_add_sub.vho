@@ -63,7 +63,7 @@ COMPONENT floating_point_add_sub
     s_axis_operation_tdata : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
     m_axis_result_tvalid : OUT STD_LOGIC;
     m_axis_result_tdata : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    m_axis_result_tuser : OUT STD_LOGIC_VECTOR(1 DOWNTO 0)
+    m_axis_result_tuser : OUT STD_LOGIC_VECTOR(2 DOWNTO 0)
   );
 END COMPONENT;
 -- COMP_TAG_END ------ End COMPONENT Declaration ------------

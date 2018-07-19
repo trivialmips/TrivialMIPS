@@ -45,9 +45,13 @@ begin
 			5'b00110: `INST_W(FPU_OP_CTC, 5'b0, 5'b0, fs)
 			5'b10000: // fmt = S
 			begin
-				unique case(inst[5:0])
-				6'b000000: `INST_W(FPU_OP_ADD, fs, ft, fd)
-				6'b000001: `INST_W(FPU_OP_SUB, fs, ft, fd)
+				unique casez(inst[5:0])
+				6'b000000: `INST_W(FPU_OP_ADD,  fs, ft, fd)
+				6'b000001: `INST_W(FPU_OP_SUB,  fs, ft, fd)
+				6'b000010: `INST_W(FPU_OP_MUL,  fs, ft, fd)
+				6'b000011: `INST_W(FPU_OP_DIV,  fs, ft, fd)
+				6'b000100: `INST_W(FPU_OP_SQRT, fs, ft, fd)
+				6'b11????: `INST_R(FPU_OP_COND, fs, ft)
 				default: op = FPU_OP_INVALID;
 				endcase
 			end

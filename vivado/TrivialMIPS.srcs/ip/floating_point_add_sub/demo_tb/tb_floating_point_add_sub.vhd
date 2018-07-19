@@ -85,7 +85,7 @@ architecture tb of tb_floating_point_add_sub is
   constant CLOCK_PERIOD : time := 100 ns;
   constant T_HOLD       : time := 10 ns;
   constant T_STROBE     : time := CLOCK_PERIOD - (1 ns);
-  constant DUT_DELAY    : time := CLOCK_PERIOD * 4;
+  constant DUT_DELAY    : time := CLOCK_PERIOD * 1;
 
   -----------------------------------------------------------------------
   -- Testbench types and signals
@@ -378,7 +378,7 @@ architecture tb of tb_floating_point_add_sub is
   -- Result master channel signals
   signal m_axis_result_tvalid    : std_logic := '0';
   signal m_axis_result_tdata     : std_logic_vector(31 downto 0) := (others => '0');  -- data payload
-  signal m_axis_result_tuser     : std_logic_vector(1 downto 0) := (others => '0');  -- exceptions and user-defined payload
+  signal m_axis_result_tuser     : std_logic_vector(2 downto 0) := (others => '0');  -- exceptions and user-defined payload
 
   -----------------------------------------------------------------------
   -- Aliases for AXI channel TDATA and TUSER fields
@@ -414,6 +414,7 @@ architecture tb of tb_floating_point_add_sub is
   signal m_axis_result_tdata_mant    : std_logic_vector(22 downto 0) := (others => '0');  -- mantissa (without hidden bit)
   signal m_axis_result_tuser_underflow      : std_logic := '0';  -- Underflow exception
   signal m_axis_result_tuser_overflow       : std_logic := '0';  -- Overflow exception
+  signal m_axis_result_tuser_invalid_op     : std_logic := '0';  -- Invalid operation exception
 
 begin
 
@@ -954,6 +955,7 @@ begin
   m_axis_result_tdata_mant     <= m_axis_result_tdata(22 downto 0) when m_axis_result_tvalid = '1';
   m_axis_result_tuser_underflow      <= m_axis_result_tuser(0) when m_axis_result_tvalid = '1';
   m_axis_result_tuser_overflow       <= m_axis_result_tuser(1) when m_axis_result_tvalid = '1';
+  m_axis_result_tuser_invalid_op     <= m_axis_result_tuser(2) when m_axis_result_tvalid = '1';
 
 
 

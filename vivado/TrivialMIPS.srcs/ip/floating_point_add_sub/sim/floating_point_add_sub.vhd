@@ -67,7 +67,7 @@ ENTITY floating_point_add_sub IS
     s_axis_operation_tdata : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
     m_axis_result_tvalid : OUT STD_LOGIC;
     m_axis_result_tdata : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    m_axis_result_tuser : OUT STD_LOGIC_VECTOR(1 DOWNTO 0)
+    m_axis_result_tuser : OUT STD_LOGIC_VECTOR(2 DOWNTO 0)
   );
 END floating_point_add_sub;
 
@@ -174,7 +174,7 @@ ARCHITECTURE floating_point_add_sub_arch OF floating_point_add_sub IS
       m_axis_result_tvalid : OUT STD_LOGIC;
       m_axis_result_tready : IN STD_LOGIC;
       m_axis_result_tdata : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-      m_axis_result_tuser : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+      m_axis_result_tuser : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
       m_axis_result_tlast : OUT STD_LOGIC
     );
   END COMPONENT floating_point_v7_1_6;
@@ -182,7 +182,7 @@ ARCHITECTURE floating_point_add_sub_arch OF floating_point_add_sub IS
   ATTRIBUTE X_INTERFACE_PARAMETER : STRING;
   ATTRIBUTE X_INTERFACE_INFO OF m_axis_result_tuser: SIGNAL IS "xilinx.com:interface:axis:1.0 M_AXIS_RESULT TUSER";
   ATTRIBUTE X_INTERFACE_INFO OF m_axis_result_tdata: SIGNAL IS "xilinx.com:interface:axis:1.0 M_AXIS_RESULT TDATA";
-  ATTRIBUTE X_INTERFACE_PARAMETER OF m_axis_result_tvalid: SIGNAL IS "XIL_INTERFACENAME M_AXIS_RESULT, TDATA_NUM_BYTES 4, TDEST_WIDTH 0, TID_WIDTH 0, TUSER_WIDTH 2, HAS_TREADY 0, HAS_TSTRB 0, HAS_TKEEP 0, HAS_TLAST 0, FREQ_HZ 100000000, PHASE 0.000, LAYERED_METADATA undef";
+  ATTRIBUTE X_INTERFACE_PARAMETER OF m_axis_result_tvalid: SIGNAL IS "XIL_INTERFACENAME M_AXIS_RESULT, TDATA_NUM_BYTES 4, TDEST_WIDTH 0, TID_WIDTH 0, TUSER_WIDTH 3, HAS_TREADY 0, HAS_TSTRB 0, HAS_TKEEP 0, HAS_TLAST 0, FREQ_HZ 100000000, PHASE 0.000, LAYERED_METADATA undef";
   ATTRIBUTE X_INTERFACE_INFO OF m_axis_result_tvalid: SIGNAL IS "xilinx.com:interface:axis:1.0 M_AXIS_RESULT TVALID";
   ATTRIBUTE X_INTERFACE_INFO OF s_axis_operation_tdata: SIGNAL IS "xilinx.com:interface:axis:1.0 S_AXIS_OPERATION TDATA";
   ATTRIBUTE X_INTERFACE_PARAMETER OF s_axis_operation_tvalid: SIGNAL IS "XIL_INTERFACENAME S_AXIS_OPERATION, TDATA_NUM_BYTES 1, TDEST_WIDTH 0, TID_WIDTH 0, TUSER_WIDTH 0, HAS_TREADY 0, HAS_TSTRB 0, HAS_TKEEP 0, HAS_TLAST 0, FREQ_HZ 100000000, PHASE 0.000, LAYERED_METADATA undef";
@@ -226,7 +226,7 @@ BEGIN
       C_RESULT_WIDTH => 32,
       C_RESULT_FRACTION_WIDTH => 24,
       C_COMPARE_OPERATION => 8,
-      C_LATENCY => 4,
+      C_LATENCY => 1,
       C_OPTIMIZATION => 1,
       C_MULT_USAGE => 2,
       C_BRAM_USAGE => 0,
@@ -236,7 +236,7 @@ BEGIN
       C_ACCUM_LSB => -31,
       C_HAS_UNDERFLOW => 1,
       C_HAS_OVERFLOW => 1,
-      C_HAS_INVALID_OP => 0,
+      C_HAS_INVALID_OP => 1,
       C_HAS_DIVIDE_BY_ZERO => 0,
       C_HAS_ACCUM_OVERFLOW => 0,
       C_HAS_ACCUM_INPUT_OVERFLOW => 0,
@@ -266,7 +266,7 @@ BEGIN
       C_OPERATION_TDATA_WIDTH => 8,
       C_OPERATION_TUSER_WIDTH => 1,
       C_RESULT_TDATA_WIDTH => 32,
-      C_RESULT_TUSER_WIDTH => 2,
+      C_RESULT_TUSER_WIDTH => 3,
       C_FIXED_DATA_UNSIGNED => 0
     )
     PORT MAP (

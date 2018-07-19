@@ -324,6 +324,7 @@ cpu_id stage_id_b(
 branch branch_instance(
 	.rst,
 	.data_id(data_id_a),
+	.fpu_fcc(id_fcsr.fcc),
 	.is_branch,
 	.jump,
 	.jump_to

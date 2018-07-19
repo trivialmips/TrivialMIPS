@@ -64,7 +64,7 @@ floating_point_add_sub your_instance_name (
   .s_axis_operation_tdata(s_axis_operation_tdata),    // input wire [7 : 0] s_axis_operation_tdata
   .m_axis_result_tvalid(m_axis_result_tvalid),        // output wire m_axis_result_tvalid
   .m_axis_result_tdata(m_axis_result_tdata),          // output wire [31 : 0] m_axis_result_tdata
-  .m_axis_result_tuser(m_axis_result_tuser)          // output wire [1 : 0] m_axis_result_tuser
+  .m_axis_result_tuser(m_axis_result_tuser)          // output wire [2 : 0] m_axis_result_tuser
 );
 // INST_TAG_END ------ End INSTANTIATION Template ---------
 
