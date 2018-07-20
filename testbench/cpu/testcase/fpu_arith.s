@@ -2,8 +2,10 @@
 	.global _start
 	.set noat
 _start:
+	# 2.3
 	la $1, 0x40133333 # ans: skip
 	                  # ans: $1=0x40133333
+	# -4.7
 	la $2, 0xc0966666 # ans: skip
 	                  # ans: $2=0xc0966666
 	mtc1 $1, $f1
@@ -53,3 +55,38 @@ _start:
 	mfc1 $3, $f3    # ans: $3=0x00000002
 	cvt.s.w $f3, $f3
 	mfc1 $3, $f3    # ans: $3=0x40000000
+
+	# 0.3
+	la $1, 0x3e99999a # ans: skip
+	                  # ans: $1=0x3e99999a
+	mtc1 $1, $f1
+	cvt.w.s $f4, $f1
+	cvt.s.w $f2, $f4
+	mfc1 $1, $f4     # ans: $1=0x00000000
+	mfc1 $2, $f2     # ans: $2=0x00000000
+
+	# 0.3
+	la $1, 0x3e99999a # ans: skip
+	                  # ans: $1=0x3e99999a
+	mtc1 $1, $f1
+	round.w.s $f3, $f1
+	trunc.w.s $f4, $f1
+	floor.w.s $f5, $f1
+	ceil.w.s  $f6, $f1
+	mfc1 $3, $f3    # ans: $3=0x00000000
+	mfc1 $4, $f4    # ans: $4=0x00000000
+	mfc1 $5, $f5    # ans: $5=0x00000000
+	mfc1 $6, $f6    # ans: $6=0x00000001
+
+	# -0.6
+	la $1, 0xbf19999a # ans: skip
+	                  # ans: $1=0xbf19999a
+	mtc1 $1, $f1
+	round.w.s $f3, $f1
+	trunc.w.s $f4, $f1
+	floor.w.s $f5, $f1
+	ceil.w.s  $f6, $f1
+	mfc1 $3, $f3    # ans: $3=0xffffffff
+	mfc1 $4, $f4    # ans: $4=0x00000000
+	mfc1 $5, $f5    # ans: $5=0xffffffff
+	mfc1 $6, $f6    # ans: $6=0x00000000

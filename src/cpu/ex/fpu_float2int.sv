@@ -16,12 +16,12 @@ module fpu_float2int(
 logic sign, frac_half, frac_nonzero;
 logic [31:0] fixed, fixed_plus1;
 logic [7:0] exponent_biased;
-logic [4:0] exponent;
+logic [5:0] exponent_minus1;
 logic [22:0] fraction;
-logic [21:0] frac_remain;
+logic [22:0] frac_remain;
 assign { sign, exponent_biased, fraction } = float;
-assign exponent = exponent_biased - 8'd127;
-assign { fixed, frac_half, frac_remain } = { 31'b0, 1'b1, fraction } << exponent;
+assign exponent_minus1 = exponent_biased - 8'd126;
+assign { fixed, frac_half, frac_remain } = { 32'b0, 1'b1, fraction } << exponent_minus1;
 assign frac_nonzero = (|frac_remain) | frac_half;
 assign fixed_plus1  = fixed + 32'd1;
 
@@ -34,10 +34,10 @@ endfunction
 
 always_comb
 begin
-	if(exponent_biased == 8'b0)
+	if(exponent_biased < 126)
 	begin
-		ceil  = 32'b0;
-		floor = 32'b0;
+		ceil  = (sign || exponent_biased == 0) ? 32'b0 : 32'b1;
+		floor = (sign && exponent_biased != 0) ? 32'hffffffff : 32'b0;
 		trunc = 32'b0;
 		round = 32'b0;
 		invalid_ceil  = 1'b0;
