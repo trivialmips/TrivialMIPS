@@ -66,7 +66,7 @@ begin
 			default: op = FPU_OP_INVALID;
 			endcase
 		end
-		default: op = FPU_OP_INVALID;
+		default: op = FPU_OP_NOP;
 	endcase
 end
 

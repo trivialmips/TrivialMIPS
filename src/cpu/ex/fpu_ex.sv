@@ -226,6 +226,7 @@ begin
 		endcase
 	end
 	FPU_OP_INVALID: except.unimpl = 1'b1;
+	default: begin end
 	endcase
 end
 
@@ -262,6 +263,7 @@ begin
 		end
 		endcase
 	end
+	default: fcsr_wdata = fcsr;
 	endcase
 end
 

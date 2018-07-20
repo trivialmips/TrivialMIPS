@@ -158,10 +158,11 @@ fpu_id fpu_id_instance(
 	.we(req_id.freg_wr.we)
 );
 
-Bit_t cond_move_not_taken, movz_not_taken, movn_not_taken;
+Bit_t cond_move_not_taken, movz_not_taken, movn_not_taken, movci_not_taken;
 assign movn_not_taken = op_type_r == OP_MOVN && safe_reg2 == `ZERO_WORD;
 assign movz_not_taken = op_type_r == OP_MOVZ && safe_reg2 != `ZERO_WORD;
-assign cond_move_not_taken = movn_not_taken | movz_not_taken;
+assign movci_not_taken = op_type_r == OP_MOVCI && fpu_fcsr.fcc[inst[20:18]] != inst[16];
+assign cond_move_not_taken = movn_not_taken | movz_not_taken | movci_not_taken;
 
 always_comb
 begin

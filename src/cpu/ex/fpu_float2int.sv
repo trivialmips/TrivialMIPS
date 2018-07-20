@@ -21,7 +21,7 @@ logic [22:0] fraction;
 logic [21:0] frac_remain;
 assign { sign, exponent_biased, fraction } = float;
 assign exponent = exponent_biased - 8'd127;
-assign { fixed, frac_half, frac_remain } = { 32'b0, fraction } << exponent;
+assign { fixed, frac_half, frac_remain } = { 31'b0, 1'b1, fraction } << exponent;
 assign frac_nonzero = (|frac_remain) | frac_half;
 assign fixed_plus1  = fixed + 32'd1;
 

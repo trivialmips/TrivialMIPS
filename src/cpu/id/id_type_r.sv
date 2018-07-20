@@ -143,7 +143,7 @@ begin
 			5'b00100: `INST_R(OP_MTC1, 5'b0, rt)
 			5'b00110: `INST_R(OP_CTC1, 5'b0, rt)
 			5'b01000: `INST_R(OP_BC1, 5'b0, 5'b0)
-			default: op = OP_FPU;
+			default: `INST_R(OP_FPU, 5'b0, 5'b0)
 			endcase
 		end
 		default: op = OP_INVALID;

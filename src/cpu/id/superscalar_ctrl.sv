@@ -43,6 +43,12 @@ function is_cond_move_inst(input Oper_t op);
 	);
 endfunction
 
+function is_fpu_mutex_inst(input Oper_t op);
+	is_fpu_mutex_inst = (
+		op == OP_CFC1 || op == OP_CTC1 || op == OP_BC1
+	);
+endfunction
+
 function is_privileged_inst(input Oper_t op);
 	is_privileged_inst = (
 		op == OP_CACHE || op == OP_ERET || op == OP_MFC0 ||
@@ -75,9 +81,13 @@ Bit_t cond_move_inst_a, cond_move_inst_b;
 assign cond_move_inst_a = is_cond_move_inst(data_a.op);
 assign cond_move_inst_b = is_cond_move_inst(data_b.op);
 
+Bit_t fpu_mutex_inst_a, fpu_mutex_inst_b;
+assign fpu_mutex_inst_a = is_fpu_mutex_inst(data_a.op);
+assign fpu_mutex_inst_b = is_fpu_mutex_inst(data_b.op);
+
 Bit_t fpu_inst_a, fpu_inst_b;
-assign fpu_inst_a = (data_a.fpu_op != FPU_OP_INVALID);
-assign fpu_inst_b = (data_b.fpu_op != FPU_OP_INVALID);
+assign fpu_inst_a = (data_a.fpu_op != FPU_OP_NOP);
+assign fpu_inst_b = (data_b.fpu_op != FPU_OP_NOP);
 
 Bit_t reg_data_related;
 assign reg_data_related = (
@@ -87,7 +97,12 @@ assign reg_data_related = (
       req_a.reg_wr.waddr == data_b.reg_addr2 )
 );
 
-// TODO: SSNOP ?
+Bit_t fpu_reg_data_related;
+assign fpu_reg_data_related = (
+    req_a.freg_wr.we && fpu_inst_b &&
+    ( req_a.freg_wr.waddr == data_b.fpu_raddr1 ||
+      req_a.freg_wr.waddr == data_b.fpu_raddr2 )
+);
 
 always_comb
 begin
@@ -99,7 +114,11 @@ begin
 		begin
 			// SSNOP is used to break the superscalar issue.
 			inst2_taken = 1'b0;
-		end else if(fpu_inst_b) begin
+		end else if(fpu_reg_data_related) begin
+			// FPU data related
+			inst2_taken = 1'b0;
+		end else if(fpu_mutex_inst_a || fpu_mutex_inst_b) begin
+			// these instructions can only be run on pipe-a
 			inst2_taken = 1'b0;
 		end else if(cond_move_inst_b && reg_data_related) begin
 			// data is required at ID stage, but arrived at EX stage.
