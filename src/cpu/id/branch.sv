@@ -44,13 +44,13 @@ begin
 		jump      = 1'b0;
 		jump_to   = `ZERO_WORD;
 	end else begin
-		case(opcode)
+		unique case(opcode)
 			6'b000000: // SPECIAL
 			begin
 				// JR (001000), JALR (001001)
 				is_branch = (inst[5:1] == 5'b00100);
 				jump      = is_branch;
-				jump_to   = reg1;  // TODO: raise 'Address Error' when not aligned
+				jump_to   = reg1;
 			end
 			6'b000001: // REGIMM
 			begin

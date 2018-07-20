@@ -381,6 +381,7 @@ cpu_ex stage_ex_a(
 	.hilo_unsafe(reg_hilo),
 	.fpu_reg1_unsafe(fpu_reg_rdata1),
 	.fpu_reg2_unsafe(fpu_reg_rdata2),
+	.fpu_fccr,
 	.cp0_rdata_unsafe(cp0_rdata),
 	.cp0_raddr(cp0_raddr),
 	.cp0_rsel(cp0_rsel),
@@ -409,6 +410,7 @@ cpu_ex stage_ex_b(
 	.hilo_unsafe(reg_hilo),
 	.fpu_reg1_unsafe(fpu_reg_rdata3),
 	.fpu_reg2_unsafe(fpu_reg_rdata4),
+	.fpu_fccr,
 	// only pipe-a will read CP0
 	.cp0_rdata_unsafe(`ZERO_WORD),
 	.cp0_raddr(),

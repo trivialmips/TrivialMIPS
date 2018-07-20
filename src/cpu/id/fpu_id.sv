@@ -51,6 +51,8 @@ begin
 				6'b000010: `INST_W(FPU_OP_MUL,  fs, ft, fd)
 				6'b000011: `INST_W(FPU_OP_DIV,  fs, ft, fd)
 				6'b000100: `INST_W(FPU_OP_SQRT, fs, ft, fd)
+				6'b000101: `INST_W(FPU_OP_ABS,  fs, ft, fd)
+				6'b000111: `INST_W(FPU_OP_NEG,  fs, ft, fd)
 				6'b001100: `INST_W(FPU_OP_ROUND, fs, ft, fd)
 				6'b001101: `INST_W(FPU_OP_TRUNC, fs, ft, fd)
 				6'b001110: `INST_W(FPU_OP_CEIL,  fs, ft, fd)

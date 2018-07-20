@@ -194,8 +194,8 @@ typedef enum {
 	FPU_OP_CFC, FPU_OP_CTC, FPU_OP_MFC, FPU_OP_MTC,
 
 	/* FPU arithematic */
-	FPU_OP_ADD, FPU_OP_SUB, FPU_OP_COND,
-	FPU_OP_MUL, FPU_OP_DIV, FPU_OP_SQRT,
+	FPU_OP_ADD, FPU_OP_SUB, FPU_OP_COND, FPU_OP_NEG,
+	FPU_OP_MUL, FPU_OP_DIV, FPU_OP_SQRT, FPU_OP_ABS,
 
 	/* FPU conversion */
 	FPU_OP_CVTW, FPU_OP_CVTS,
@@ -209,8 +209,8 @@ typedef enum {
 // FPU
 typedef struct packed {
 	logic unimpl;  // only used by 'cause'
-	logic invalid_op;
-	logic divide_by_zero;
+	logic invalid;
+	logic divided_by_zero;
 	logic overflow;
 	logic underflow;
 	logic inexact;
