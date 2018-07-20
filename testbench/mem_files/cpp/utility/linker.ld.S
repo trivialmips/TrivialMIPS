@@ -14,8 +14,10 @@ SECTIONS
         *(.text);
         _text_end = .;
     }
-
-    . = 0x80100000;    
+#ifdef BOOT_FROM_BOOTROM
+#else
+    . = 0x80100000;
+#endif    
     .data :
     {
         _data = .;
