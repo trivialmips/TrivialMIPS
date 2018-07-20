@@ -47,3 +47,9 @@ _start:
 	mfc1 $4, $f4    # ans: $4=0xfffffffc
 	mfc1 $5, $f5    # ans: $5=0xfffffffb
 	mfc1 $6, $f6    # ans: $6=0xfffffffc
+
+	ctc1 $0, $31  # set round mode
+	cvt.w.s $f3, $f1
+	mfc1 $3, $f3    # ans: $3=0x00000002
+	cvt.s.w $f3, $f3
+	mfc1 $3, $f3    # ans: $3=0x40000000

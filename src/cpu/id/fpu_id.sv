@@ -57,9 +57,15 @@ begin
 				6'b001101: `INST_W(FPU_OP_TRUNC, fs, ft, fd)
 				6'b001110: `INST_W(FPU_OP_CEIL,  fs, ft, fd)
 				6'b001111: `INST_W(FPU_OP_FLOOR, fs, ft, fd)
-				6'b100000: `INST_W(FPU_OP_CVTS,  fs, ft, fd)
 				6'b100100: `INST_W(FPU_OP_CVTW,  fs, ft, fd)
 				6'b11????: `INST_R(FPU_OP_COND,  fs, ft)
+				default: op = FPU_OP_INVALID;
+				endcase
+			end
+			5'b10100: // fmt = W
+			begin
+				unique casez(inst[5:0])
+				6'b100000: `INST_W(FPU_OP_CVTS,  fs, ft, fd)
 				default: op = FPU_OP_INVALID;
 				endcase
 			end

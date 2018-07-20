@@ -238,7 +238,8 @@ begin
 	unique case(op)
 	FPU_OP_COND: fcsr_wdata.fcc = ret_compare_fcc_pipe;
 	FPU_OP_ADD, FPU_OP_SUB, FPU_OP_MUL, FPU_OP_DIV, FPU_OP_SQRT,
-	FPU_OP_CEIL, FPU_OP_TRUNC, FPU_OP_FLOOR, FPU_OP_ROUND, FPU_OP_CVTS:
+	FPU_OP_CEIL, FPU_OP_TRUNC, FPU_OP_FLOOR, FPU_OP_ROUND, FPU_OP_CVTS,
+	FPU_OP_CVTW, FPU_OP_NEG, FPU_OP_ABS:
 		fcsr_wdata.flags[4:0] = fcsr.flags[4:0] | except[4:0];
 	FPU_OP_CTC:
 	begin
