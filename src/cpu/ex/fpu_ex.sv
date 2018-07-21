@@ -262,9 +262,10 @@ begin
 			fcsr_wdata.flags[4:0]   = gpr2[6:2];
 			fcsr_wdata.rm           = gpr2[1:0];
 		end
+		default: fcsr_we = 1'b0;
 		endcase
 	end
-	default: fcsr_wdata = fcsr;
+	default: fcsr_we = 1'b0;
 	endcase
 end
 
@@ -273,6 +274,7 @@ always_comb
 begin
 	unique case(op)
 	FPU_OP_MTC:  ret = gpr2;
+	FPU_OP_MOV:  ret = reg1.val;
 	FPU_OP_NEG:  ret = ret_neg;
 	FPU_OP_ABS:  ret = ret_abs;
 	FPU_OP_ADD:  ret = ret_add;

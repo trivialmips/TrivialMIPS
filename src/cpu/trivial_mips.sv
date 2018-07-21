@@ -400,7 +400,9 @@ cpu_ex stage_ex_a(
 	.wb_cp0_reg_wr(cp0_reg_wr),
 
 	.ex_hilo_wr_a(empty_hilo_wr),
-	.ex_reg_wr_a(empty_reg_wr)
+	.ex_reg_wr_a(empty_reg_wr),
+	.ex_fcsr_we(1'b0),
+	.ex_fcsr_wdata({$bits(FCSRReg_t){1'b0}})
 );
 
 cpu_ex stage_ex_b(
@@ -430,7 +432,9 @@ cpu_ex stage_ex_b(
 	.wb_cp0_reg_wr(cp0_reg_wr),
 
 	.ex_hilo_wr_a(req_ex_a.hilo_wr),
-	.ex_reg_wr_a(req_ex_a.reg_wr)
+	.ex_reg_wr_a(req_ex_a.reg_wr),
+	.ex_fcsr_we(req_ex_a.fcsr_we),
+	.ex_fcsr_wdata(req_ex_a.fcsr)
 );
 
 // early lookup TLB

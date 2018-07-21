@@ -27,7 +27,9 @@ module cpu_ex(
 
 	// data downward
 	input  HiloWriteReq_t ex_hilo_wr_a,
-	input  RegWriteReq_t  ex_reg_wr_a
+	input  RegWriteReq_t  ex_reg_wr_a,
+	input  Bit_t          ex_fcsr_we,
+	input  FCSRReg_t      ex_fcsr_wdata
 );
 
 // setup data and request
@@ -342,7 +344,7 @@ fpu_ex fpu_ex_instance(
 	.flush,
 	.inst,
 	.op(data_idex.fpu_op),
-	.fcsr(req_idex.fcsr),
+	.fcsr(ex_fcsr_we ? ex_fcsr_wdata : req_idex.fcsr),
 	.fccr(fpu_fccr),
 	.gpr1(reg1),
 	.gpr2(reg2),

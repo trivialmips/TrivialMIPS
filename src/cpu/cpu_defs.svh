@@ -202,6 +202,9 @@ typedef enum {
 	FPU_OP_TRUNC, FPU_OP_ROUND,
 	FPU_OP_CEIL, FPU_OP_FLOOR,
 
+	/* FPU move */
+	FPU_OP_MOV,
+
 	/* invalid */
 	FPU_OP_INVALID
 } FPUOper_t;

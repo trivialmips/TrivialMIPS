@@ -148,10 +148,16 @@ id_type_r id_type_r_instance(
 	.op(op_type_r)
 );
 
+Bit_t fcc_match, gpr_zero;
+assign fcc_match = fpu_fcsr.fcc[inst[20:18]] == inst[16];
+assign gpr_zero  = safe_reg2 == `ZERO_WORD;
+
 /* FPU instructions */
 fpu_id fpu_id_instance(
 	.inst,
 	.op(data_id.fpu_op),
+	.fcc_match,
+	.gpr_zero,
 	.raddr1(data_id.fpu_raddr1),
 	.raddr2(data_id.fpu_raddr2),
 	.waddr(req_id.freg_wr.waddr),
@@ -159,9 +165,9 @@ fpu_id fpu_id_instance(
 );
 
 Bit_t cond_move_not_taken, movz_not_taken, movn_not_taken, movci_not_taken;
-assign movn_not_taken = op_type_r == OP_MOVN && safe_reg2 == `ZERO_WORD;
-assign movz_not_taken = op_type_r == OP_MOVZ && safe_reg2 != `ZERO_WORD;
-assign movci_not_taken = op_type_r == OP_MOVCI && fpu_fcsr.fcc[inst[20:18]] != inst[16];
+assign movn_not_taken = op_type_r == OP_MOVN && gpr_zero;
+assign movz_not_taken = op_type_r == OP_MOVZ && ~gpr_zero;
+assign movci_not_taken = op_type_r == OP_MOVCI && ~fcc_match;
 assign cond_move_not_taken = movn_not_taken | movz_not_taken | movci_not_taken;
 
 always_comb

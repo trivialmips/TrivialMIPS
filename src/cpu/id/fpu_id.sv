@@ -14,6 +14,8 @@ end
 
 module fpu_id(
 	input  Inst_t    inst,
+	input  Bit_t     fcc_match,
+	input  Bit_t     gpr_zero,
 	output FPUOper_t op,
 	output RegAddr_t raddr1,
 	output RegAddr_t raddr2,
@@ -43,6 +45,7 @@ begin
 			5'b00010: `INST_R(FPU_OP_CFC, 5'b0, fs)
 			5'b00100: `INST_W(FPU_OP_MTC, 5'b0, 5'b0, fs)
 			5'b00110: `INST_W(FPU_OP_CTC, 5'b0, 5'b0, fs)
+			5'b01000: `INST_R(FPU_OP_NOP, 5'b0, 5'b0) // BC1
 			5'b10000: // fmt = S
 			begin
 				unique casez(inst[5:0])
@@ -52,11 +55,15 @@ begin
 				6'b000011: `INST_W(FPU_OP_DIV,  fs, ft, fd)
 				6'b000100: `INST_W(FPU_OP_SQRT, fs, ft, fd)
 				6'b000101: `INST_W(FPU_OP_ABS,  fs, ft, fd)
+				6'b000110: `INST_W(FPU_OP_MOV,  fs, ft, fd)
 				6'b000111: `INST_W(FPU_OP_NEG,  fs, ft, fd)
 				6'b001100: `INST_W(FPU_OP_ROUND, fs, ft, fd)
 				6'b001101: `INST_W(FPU_OP_TRUNC, fs, ft, fd)
 				6'b001110: `INST_W(FPU_OP_CEIL,  fs, ft, fd)
 				6'b001111: `INST_W(FPU_OP_FLOOR, fs, ft, fd)
+				6'b010001: `INST  (FPU_OP_MOV,   fs, 5'b0, fcc_match, fd)
+				6'b010010: `INST  (FPU_OP_MOV,   fs, 5'b0,  gpr_zero, fd)
+				6'b010011: `INST  (FPU_OP_MOV,   fs, 5'b0, ~gpr_zero, fd)
 				6'b100100: `INST_W(FPU_OP_CVTW,  fs, ft, fd)
 				6'b11????: `INST_R(FPU_OP_COND,  fs, ft)
 				default: op = FPU_OP_INVALID;

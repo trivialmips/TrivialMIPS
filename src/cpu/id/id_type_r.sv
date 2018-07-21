@@ -143,6 +143,12 @@ begin
 			5'b00100: `INST_R(OP_MTC1, 5'b0, rt)
 			5'b00110: `INST_R(OP_CTC1, 5'b0, rt)
 			5'b01000: `INST_R(OP_BC1, 5'b0, 5'b0)
+			5'b10000: // fmt = S
+			begin
+				`INST_R(OP_FPU, 5'b0, 5'b0)
+				if(inst[5:1] == 5'b01001)
+					reg_raddr2 = rt; // MOVZ, MOVN
+			end
 			default: `INST_R(OP_FPU, 5'b0, 5'b0)
 			endcase
 		end
