@@ -38,8 +38,11 @@ FCSRReg_t fcsr_reg;
 
 always_comb
 begin
-	if(fcsr_we)
+	if(rst)
 	begin
+		fcsr = {$bits(FCSRReg_t){1'b0}};
+		fcsr.enables.unimpl = 1'b1;
+	end else if(fcsr_we) begin
 		fcsr = fcsr_wdata;
 	end else begin
 		fcsr = fcsr_reg;
