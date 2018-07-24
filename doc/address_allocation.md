@@ -63,11 +63,11 @@ The first register(`0x04000000`) of Timer contains an integer that automatically
 
 ## Ethernet
 
-The first register (`0x0500000`) of Ethernet controller is address line, and the second register (`0x0500004`) is data line. They are both r/w, and their value are prone to change. The details are explained in the data sheet of DM9000A Controller.
+The first register (`0x0500000`) of Ethernet controller is address line, and the second register (`0x0500004`) is data line. They are both r/w, and their value (16 bits) are prone to change. The details are explained in the data sheet of DM9000A Controller.
 
 ## USB
 
-T.B.D.
+The first register (`0x0700000`) of USB controller is address line, and the second register (`0x0700004`) is data line. They are both r/w, and their value (8 bits) are prone to change. The details are explained in the data sheet of SL811HS Controller.
 
 ## `kseg1` Address Mapping
 

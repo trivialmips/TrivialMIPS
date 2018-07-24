@@ -161,6 +161,11 @@ module peripheral_tb();
         .ethernet
     );
 
+    usb_controller usb_controller_instance(
+        .data_bus(usb_if.slave),
+        .usb
+    );
+
     task test_data_bus(
         input Word_t address,
         input Word_t data,

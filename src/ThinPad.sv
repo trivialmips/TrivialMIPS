@@ -138,4 +138,9 @@ module ThinPad(
         .ethernet
     );
 
+    usb_controller usb_controller_instance(
+        .data_bus(usb_if.slave),
+        .usb
+    );
+
 endmodule
