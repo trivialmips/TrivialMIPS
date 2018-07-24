@@ -97,7 +97,8 @@ end \
                     `GEN_WAIT_STATE(STATE_WRITE_BYTE_0)
 
                     STATE_WRITE_BYTE_0_3: begin
-                        data_to_write <= data_bus.data_wr[16 +: 16];
+                        // still use the lowest 16 bits of commands, which might work more smoothly with CFI
+                        //data_to_write <= data_bus.data_wr[16 +: 16];
                         flash.address <= chip_base_address + 2'h2;
                         currentState <= STATE_WRITE_BYTE_1_0;
                     end
