@@ -21,9 +21,9 @@ module usb_controller(
 
     typedef enum {
         STATE_INIT,
-        STATE_WRITE_BYTE_0_[`WAIT_CYCLES],
-        STATE_READ_BYTE_0_[`WAIT_CYCLES],
-        STATE_CS_INACTIVE[`WAIT_CYCLES]
+        STATE_WRITE_BYTE_[`WAIT_CYCLES],
+        STATE_READ_BYTE_[`WAIT_CYCLES],
+        STATE_CS_INACTIVE_[`WAIT_CYCLES]
     } UsbState_t;
 
     UsbState_t currentState;
@@ -76,7 +76,7 @@ end \
                         end
                     end
 
-                    `GEN_WAIT_STATE(STATE_WRITE_BYTE)
+                    `GEN_WAIT_STATES(STATE_WRITE_BYTE)
 
                     STATE_WRITE_BYTE_3: begin
                         usb.cs_n <= 1'b1;

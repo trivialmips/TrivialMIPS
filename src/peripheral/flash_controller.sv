@@ -94,7 +94,7 @@ end \
                         end
                     end
 
-                    `GEN_WAIT_STATE(STATE_WRITE_BYTE_0)
+                    `GEN_WAIT_STATES(STATE_WRITE_BYTE_0)
 
                     STATE_WRITE_BYTE_0_3: begin
                         // still use the lowest 16 bits of commands, which might work more smoothly with CFI
@@ -103,7 +103,7 @@ end \
                         currentState <= STATE_WRITE_BYTE_1_0;
                     end
 
-                    `GEN_WAIT_STATE(STATE_WRITE_BYTE_1)
+                    `GEN_WAIT_STATES(STATE_WRITE_BYTE_1)
 
                     STATE_WRITE_BYTE_1_3: begin
                         data_bus.stall <= `ZERO_BIT;
