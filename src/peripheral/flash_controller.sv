@@ -20,7 +20,8 @@ module flash_controller(
 
     typedef enum {
         STATE_INIT, STATE_RESET,
-        STATE_SELECT_MODE_[`WAIT_CYCLES],
+        STATE_WRITE_BYTE_0_[`WAIT_CYCLES],
+        STATE_WRITE_BYTE_1_[`WAIT_CYCLES],
         STATE_READ_BYTE_0_[`WAIT_CYCLES],
         STATE_READ_BYTE_1_[`WAIT_CYCLES]
     } FlashState_t;
@@ -32,8 +33,10 @@ module flash_controller(
     FlashChipAddress_t chip_base_address;
     assign chip_base_address = FlashChipAddress_t'(data_bus.address << 2);
 
+    HalfWord_t data_to_write;
+
     logic write_flash;
-    assign flash.data = write_flash ? `FLASH_OP_READ : `HIGHZ_HWORD;
+    assign flash.data = write_flash ? data_to_write : `HIGHZ_HWORD;
     assign data_bus.data_rd = data_read;
 
 `define GEN_WAIT_STATE(NAME, A, B) NAME``_``A: begin \
@@ -57,28 +60,22 @@ end \
             if (clk_bus == ~`BUS_CLK_POSEDGE) begin // falling edge of clk_bus
                 unique case (currentState)
                     STATE_RESET: begin
+                        // put flash in read mode
                         flash.ce_n <= 1'b0;
                         flash.we_n <= 1'b0;
                         flash.oe_n <= 1'b1;
                         write_flash <= 1'b1;
+                        data_to_write <= `FLASH_OP_READ;
                         flash.address <= 0;
-                        currentState <= STATE_SELECT_MODE_0;
-                    end
-
-                    `GEN_WAIT_STATES(STATE_SELECT_MODE)
-
-                    STATE_SELECT_MODE_3: begin
-                        flash.ce_n <= 1'b1;
-                        flash.we_n <= 1'b1;
-                        flash.oe_n <= 1'b1;
-                        write_flash <= 1'b0;
-                        currentState <= STATE_INIT;
+                        // write into one address is enough
+                        currentState <= STATE_WRITE_BYTE_1_0;
                     end
 
                     STATE_INIT: begin
                         flash.ce_n <= 1'b1;
                         flash.we_n <= 1'b1;
                         flash.oe_n <= 1'b1;
+                        write_flash <= `ZERO_BIT;
                         if (data_bus.read) begin
                             data_bus.stall <= 1'b1;
                             flash.ce_n <= 1'b0;
@@ -86,6 +83,33 @@ end \
                             flash.address <= chip_base_address;
                             currentState <= STATE_READ_BYTE_0_0;
                         end
+                        else if (data_bus.write) begin
+                            data_bus.stall <= 1'b1;
+                            flash.ce_n <= 1'b0;
+                            flash.we_n <= 1'b0;
+                            flash.address <= chip_base_address;
+                            currentState <= STATE_WRITE_BYTE_0_0;
+                            write_flash <= 1'b1;
+                            data_to_write <= data_bus.data_wr[0 +: 16];
+                        end
+                    end
+
+                    `GEN_WAIT_STATE(STATE_WRITE_BYTE_0)
+
+                    STATE_WRITE_BYTE_0_3: begin
+                        data_to_write <= data_bus.data_wr[16 +: 16];
+                        flash.address <= chip_base_address + 2'h2;
+                        currentState <= STATE_WRITE_BYTE_1_0;
+                    end
+
+                    `GEN_WAIT_STATE(STATE_WRITE_BYTE_1)
+
+                    STATE_WRITE_BYTE_1_3: begin
+                        data_bus.stall <= `ZERO_BIT;
+                        flash.ce_n <= 1'b1;
+                        flash.we_n <= 1'b1;
+                        flash.oe_n <= 1'b1;
+                        currentState <= STATE_INIT;
                     end
 
                     `GEN_WAIT_STATES(STATE_READ_BYTE_0)
@@ -107,7 +131,7 @@ end \
                         currentState <= STATE_INIT;
                     end
 
-                    default: currentState <= STATE_SELECT_MODE_0;
+                    default: currentState <= STATE_INIT;
                 endcase
             end
         end
