@@ -41,7 +41,7 @@ The address and size of bootrom is special due to the hardcorded value `0xBFC000
 
 ### Graphics
 
-Graphics device is of type 'hybrid', because it consists of 480000 byte graphics memory (or 'framebuffer') from `0x02000000` to `0x0203A97F` (each address stores a word) and a configuration register at `0x0203A980`. Every pixel takes 4 bits in the memory, and will converted to the format of `{RED[2:0], GREEN[2:0], BLUE[1:0]}` when displayed, with the mapping hardcoded.
+Graphics device is of type 'hybrid', because it consists of 240000 byte graphics memory (or 'framebuffer') from `0x02000000` to `0x0203A97F` (each address stores a word) and a configuration register at `0x0203A980`. Every pixel takes 4 bits in the memory, and will converted to the format of `{RED[2:0], GREEN[2:0], BLUE[1:0]}` when displayed, with the mapping hardcoded.
 
 The configuration register, which can be both read and written, is used to indicate the offset of first pixel in the framebuffer, designed to be used in screen scrolling in the operating system.
 

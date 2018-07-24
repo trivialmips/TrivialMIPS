@@ -22,8 +22,8 @@ module graphics_controller(
     Word_t pixel_count;
 
     GraphicsMemoryAddress_t mem_address_offset, mem_address_overflow, mem_address;
-    assign mem_address_offset = GraphicsMemoryAddress_t'(pixel_offset >> 2);
-    assign mem_address_overflow = GraphicsMemoryAddress_t'(pixel_count >> 2) + mem_address_offset + 1'b1;
+    assign mem_address_offset = GraphicsMemoryAddress_t'(pixel_offset >> 3);
+    assign mem_address_overflow = GraphicsMemoryAddress_t'(pixel_count >> 3) + mem_address_offset + 1'b1;
     assign mem_address = (mem_address_overflow >= `GRAPHICS_CONFIG_ADDRESS * 2) ? 
                          (mem_address_overflow - `GRAPHICS_CONFIG_ADDRESS * 2) : (
                              (mem_address_overflow >= `GRAPHICS_CONFIG_ADDRESS) ? 
@@ -119,7 +119,7 @@ module graphics_controller(
     wire [2:0] pixel_count_mod_8 = pixel_count[2:0];
 
     VgaColor_t color;
-    VgaColorNumber_t color_number;
+    // VgaColorNumber_t color_number;
     // every pixel takes 4 bits, little endian
     assign color_number = now_data[pixel_count_mod_8 * $bits(VgaColorNumber_t) +: $bits(VgaColorNumber_t)];
 
