@@ -17,6 +17,11 @@ module mem_wb(
 	q.reg_wr.we    <= 1'b0;        \
 	q.reg_wr.waddr <= `ZERO_WORD;  \
 	q.reg_wr.wdata <= `ZERO_WORD;  \
+	q.fcsr_we       <= 1'b0;        \
+	q.fcsr          <= `ZERO_WORD;  \
+	q.freg_wr.we    <= 1'b0;        \
+	q.freg_wr.waddr <= `ZERO_WORD;  \
+	q.freg_wr.wdata <= {$bits(FPUReg_t){1'b0}};  \
 	q.hilo_wr.we    <= 1'b0;        \
 	q.hilo_wr.hilo  <= `ZERO_DWORD; \
 	q.cp0_reg_wr.we    <= 1'b0;        \

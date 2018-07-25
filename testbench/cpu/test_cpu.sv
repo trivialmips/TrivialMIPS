@@ -152,6 +152,8 @@ begin
 	unittest("except_delayslot", 0);
 	unittest("interrupt", 0);
 	unittest("superscalar", 1);
+	unittest("fpu_arith", 0);
+	unittest("fpu_compare", 0);
 	$display("[Done]");
 	$finish;
 end

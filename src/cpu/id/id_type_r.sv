@@ -59,6 +59,7 @@ begin
 				6'b010010: `INST_W(OP_MFLO, rs, rt, rd) // rs = rt = 0
 				6'b010011: `INST_R(OP_MTLO, rs, rt)     //      rt = rd = 0
 				/* conditional move */
+				6'b000001: `INST_W(OP_MOVCI, rs, 5'b0, rd)
 				6'b001011: `INST_W(OP_MOVN, rs, rt, rd)
 				6'b001010: `INST_W(OP_MOVZ, rs, rt, rd)
 				/* jump */
@@ -132,6 +133,23 @@ begin
 				endcase
 			end
 			default: op = OP_INVALID;
+			endcase
+		end
+		6'b010001:  // COP1
+		begin
+			unique case(inst[25:21])
+			5'b00000: `INST_W(OP_MFC1, 5'b0, 5'b0, rt)
+			5'b00010: `INST_W(OP_CFC1, 5'b0, 5'b0, rt)
+			5'b00100: `INST_R(OP_MTC1, 5'b0, rt)
+			5'b00110: `INST_R(OP_CTC1, 5'b0, rt)
+			5'b01000: `INST_R(OP_BC1, 5'b0, 5'b0)
+			5'b10000: // fmt = S
+			begin
+				`INST_R(OP_FPU, 5'b0, 5'b0)
+				if(inst[5:1] == 5'b01001)
+					reg_raddr2 = rt; // MOVZ, MOVN
+			end
+			default: `INST_R(OP_FPU, 5'b0, 5'b0)
 			endcase
 		end
 		default: op = OP_INVALID;

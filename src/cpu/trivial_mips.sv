@@ -97,6 +97,34 @@ cp0 cp0_instance(
 	.user_mode(cp0_user_mode)
 );
 
+// FPU registers
+RegAddr_t fpu_reg_raddr1, fpu_reg_raddr2, fpu_reg_raddr3, fpu_reg_raddr4;
+FPUReg_t  fpu_reg_rdata1, fpu_reg_rdata2, fpu_reg_rdata3, fpu_reg_rdata4;
+FPURegWriteReq_t fpu_reg_wr1, fpu_reg_wr2;
+Bit_t fpu_fcsr_we;
+FCSRReg_t fpu_fcsr_wdata, fpu_fcsr;
+Word_t fpu_fccr;
+
+fpu_regs fpu_regs_instance(
+	.clk,
+	.rst,
+	.wr1(fpu_reg_wr1),
+	.wr2(fpu_reg_wr2),
+	.raddr1(fpu_reg_raddr1),
+	.raddr2(fpu_reg_raddr2),
+	.raddr3(fpu_reg_raddr3),
+	.raddr4(fpu_reg_raddr4),
+	.rdata1(fpu_reg_rdata1),
+	.rdata2(fpu_reg_rdata2),
+	.rdata3(fpu_reg_rdata3),
+	.rdata4(fpu_reg_rdata4),
+	.fcsr_we(fpu_fcsr_we),
+	.fcsr_wdata(fpu_fcsr_wdata),
+	.fcsr(fpu_fcsr),
+	.fccr(fpu_fccr),
+	.except_req
+);
+
 // MMU
 InstAddr_t mmu_inst_vaddr;
 MemAddr_t  mmu_data_vaddr;
@@ -231,6 +259,20 @@ end
 Bit_t stall_from_id_a, stall_from_id_b;
 assign stall_from_id = stall_from_id_a | stall_from_id_b;
 
+FCSRReg_t id_fcsr;
+fcsr_mux fcsr_mux_instance(
+	.ex_fcsr_we_a(req_ex_a.fcsr_we),
+	.ex_fcsr_we_b(req_ex_b.fcsr_we),
+	.mem_fcsr_we_a(req_mem_a.fcsr_we),
+	.mem_fcsr_we_b(req_mem_b.fcsr_we),
+	.ex_fcsr_a(req_ex_a.fcsr),
+	.ex_fcsr_b(req_ex_b.fcsr),
+	.mem_fcsr_a(req_mem_a.fcsr),
+	.mem_fcsr_b(req_mem_b.fcsr),
+	.fcsr_unsafe(fpu_fcsr),
+	.fcsr_safe(id_fcsr)
+);
+
 // ID stage
 cpu_id stage_id_a(
 	.rst,
@@ -242,6 +284,7 @@ cpu_id stage_id_a(
 	.reg2_i(reg_rdata2),
 	.reg_raddr1(reg_raddr1),
 	.reg_raddr2(reg_raddr2),
+	.fpu_fcsr(id_fcsr),
 	.stall_req(stall_from_id_a),
 	.data_id(data_id_a),
 	.req_id(req_id_a),
@@ -264,6 +307,7 @@ cpu_id stage_id_b(
 	.reg2_i(reg_rdata4),
 	.reg_raddr1(reg_raddr3),
 	.reg_raddr2(reg_raddr4),
+	.fpu_fcsr(id_fcsr),
 	.stall_req(stall_from_id_b),
 	.data_id(data_id_b),
 	.req_id(req_id_b),
@@ -280,6 +324,7 @@ cpu_id stage_id_b(
 branch branch_instance(
 	.rst,
 	.data_id(data_id_a),
+	.fpu_fcc(id_fcsr.fcc),
 	.is_branch,
 	.jump,
 	.jump_to
@@ -324,11 +369,19 @@ assign empty_reg_wr     = {$bits(RegWriteReq_t){1'b0}};
 assign empty_hilo_wr    = {$bits(HiloWriteReq_t){1'b0}};
 assign empty_cp0_reg_wr = {$bits(CP0RegWriteReq_t){1'b0}};
 
+assign fpu_reg_raddr1 = data_idex_a.fpu_raddr1;
+assign fpu_reg_raddr2 = data_idex_a.fpu_raddr2;
+assign fpu_reg_raddr3 = data_idex_b.fpu_raddr1;
+assign fpu_reg_raddr4 = data_idex_b.fpu_raddr2;
+
 cpu_ex stage_ex_a(
 	.clk,
 	.rst,
 	.flush,
 	.hilo_unsafe(reg_hilo),
+	.fpu_reg1_unsafe(fpu_reg_rdata1),
+	.fpu_reg2_unsafe(fpu_reg_rdata2),
+	.fpu_fccr,
 	.cp0_rdata_unsafe(cp0_rdata),
 	.cp0_raddr(cp0_raddr),
 	.cp0_rsel(cp0_rsel),
@@ -341,11 +394,15 @@ cpu_ex stage_ex_a(
 
 	.mem_hilo_wr_a(req_mem_a.hilo_wr),
 	.mem_hilo_wr_b(req_mem_b.hilo_wr),
+	.mem_fpu_wr_a(req_mem_a.freg_wr),
+	.mem_fpu_wr_b(req_mem_b.freg_wr),
 	.mem_cp0_reg_wr(req_mem_a.cp0_reg_wr),
 	.wb_cp0_reg_wr(cp0_reg_wr),
 
 	.ex_hilo_wr_a(empty_hilo_wr),
-	.ex_reg_wr_a(empty_reg_wr)
+	.ex_reg_wr_a(empty_reg_wr),
+	.ex_fcsr_we(1'b0),
+	.ex_fcsr_wdata({$bits(FCSRReg_t){1'b0}})
 );
 
 cpu_ex stage_ex_b(
@@ -353,6 +410,9 @@ cpu_ex stage_ex_b(
 	.rst,
 	.flush,
 	.hilo_unsafe(reg_hilo),
+	.fpu_reg1_unsafe(fpu_reg_rdata3),
+	.fpu_reg2_unsafe(fpu_reg_rdata4),
+	.fpu_fccr,
 	// only pipe-a will read CP0
 	.cp0_rdata_unsafe(`ZERO_WORD),
 	.cp0_raddr(),
@@ -366,11 +426,15 @@ cpu_ex stage_ex_b(
 
 	.mem_hilo_wr_a(req_mem_a.hilo_wr),
 	.mem_hilo_wr_b(req_mem_b.hilo_wr),
+	.mem_fpu_wr_a(req_mem_a.freg_wr),
+	.mem_fpu_wr_b(req_mem_b.freg_wr),
 	.mem_cp0_reg_wr(empty_cp0_reg_wr),
 	.wb_cp0_reg_wr(cp0_reg_wr),
 
 	.ex_hilo_wr_a(req_ex_a.hilo_wr),
-	.ex_reg_wr_a(req_ex_a.reg_wr)
+	.ex_reg_wr_a(req_ex_a.reg_wr),
+	.ex_fcsr_we(req_ex_a.fcsr_we),
+	.ex_fcsr_wdata(req_ex_a.fcsr)
 );
 
 // early lookup TLB
@@ -409,7 +473,6 @@ cpu_mem stage_mem(
 	.req_mem_a(req_mem_a),
 	.req_mem_b(req_mem_b),
 	.mmu_data_result(mem_mmu_data_result),
-//	.except_already_occur(req_exmem_a.except.occur | req_exmem_b.except.occur),
 	.except_already_occur(flush),
 	.data_bus,
 	.memory_data_we,
@@ -435,6 +498,8 @@ except except_handler(
 	.data_b(data_mem_b),
 	.except_a(req_mem_a.except),
 	.except_b(req_mem_b.except),
+	.fpu_except_a(req_mem_a.fpu_except & req_mem_a.fcsr.enables),
+	.fpu_except_b(req_mem_b.fpu_except & req_mem_b.fcsr.enables),
 	.except_req,
 	.memory_data_we,
 	.data_vaddr(mem_mmu_data_result.virt_addr),
@@ -469,6 +534,10 @@ cpu_wb stage_wb(
 	.reg_wr2,
 	.hilo_wr,
 	.cp0_reg_wr,
+	.fpu_reg_wr1,
+	.fpu_reg_wr2,
+	.fpu_fcsr_we,
+	.fpu_fcsr_wdata,
 
 	.stall_req(stall_from_wb)
 );

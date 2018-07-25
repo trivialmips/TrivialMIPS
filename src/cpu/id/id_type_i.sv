@@ -96,6 +96,10 @@ begin
 		6'b100101: `INST_W(OP_LHU, rs, 5'b0, rt)
 		6'b100110: `INST_W(OP_LWR, rs, rt,   rt)
 
+		/* FPU load and store */
+		6'b110001: `INST_R(OP_LWC1, rs, 5'b0)
+		6'b111001: `INST_R(OP_SWC1, rs, 5'b0)
+
 		/* conditional load/store */
 		6'b110000: `INST_W(OP_LL,  rs, 5'b0, rt)
 		6'b111000: `INST_W(OP_SC,  rs, rt,   rt)

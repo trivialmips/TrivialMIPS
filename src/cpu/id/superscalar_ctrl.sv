@@ -14,14 +14,16 @@ module superscalar_ctrl(
 function is_read_memory_inst(input Oper_t op);
 	is_read_memory_inst = (
 		op == OP_LB || op == OP_LBU || op == OP_LH || op == OP_LHU ||
-		op == OP_LW || op == OP_LWL || op == OP_LWR || op == OP_LL
+		op == OP_LW || op == OP_LWL || op == OP_LWR || op == OP_LL ||
+		op == OP_LWC1
 	);
 endfunction
 
 function is_write_memory_inst(input Oper_t op);
 	is_write_memory_inst = (
 		op == OP_SB || op == OP_SH || op == OP_SW ||
-		op == OP_SWL || op == OP_SWR || op == OP_SC
+		op == OP_SWL || op == OP_SWR || op == OP_SC ||
+		op == OP_SWC1
 	);
 endfunction
 
@@ -30,13 +32,20 @@ function is_jump_inst(input Oper_t op);
 		op == OP_BEQ || op == OP_BGEZ || op == OP_BGEZAL ||
 		op == OP_BGTZ || op == OP_BLEZ || op == OP_BLTZ ||
 		op == OP_BLTZAL || op == OP_BNE || op == OP_J ||
-		op == OP_JAL || op == OP_JALR || op == OP_JR
+		op == OP_JAL || op == OP_JALR || op == OP_JR ||
+		op == OP_BC1
 	);
 endfunction
 
 function is_cond_move_inst(input Oper_t op);
 	is_cond_move_inst = (
 		op == OP_MOVZ || op == OP_MOVN
+	);
+endfunction
+
+function is_fpu_mutex_inst(input Oper_t op);
+	is_fpu_mutex_inst = (
+		op == OP_CFC1 || op == OP_CTC1 || op == OP_BC1
 	);
 endfunction
 
@@ -72,6 +81,14 @@ Bit_t cond_move_inst_a, cond_move_inst_b;
 assign cond_move_inst_a = is_cond_move_inst(data_a.op);
 assign cond_move_inst_b = is_cond_move_inst(data_b.op);
 
+Bit_t fpu_mutex_inst_a, fpu_mutex_inst_b;
+assign fpu_mutex_inst_a = is_fpu_mutex_inst(data_a.op);
+assign fpu_mutex_inst_b = is_fpu_mutex_inst(data_b.op);
+
+Bit_t fpu_inst_a, fpu_inst_b;
+assign fpu_inst_a = (data_a.fpu_op != FPU_OP_NOP);
+assign fpu_inst_b = (data_b.fpu_op != FPU_OP_NOP);
+
 Bit_t reg_data_related;
 assign reg_data_related = (
     req_a.reg_wr.we &&
@@ -80,7 +97,12 @@ assign reg_data_related = (
       req_a.reg_wr.waddr == data_b.reg_addr2 )
 );
 
-// TODO: SSNOP ?
+Bit_t fpu_reg_data_related;
+assign fpu_reg_data_related = (
+    req_a.freg_wr.we && fpu_inst_b &&
+    ( req_a.freg_wr.waddr == data_b.fpu_raddr1 ||
+      req_a.freg_wr.waddr == data_b.fpu_raddr2 )
+);
 
 always_comb
 begin
@@ -91,6 +113,12 @@ begin
 		if(data_a.op == OP_SSNOP || data_b.op == OP_SSNOP)
 		begin
 			// SSNOP is used to break the superscalar issue.
+			inst2_taken = 1'b0;
+		end else if(fpu_reg_data_related) begin
+			// FPU data related
+			inst2_taken = 1'b0;
+		end else if(fpu_mutex_inst_a || fpu_mutex_inst_b) begin
+			// these instructions can only be run on pipe-a
 			inst2_taken = 1'b0;
 		end else if(cond_move_inst_b && reg_data_related) begin
 			// data is required at ID stage, but arrived at EX stage.

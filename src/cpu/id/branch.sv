@@ -3,6 +3,7 @@
 module branch(
 	input  rst,
 	input  PipelineData_t data_id,
+	input  [7:0]      fpu_fcc,
 
 	output Bit_t      is_branch,
 	output Bit_t      jump,
@@ -43,13 +44,13 @@ begin
 		jump      = 1'b0;
 		jump_to   = `ZERO_WORD;
 	end else begin
-		case(opcode)
+		unique case(opcode)
 			6'b000000: // SPECIAL
 			begin
 				// JR (001000), JALR (001001)
 				is_branch = (inst[5:1] == 5'b00100);
 				jump      = is_branch;
-				jump_to   = reg1;  // TODO: raise 'Address Error' when not aligned
+				jump_to   = reg1;
 			end
 			6'b000001: // REGIMM
 			begin
@@ -77,6 +78,18 @@ begin
 				is_branch = 1'b1;
 				jump      = 1'b1;
 				jump_to   = default_jump_j;
+			end
+			6'b010001: begin // COP1
+				if(inst[25:21] == 5'b01000 && ~inst[17])
+				begin
+					is_branch = 1'b1;
+					jump      = (fpu_fcc[inst[20:18]] == inst[16]);
+					jump_to   = default_jump_i;
+				end else begin
+					is_branch = 1'b0;
+					jump      = 1'b0;
+					jump_to   = `ZERO_WORD;
+				end
 			end
 			default: begin
 				is_branch = 1'b0;

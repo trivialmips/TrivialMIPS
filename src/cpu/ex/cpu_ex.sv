@@ -5,6 +5,9 @@ module cpu_ex(
 	input  Bit_t          flush,
 	input  Word_t         cp0_rdata_unsafe,
 	input  DoubleWord_t   hilo_unsafe,
+	input  FPUReg_t       fpu_reg1_unsafe,
+	input  FPUReg_t       fpu_reg2_unsafe,
+	input  Word_t         fpu_fccr,
 	output RegAddr_t      cp0_raddr,
 	output wire [2:0]     cp0_rsel,
 	output Bit_t          stall_req,
@@ -19,10 +22,14 @@ module cpu_ex(
 	input  CP0RegWriteReq_t wb_cp0_reg_wr,
 	input  HiloWriteReq_t   mem_hilo_wr_a,
 	input  HiloWriteReq_t   mem_hilo_wr_b,
+	input  FPURegWriteReq_t mem_fpu_wr_a,
+	input  FPURegWriteReq_t mem_fpu_wr_b,
 
 	// data downward
 	input  HiloWriteReq_t ex_hilo_wr_a,
-	input  RegWriteReq_t  ex_reg_wr_a
+	input  RegWriteReq_t  ex_reg_wr_a,
+	input  Bit_t          ex_fcsr_we,
+	input  FCSRReg_t      ex_fcsr_wdata
 );
 
 // setup data and request
@@ -30,6 +37,7 @@ Oper_t         op;
 InstAddr_t     pc;
 Inst_t         inst;
 Word_t         reg1, reg2, imm;
+FPUReg_t       fpu_reg1, fpu_reg2;
 HiloWriteReq_t hilo_wr;
 CP0RegWriteReq_t cp0_reg_wr;
 MemAccessReq_t memory_req;
@@ -62,6 +70,8 @@ assign req_ex.memory_req = memory_req;
 assign req_ex.reg_wr.we = req_idex.reg_wr.we;
 assign req_ex.reg_wr.waddr = req_idex.reg_wr.waddr;
 assign req_ex.reg_wr.wdata = ret;
+assign req_ex.freg_wr.we = req_idex.freg_wr.we;
+assign req_ex.freg_wr.waddr = req_idex.freg_wr.waddr;
 assign req_ex.except = except;
 assign req_ex.llbit_set = (op == OP_LL);
 assign req_ex.tlbp      = (op == OP_TLBP);
@@ -69,6 +79,7 @@ assign req_ex.tlb_wi    = (op == OP_TLBWI);
 assign req_ex.tlb_wr    = (op == OP_TLBWR);
 assign req_ex.tlb_read  = (op == OP_TLBR);
 assign data_ex.op = data_idex.op;
+assign data_ex.fpu_op = data_idex.fpu_op;
 assign data_ex.pc = data_idex.pc;
 assign data_ex.inst = data_idex.inst;
 assign data_ex.reg1 = reg1;
@@ -95,6 +106,28 @@ begin
 		hilo_safe = mem_hilo_wr_a.hilo;
 	end else begin
 		hilo_safe = hilo_unsafe;
+	end
+end
+
+// safe FPU registers
+always_comb
+begin
+	if(mem_fpu_wr_b.we && data_idex.fpu_raddr1 == mem_fpu_wr_b.waddr)
+	begin
+		fpu_reg1 = mem_fpu_wr_b.wdata;
+	end else if(mem_fpu_wr_a.we && data_idex.fpu_raddr1 == mem_fpu_wr_a.waddr) begin
+		fpu_reg1 = mem_fpu_wr_a.wdata;
+	end else begin
+		fpu_reg1 = fpu_reg1_unsafe;
+	end
+
+	if(mem_fpu_wr_b.we && data_idex.fpu_raddr2 == mem_fpu_wr_b.waddr)
+	begin
+		fpu_reg2 = mem_fpu_wr_b.wdata;
+	end else if(mem_fpu_wr_a.we && data_idex.fpu_raddr2 == mem_fpu_wr_a.waddr) begin
+		fpu_reg2 = mem_fpu_wr_a.wdata;
+	end else begin
+		fpu_reg2 = fpu_reg2_unsafe;
 	end
 end
 
@@ -163,17 +196,19 @@ MemAddr_t mem_addr;
 assign mem_addr = reg1 + imm;
 assign is_load_memory_inst = (
 	op == OP_LB  || op == OP_LBU || op == OP_LH  || op == OP_LL ||
-	op == OP_LHU || op == OP_LW  || op == OP_LWL || op == OP_LWR);
+	op == OP_LHU || op == OP_LW  || op == OP_LWL || op == OP_LWR ||
+	op == OP_LWC1);
 assign is_save_memory_inst = (
 	op == OP_SB  || op == OP_SH  || op == OP_SW ||
-	op == OP_SWL || op == OP_SWR || op == OP_SC);
+	op == OP_SWL || op == OP_SWR || op == OP_SC ||
+	op == OP_SWC1);
 assign memory_req.ce = is_load_memory_inst | is_save_memory_inst;
 assign memory_req.we = is_save_memory_inst;
 assign memory_req.addr = mem_addr;
 always_comb
 begin
 	unique case(op)
-	OP_LW, OP_LL, OP_SW, OP_SC:
+	OP_LW, OP_LL, OP_SW, OP_SC, OP_LWC1, OP_SWC1:
 	begin
 		memory_req.sel = 4'b1111;
 		memory_req.wdata = reg2;
@@ -266,7 +301,7 @@ begin
 		endcase
 
 		unique case(op)
-			OP_LW, OP_LL, OP_SW, OP_SC:
+			OP_LW, OP_LL, OP_SW, OP_SC, OP_LWC1, OP_SWC1:
 				except.daddr_unaligned = mem_addr[0] | mem_addr[1];
 			OP_LH, OP_LHU, OP_SH:
 				except.daddr_unaligned = mem_addr[0];
@@ -285,6 +320,7 @@ assign we_hilo = (
 	op == OP_DIV   || op == OP_DIVU
 );
 
+Bit_t multi_cyc_busy;
 Word_t mult_word;
 DoubleWord_t multi_cyc_ret;
 ex_multi_cyc multi_cyc_instance(
@@ -297,9 +333,32 @@ ex_multi_cyc multi_cyc_instance(
 	.hilo(hilo_safe),
 	.ret(multi_cyc_ret),
 	.mult_word,
-	.is_busy(stall_req)
+	.is_busy(multi_cyc_busy)
 );
 
+Bit_t fpu_busy;
+Word_t fpu_gpr_ret;
+fpu_ex fpu_ex_instance(
+	.clk,
+	.rst,
+	.flush,
+	.inst,
+	.op(data_idex.fpu_op),
+	.fcsr(ex_fcsr_we ? ex_fcsr_wdata : req_idex.fcsr),
+	.fccr(fpu_fccr),
+	.gpr1(reg1),
+	.gpr2(reg2),
+	.reg1(fpu_reg1),
+	.reg2(fpu_reg2),
+	.fpu_ret(req_ex.freg_wr.wdata),
+	.cpu_ret(fpu_gpr_ret),
+	.except(req_ex.fpu_except),
+	.fcsr_we(req_ex.fcsr_we),
+	.fcsr_wdata(req_ex.fcsr),
+	.is_busy(fpu_busy)
+);
+
+assign stall_req = fpu_busy | multi_cyc_busy;
 
 always_comb
 begin
@@ -334,7 +393,8 @@ begin
 		OP_MFLO: ret = lo;
 		OP_MTHI: hilo_wr.hilo = { reg1, lo };
 		OP_MTLO: hilo_wr.hilo = { hi, reg1 };
-		OP_MOVZ, OP_MOVN: ret = reg1; // 'we' is set in ID stage.
+		OP_MOVZ, OP_MOVN, OP_MOVCI:
+			ret = reg1;   // 'we' was set in ID stage.
 
 		/* jump instructions */
 		OP_JAL, OP_BLTZAL, OP_BGEZAL, OP_JALR:
@@ -361,11 +421,12 @@ begin
 			ret = `ZERO_WORD;
 		end
 
-		/* read CP0 */
+		/* read coprocessers */
 		OP_MFC0: ret = cp0_rdata_safe;
+		OP_MFC1, OP_CFC1: ret = fpu_gpr_ret;
 		default: begin
-            ret = `ZERO_WORD;
-        end
+			ret = `ZERO_WORD;
+		end
 		endcase
 	end
 end
