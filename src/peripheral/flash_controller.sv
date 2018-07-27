@@ -20,8 +20,7 @@ module flash_controller(
 
     typedef enum {
         STATE_INIT, STATE_RESET,
-        STATE_WRITE_BYTE_0_[`WAIT_CYCLES],
-        STATE_WRITE_BYTE_1_[`WAIT_CYCLES],
+        STATE_WRITE_BYTE_[`WAIT_CYCLES],
         STATE_READ_BYTE_0_[`WAIT_CYCLES],
         STATE_READ_BYTE_1_[`WAIT_CYCLES]
     } FlashState_t;
@@ -38,6 +37,10 @@ module flash_controller(
     logic write_flash;
     assign flash.data = write_flash ? data_to_write : `HIGHZ_HWORD;
     assign data_bus.data_rd = data_read;
+
+    // only 16-bit write is supported
+    logic write_upper_half;
+    assign write_upper_half = ~(|data_bus.mask[1:0]);
 
 `define GEN_WAIT_STATE(NAME, A, B) NAME``_``A: begin \
     currentState <= NAME``_``B; \
@@ -68,7 +71,7 @@ end \
                         data_to_write <= `FLASH_OP_READ;
                         flash.address <= 0;
                         // write into one address is enough
-                        currentState <= STATE_WRITE_BYTE_1_0;
+                        currentState <= STATE_WRITE_BYTE_0;
                     end
 
                     STATE_INIT: begin
@@ -87,25 +90,16 @@ end \
                             data_bus.stall <= 1'b1;
                             flash.ce_n <= 1'b0;
                             flash.we_n <= 1'b0;
-                            flash.address <= chip_base_address;
+                            flash.address <= write_upper_half ? chip_base_address + 2'h2 : chip_base_address;
                             currentState <= STATE_WRITE_BYTE_0_0;
                             write_flash <= 1'b1;
-                            data_to_write <= data_bus.data_wr[0 +: 16];
+                            data_to_write <= write_upper_half ? data_bus.data_wr[16 +: 16] : data_bus.data_wr[0 +: 16];
                         end
                     end
 
-                    `GEN_WAIT_STATES(STATE_WRITE_BYTE_0)
+                    `GEN_WAIT_STATES(STATE_WRITE_BYTE)
 
-                    STATE_WRITE_BYTE_0_3: begin
-                        // still use the lowest 16 bits of commands, which might work more smoothly with CFI
-                        //data_to_write <= data_bus.data_wr[16 +: 16];
-                        flash.address <= chip_base_address + 2'h2;
-                        currentState <= STATE_WRITE_BYTE_1_0;
-                    end
-
-                    `GEN_WAIT_STATES(STATE_WRITE_BYTE_1)
-
-                    STATE_WRITE_BYTE_1_3: begin
+                    STATE_WRITE_BYTE_3: begin
                         data_bus.stall <= `ZERO_BIT;
                         flash.ce_n <= 1'b1;
                         flash.we_n <= 1'b1;

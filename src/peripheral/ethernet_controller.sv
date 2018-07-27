@@ -36,14 +36,14 @@ module ethernet_controller(
             write <= `ZERO_BIT;
 
             if (bus_clk == `BUS_CLK_POSEDGE) begin
-                if (data_bus.read) begin
+                if (data_bus.read) begin // give back the result
                     data_bus.data_rd <= ethernet.sd;
                 end else if (data_bus.write) begin
                     // datasheet requires data hold time, so we keep data
                     ethernet.cs_n <= 1'b0;
                     write <= 1'b1;
                 end
-            end else begin
+            end else begin // latch the request and perform it
                 if (data_bus.write) begin
                     ethernet.cs_n <= 1'b0;
                     ethernet.iow_n <= 1'b0;
