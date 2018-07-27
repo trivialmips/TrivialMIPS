@@ -240,7 +240,10 @@ begin
 	FPU_OP_ADD, FPU_OP_SUB, FPU_OP_MUL, FPU_OP_DIV, FPU_OP_SQRT,
 	FPU_OP_CEIL, FPU_OP_TRUNC, FPU_OP_FLOOR, FPU_OP_ROUND, FPU_OP_CVTS,
 	FPU_OP_CVTW, FPU_OP_NEG, FPU_OP_ABS:
+	begin
+		fcsr_wdata.cause = except;
 		fcsr_wdata.flags[4:0] = fcsr.flags[4:0] | except[4:0];
+	end
 	FPU_OP_CTC:
 	begin
 		unique case(inst[15:11])
@@ -275,6 +278,7 @@ begin
 	unique case(op)
 	FPU_OP_MTC:  ret = gpr2;
 	FPU_OP_MOV:  ret = reg1.val;
+	FPU_OP_CMOV: ret = reg1.val;
 	FPU_OP_NEG:  ret = ret_neg;
 	FPU_OP_ABS:  ret = ret_abs;
 	FPU_OP_ADD:  ret = ret_add;

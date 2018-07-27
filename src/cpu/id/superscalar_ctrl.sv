@@ -37,15 +37,16 @@ function is_jump_inst(input Oper_t op);
 	);
 endfunction
 
-function is_cond_move_inst(input Oper_t op);
+function is_cond_move_inst(input Oper_t op, input FPUOper_t fop);
 	is_cond_move_inst = (
-		op == OP_MOVZ || op == OP_MOVN
+		op == OP_MOVZ || op == OP_MOVN || fop == FPU_OP_MOV
 	);
 endfunction
 
-function is_fpu_mutex_inst(input Oper_t op);
+function is_fpu_mutex_inst(input Oper_t op, input FPUOper_t fop);
 	is_fpu_mutex_inst = (
-		op == OP_CFC1 || op == OP_CTC1 || op == OP_BC1
+		op == OP_CFC1 || op == OP_CTC1 || op == OP_BC1 ||
+		fop == FPU_OP_CMOV
 	);
 endfunction
 
@@ -78,12 +79,12 @@ assign jump_inst_a = is_jump_inst(data_a.op);
 assign jump_inst_b = is_jump_inst(data_b.op);
 
 Bit_t cond_move_inst_a, cond_move_inst_b;
-assign cond_move_inst_a = is_cond_move_inst(data_a.op);
-assign cond_move_inst_b = is_cond_move_inst(data_b.op);
+assign cond_move_inst_a = is_cond_move_inst(data_a.op, data_a.fpu_op);
+assign cond_move_inst_b = is_cond_move_inst(data_b.op, data_b.fpu_op);
 
 Bit_t fpu_mutex_inst_a, fpu_mutex_inst_b;
-assign fpu_mutex_inst_a = is_fpu_mutex_inst(data_a.op);
-assign fpu_mutex_inst_b = is_fpu_mutex_inst(data_b.op);
+assign fpu_mutex_inst_a = is_fpu_mutex_inst(data_a.op, data_a.fpu_op);
+assign fpu_mutex_inst_b = is_fpu_mutex_inst(data_b.op, data_b.fpu_op);
 
 Bit_t fpu_inst_a, fpu_inst_b;
 assign fpu_inst_a = (data_a.fpu_op != FPU_OP_NOP);
