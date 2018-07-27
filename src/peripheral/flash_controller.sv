@@ -91,7 +91,7 @@ end \
                             flash.ce_n <= 1'b0;
                             flash.we_n <= 1'b0;
                             flash.address <= write_upper_half ? chip_base_address + 2'h2 : chip_base_address;
-                            currentState <= STATE_WRITE_BYTE_0_0;
+                            currentState <= STATE_WRITE_BYTE_0;
                             write_flash <= 1'b1;
                             data_to_write <= write_upper_half ? data_bus.data_wr[16 +: 16] : data_bus.data_wr[0 +: 16];
                         end
