@@ -65,9 +65,17 @@ module graphics_controller(
         end
     end
 
-    assign data_bus.data_rd = rst ? `ZERO_WORD : 
-           ((data_bus.read && data_bus.address == `GRAPHICS_CONFIG_ADDRESS) ? pixel_offset_reg_o[1] : gmem_data_out_a);
-
+    always_comb begin
+        if (rst || !data_bus.read) begin
+            data_bus.data_rd = `ZERO_WORD;
+        end else begin
+            if (data_bus.address == `GRAPHICS_CONFIG_ADDRESS) begin
+                data_bus.data_rd = pixel_offset_reg_o[1];
+            end else begin
+                data_bus.data_rd = gmem_data_out_a;
+            end
+        end
+    end
 
     always_ff @(posedge bus_clk or posedge rst) begin
         if (rst) begin
@@ -75,7 +83,7 @@ module graphics_controller(
             pixel_offset_reg_o[0] <= `ZERO_WORD;
             pixel_offset_reg_o[1] <= `ZERO_WORD;
         end else begin
-            pixel_offset_reg_o[0] <= pixel_count;
+            pixel_offset_reg_o[0] <= pixel_offset;
             pixel_offset_reg_o[1] <= pixel_offset_reg_o[0];
             if (data_bus.write && data_bus.address == `GRAPHICS_CONFIG_ADDRESS) begin
                 pixel_offset_reg_i[0] <= data_bus.data_wr;
