@@ -208,7 +208,12 @@ assign memory_req.addr = mem_addr;
 always_comb
 begin
 	unique case(op)
-	OP_LW, OP_LL, OP_SW, OP_SC, OP_LWC1, OP_SWC1:
+	OP_LWC1, OP_SWC1:
+	begin
+		memory_req.sel = 4'b1111;
+		memory_req.wdata = fpu_reg1;
+	end
+	OP_LW, OP_LL, OP_SW, OP_SC:
 	begin
 		memory_req.sel = 4'b1111;
 		memory_req.wdata = reg2;
