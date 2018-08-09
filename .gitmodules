@@ -1,0 +1,3 @@
+[submodule "software"]
+	path = software
+	url = git@git.tsinghua.edu.cn:chensq16/TrivialMIPS_Software.git
