@@ -61,9 +61,9 @@ begin
 				6'b001101: `INST_W(FPU_OP_TRUNC, fs, ft, fd)
 				6'b001110: `INST_W(FPU_OP_CEIL,  fs, ft, fd)
 				6'b001111: `INST_W(FPU_OP_FLOOR, fs, ft, fd)
-				6'b010001: `INST  (FPU_OP_MOV,   fs, 5'b0, fcc_match, fd)
-				6'b010010: `INST  (FPU_OP_MOV,   fs, 5'b0,  gpr_zero, fd)
-				6'b010011: `INST  (FPU_OP_MOV,   fs, 5'b0, ~gpr_zero, fd)
+				6'b010001: `INST  (FPU_OP_CMOV,  fs, 5'b0, fcc_match, fd)
+				6'b010010: `INST  (FPU_OP_CMOV,  fs, 5'b0,  gpr_zero, fd)
+				6'b010011: `INST  (FPU_OP_CMOV,  fs, 5'b0, ~gpr_zero, fd)
 				6'b100100: `INST_W(FPU_OP_CVTW,  fs, ft, fd)
 				6'b11????: `INST_R(FPU_OP_COND,  fs, ft)
 				default: op = FPU_OP_INVALID;

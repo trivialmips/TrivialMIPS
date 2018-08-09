@@ -154,6 +154,7 @@ begin
 	unittest("superscalar", 1);
 	unittest("fpu_arith", 0);
 	unittest("fpu_compare", 0);
+	unittest("fpu_transfer", 0);
 	$display("[Done]");
 	$finish;
 end
