@@ -55,10 +55,10 @@
 COMPONENT blk_mem_bootrom
   PORT (
     clka : IN STD_LOGIC;
-    addra : IN STD_LOGIC_VECTOR(9 DOWNTO 0);
+    addra : IN STD_LOGIC_VECTOR(11 DOWNTO 0);
     douta : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
     clkb : IN STD_LOGIC;
-    addrb : IN STD_LOGIC_VECTOR(9 DOWNTO 0);
+    addrb : IN STD_LOGIC_VECTOR(11 DOWNTO 0);
     doutb : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
   );
 END COMPONENT;

@@ -76,7 +76,7 @@ typedef Word_t  MemAddr_t;
 // the last two bits are always not used in order to align in 4 bytes
 //  ADDRESS  | NOT USED
 // 22 ... 2  | 1     0
-`define BOOTROM_ADDRESS_WIDTH  10 // 4 KB
+`define BOOTROM_ADDRESS_WIDTH  12 // 16 KB
 `define RAM_ADDRESS_WIDTH      21 // 8 MB
 `define FLASH_ADDRESS_WIDTH    21 // 8 MB
 `define UART_ADDRESS_WIDTH     1 // 2 address
