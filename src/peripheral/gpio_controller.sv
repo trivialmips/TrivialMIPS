@@ -39,7 +39,7 @@ module gpio_controller(
             gpio.leds <= `ZERO_HWORD;
             raw_data_display <= `ZERO_WORD;
         end else begin
-            if (clk_bus == 1'b0) begin
+            if (clk_bus == ~`BUS_CLK_POSEDGE) begin
                 if (data_bus.read) begin
                     if (data_bus.address[1:0] != 2'h0) begin
                         data_bus.data_rd <= `ZERO_WORD;
