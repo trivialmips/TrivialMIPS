@@ -2,7 +2,6 @@
 set_property -dict {PACKAGE_PIN D18 IOSTANDARD LVCMOS33} [get_ports clk_50M]
 set_property -dict {PACKAGE_PIN C18 IOSTANDARD LVCMOS33} [get_ports clk_11M0592]
 
-
 #Touch Button
 set_property -dict {PACKAGE_PIN J19 IOSTANDARD LVCMOS33} [get_ports {touch_btn[0]}]
 set_property -dict {PACKAGE_PIN E25 IOSTANDARD LVCMOS33} [get_ports {touch_btn[1]}]
@@ -10,9 +9,6 @@ set_property -dict {PACKAGE_PIN F23 IOSTANDARD LVCMOS33} [get_ports {touch_btn[2
 set_property -dict {PACKAGE_PIN E23 IOSTANDARD LVCMOS33} [get_ports {touch_btn[3]}]
 set_property -dict {PACKAGE_PIN H19 IOSTANDARD LVCMOS33} [get_ports clock_btn]
 set_property -dict {PACKAGE_PIN F22 IOSTANDARD LVCMOS33} [get_ports reset_btn]
-
-#required if touch button used as manual clock source
-set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets reset_btn_IBUF]
 
 #CPLD
 set_property -dict {PACKAGE_PIN P20 IOSTANDARD LVCMOS33} [get_ports uart_wrn]
@@ -153,6 +149,7 @@ set_property -dict {PACKAGE_PIN N7 IOSTANDARD LVCMOS33} [get_ports {gpio\.dip_sw
 set_property -dict {PACKAGE_PIN M7 IOSTANDARD LVCMOS33} [get_ports {gpio\.dip_sw[30]}]
 set_property -dict {PACKAGE_PIN M5 IOSTANDARD LVCMOS33} [get_ports {gpio\.dip_sw[31]}]
 
+#Flash
 set_property -dict {PACKAGE_PIN K8 IOSTANDARD LVCMOS33} [get_ports {flash\.address[0]}]
 set_property -dict {PACKAGE_PIN C26 IOSTANDARD LVCMOS33} [get_ports {flash\.address[1]}]
 set_property -dict {PACKAGE_PIN B26 IOSTANDARD LVCMOS33} [get_ports {flash\.address[2]}]
@@ -201,6 +198,7 @@ set_property -dict {PACKAGE_PIN C22 IOSTANDARD LVCMOS33} [get_ports {flash\.rp_n
 set_property -dict {PACKAGE_PIN B22 IOSTANDARD LVCMOS33} [get_ports {flash\.vpen}]
 set_property -dict {PACKAGE_PIN C1 IOSTANDARD LVCMOS33} [get_ports {flash\.we_n}]
 
+#SRAM
 set_property -dict {PACKAGE_PIN F24 IOSTANDARD LVCMOS33} [get_ports {base_ram\.address[0]}]
 set_property -dict {PACKAGE_PIN G24 IOSTANDARD LVCMOS33} [get_ports {base_ram\.address[1]}]
 set_property -dict {PACKAGE_PIN L24 IOSTANDARD LVCMOS33} [get_ports {base_ram\.address[2]}]
@@ -325,42 +323,45 @@ set_property CFGBVS VCCO [current_design]
 set_property CONFIG_VOLTAGE 3.3 [current_design]
 
 
-
-
-
-
 create_clock -period 20.000 -name clk_50M -waveform {0.000 10.000} [get_ports clk_50M]
 create_clock -period 90.422 -name clk_11M0592 -waveform {0.000 45.211} [get_ports clk_11M0592]
-create_clock -period 16.667 -name VIRTUAL_clk_out1_top_clk_wiz -waveform {0.000 8.334}
-set_input_delay -clock [get_clocks clk_out1_top_clk_wiz] -min -add_delay 8.000 [get_ports {base_ram\.data[*]}]
-set_input_delay -clock [get_clocks clk_out1_top_clk_wiz] -max -add_delay 10.000 [get_ports {base_ram\.data[*]}]
-set_input_delay -clock [get_clocks clk_out1_top_clk_wiz] -min -add_delay 8.000 [get_ports {ext_ram\.data[*]}]
-set_input_delay -clock [get_clocks clk_out1_top_clk_wiz] -max -add_delay 10.000 [get_ports {ext_ram\.data[*]}]
-set_output_delay -clock [get_clocks clk_out1_top_clk_wiz] -min -add_delay 0.000 [get_ports {base_ram\.address[*]}]
-set_output_delay -clock [get_clocks clk_out1_top_clk_wiz] -max -add_delay 8.000 [get_ports {base_ram\.address[*]}]
-set_output_delay -clock [get_clocks clk_out1_top_clk_wiz] -min -add_delay 0.000 [get_ports {base_ram\.be_n[*]}]
-set_output_delay -clock [get_clocks clk_out1_top_clk_wiz] -max -add_delay 8.000 [get_ports {base_ram\.be_n[*]}]
-set_output_delay -clock [get_clocks clk_out1_top_clk_wiz] -min -add_delay 0.000 [get_ports {base_ram\.data[*]}]
-set_output_delay -clock [get_clocks clk_out1_top_clk_wiz] -max -add_delay 8.000 [get_ports {base_ram\.data[*]}]
-set_output_delay -clock [get_clocks clk_out1_top_clk_wiz] -min -add_delay 0.000 [get_ports {ext_ram\.address[*]}]
-set_output_delay -clock [get_clocks clk_out1_top_clk_wiz] -max -add_delay 8.000 [get_ports {ext_ram\.address[*]}]
-set_output_delay -clock [get_clocks clk_out1_top_clk_wiz] -min -add_delay 0.000 [get_ports {ext_ram\.be_n[*]}]
-set_output_delay -clock [get_clocks clk_out1_top_clk_wiz] -max -add_delay 8.000 [get_ports {ext_ram\.be_n[*]}]
-set_output_delay -clock [get_clocks clk_out1_top_clk_wiz] -min -add_delay 0.000 [get_ports {ext_ram\.data[*]}]
-set_output_delay -clock [get_clocks clk_out1_top_clk_wiz] -max -add_delay 8.000 [get_ports {ext_ram\.data[*]}]
-set_output_delay -clock [get_clocks clk_out1_top_clk_wiz] -min -add_delay 0.000 [get_ports {base_ram\.ce_n}]
-set_output_delay -clock [get_clocks clk_out1_top_clk_wiz] -max -add_delay 8.000 [get_ports {base_ram\.ce_n}]
-set_output_delay -clock [get_clocks clk_out1_top_clk_wiz] -min -add_delay 0.000 [get_ports {base_ram\.oe_n}]
-set_output_delay -clock [get_clocks clk_out1_top_clk_wiz] -max -add_delay 8.000 [get_ports {base_ram\.oe_n}]
-set_output_delay -clock [get_clocks clk_out1_top_clk_wiz] -min -add_delay 0.000 [get_ports {base_ram\.we_n}]
-set_output_delay -clock [get_clocks clk_out1_top_clk_wiz] -max -add_delay 8.000 [get_ports {base_ram\.we_n}]
-set_output_delay -clock [get_clocks clk_out1_top_clk_wiz] -min -add_delay 0.000 [get_ports {ext_ram\.ce_n}]
-set_output_delay -clock [get_clocks clk_out1_top_clk_wiz] -max -add_delay 8.000 [get_ports {ext_ram\.ce_n}]
-set_output_delay -clock [get_clocks clk_out1_top_clk_wiz] -min -add_delay 0.000 [get_ports {ext_ram\.oe_n}]
-set_output_delay -clock [get_clocks clk_out1_top_clk_wiz] -max -add_delay 8.000 [get_ports {ext_ram\.oe_n}]
-set_output_delay -clock [get_clocks clk_out1_top_clk_wiz] -min -add_delay 0.000 [get_ports {ext_ram\.we_n}]
-set_output_delay -clock [get_clocks clk_out1_top_clk_wiz] -max -add_delay 8.000 [get_ports {ext_ram\.we_n}]
-set_false_path -from [get_clocks clk_50M] -to [get_clocks -of_objects [get_pins clk_wiz_instance/inst/mmcm_adv_inst/CLKOUT*]]
-set_false_path -from [get_clocks -of_objects [get_pins clk_wiz_instance/inst/mmcm_adv_inst/CLKOUT*]] -to [get_clocks clk_50M]
-set_false_path -from [get_clocks -of_objects [get_pins clk_wiz_instance/inst/mmcm_adv_inst/CLKOUT0]] -to [get_clocks -of_objects [get_pins clk_wiz_instance/inst/mmcm_adv_inst/CLKOUT1]]
+
+set all_mmcm_clk   [get_clocks -of_objects [get_pins clk_wiz_instance/inst/mmcm_adv_inst/CLKOUT*]]
+set sram_clk       [get_clocks out_60M_shift_top_clk_wiz]
+set vga_clk        [get_clocks clk_50M]
+set main_clk       [get_clocks out_30M_top_clk_wiz]
+set peripheral_clk [get_clocks out_60M_shift_top_clk_wiz]
+
+set_false_path -from $vga_clk               -to $all_mmcm_clk
+set_false_path -from $all_mmcm_clk          -to $vga_clk
+set_false_path -from $peripheral_clk        -to $main_clk
 set_false_path -from [get_pins rst_reg_*/*] -to *
+
+set_input_delay  -clock $sram_clk -min -add_delay 8.000  [get_ports {base_ram\.data[*]}]
+set_input_delay  -clock $sram_clk -max -add_delay 10.000 [get_ports {base_ram\.data[*]}]
+set_input_delay  -clock $sram_clk -min -add_delay 8.000  [get_ports {ext_ram\.data[*]}]
+set_input_delay  -clock $sram_clk -max -add_delay 10.000 [get_ports {ext_ram\.data[*]}]
+set_output_delay -clock $sram_clk -min -add_delay 0.000 [get_ports {base_ram\.address[*]}]
+set_output_delay -clock $sram_clk -max -add_delay 8.000 [get_ports {base_ram\.address[*]}]
+set_output_delay -clock $sram_clk -min -add_delay 0.000 [get_ports {base_ram\.be_n[*]}]
+set_output_delay -clock $sram_clk -max -add_delay 8.000 [get_ports {base_ram\.be_n[*]}]
+set_output_delay -clock $sram_clk -min -add_delay 0.000 [get_ports {base_ram\.data[*]}]
+set_output_delay -clock $sram_clk -max -add_delay 8.000 [get_ports {base_ram\.data[*]}]
+set_output_delay -clock $sram_clk -min -add_delay 0.000 [get_ports {ext_ram\.address[*]}]
+set_output_delay -clock $sram_clk -max -add_delay 8.000 [get_ports {ext_ram\.address[*]}]
+set_output_delay -clock $sram_clk -min -add_delay 0.000 [get_ports {ext_ram\.be_n[*]}]
+set_output_delay -clock $sram_clk -max -add_delay 8.000 [get_ports {ext_ram\.be_n[*]}]
+set_output_delay -clock $sram_clk -min -add_delay 0.000 [get_ports {ext_ram\.data[*]}]
+set_output_delay -clock $sram_clk -max -add_delay 8.000 [get_ports {ext_ram\.data[*]}]
+set_output_delay -clock $sram_clk -min -add_delay 0.000 [get_ports {base_ram\.ce_n}]
+set_output_delay -clock $sram_clk -max -add_delay 8.000 [get_ports {base_ram\.ce_n}]
+set_output_delay -clock $sram_clk -min -add_delay 0.000 [get_ports {base_ram\.oe_n}]
+set_output_delay -clock $sram_clk -max -add_delay 8.000 [get_ports {base_ram\.oe_n}]
+set_output_delay -clock $sram_clk -min -add_delay 0.000 [get_ports {base_ram\.we_n}]
+set_output_delay -clock $sram_clk -max -add_delay 8.000 [get_ports {base_ram\.we_n}]
+set_output_delay -clock $sram_clk -min -add_delay 0.000 [get_ports {ext_ram\.ce_n}]
+set_output_delay -clock $sram_clk -max -add_delay 8.000 [get_ports {ext_ram\.ce_n}]
+set_output_delay -clock $sram_clk -min -add_delay 0.000 [get_ports {ext_ram\.oe_n}]
+set_output_delay -clock $sram_clk -max -add_delay 8.000 [get_ports {ext_ram\.oe_n}]
+set_output_delay -clock $sram_clk -min -add_delay 0.000 [get_ports {ext_ram\.we_n}]
+set_output_delay -clock $sram_clk -max -add_delay 8.000 [get_ports {ext_ram\.we_n}]
