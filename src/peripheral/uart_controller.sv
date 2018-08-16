@@ -37,11 +37,10 @@ module uart_controller(
     logic tx_start, tx_busy;
 
     uart_transmitter #(
-        .ClkFrequency(`UART_CLOCK_FREQUENCY),
+        .ClkFrequency(`PERIPHERAL_CLOCK_FREQUENCY),
         .Baud(`UART_BAUD_RATE)
     ) transmitter(
         .clk,
-        .clk_uart,
         .TxD_start(tx_start),
         .TxD_data(tx_fifo_out),
         .TxD(uart.txd),
@@ -104,11 +103,10 @@ module uart_controller(
     assign interrupt = ~rx_fifo_empty;
 
     uart_receiver #(
-        .ClkFrequency(`UART_CLOCK_FREQUENCY),
+        .ClkFrequency(`PERIPHERAL_CLOCK_FREQUENCY),
         .Baud(`UART_BAUD_RATE)
     ) receiver (
         .clk,
-        .clk_uart,
         .RxD(uart.rxd),
         .RxD_data_ready(rx_fifo_write),
         .RxD_clear(rst),
