@@ -13,6 +13,7 @@
 `default_nettype wire
 module uart_transmitter(
 	input clk,
+	input clk_uart,
 	input TxD_start,
 	input [7:0] TxD_data,
 	output TxD,
@@ -34,7 +35,7 @@ endgenerate
 wire BitTick = 1'b1;  // output one bit per clock cycle
 `else
 wire BitTick;
-BaudTickGen #(ClkFrequency, Baud) tickgen(.clk(clk), .enable(TxD_busy), .tick(BitTick));
+BaudTickGen #(ClkFrequency, Baud) tickgen(.clk(clk_uart), .enable(TxD_busy), .tick(BitTick));
 `endif
 
 reg [3:0] TxD_state = 0;
@@ -74,6 +75,7 @@ endmodule
 ////////////////////////////////////////////////////////
 module uart_receiver(
 	input clk,
+	input clk_uart,
 	input RxD,
 	output reg RxD_data_ready = 0,
 	input RxD_clear,
@@ -107,7 +109,7 @@ wire sampleNow = 1'b1;  // receive one bit per clock cycle
 
 `else
 wire OversamplingTick;
-BaudTickGen #(ClkFrequency, Baud, Oversampling) tickgen(.clk(clk), .enable(1'b1), .tick(OversamplingTick));
+BaudTickGen #(ClkFrequency, Baud, Oversampling) tickgen(.clk(clk_uart), .enable(1'b1), .tick(OversamplingTick));
 
 // synchronize RxD to our clk domain
 reg [1:0] RxD_sync = 2'b11;
