@@ -92,7 +92,8 @@ module peripheral_tb();
     // data and instruction bus
     Bus_if ram_data_if(.clk);
     Bus_if ram_inst_if(.clk);
-    Bus_if bootrom_if(.clk);
+    Bus_if bootrom_data_if(.clk);
+    Bus_if bootrom_inst_if(.clk);
     Bus_if flash_if(.clk);
     Bus_if uart_if(.clk);
     Bus_if timer_if(.clk);
@@ -103,6 +104,7 @@ module peripheral_tb();
 
     data_bus data_bus_instance(
         .cpu(cpu_data_if.slave),
+        .bootrom(bootrom_data_if.master),
         .ram(ram_data_if.master),
         .flash(flash_if.master),
         .uart(uart_if.master),
@@ -116,13 +118,14 @@ module peripheral_tb();
     instruction_bus instruction_bus_instance(
         .cpu(cpu_inst_if.slave),
         .ram(ram_inst_if.master),
-        .bootrom(bootrom_if.master)
+        .bootrom(bootrom_inst_if.master)
     );
 
     // pheripheral
 
     bootrom_controller bootrom_controller_instance(
-        .inst_bus(bootrom_if.slave)
+        .inst_bus(bootrom_inst_if.slave),
+        .data_bus(bootrom_data_if.slave)
     );
 
     sram_controller sram_controller_instance(
@@ -218,7 +221,9 @@ module peripheral_tb();
 
         // bootrom
         $display("[Bootrom] test begin");
+        @(posedge clk.base)
         @(negedge clk.base_2x);
+        $display("[Bootrom] simple read 2 instruction");
         begin
             test_inst_bus(
                 .address(32'h1FC00000)
@@ -226,8 +231,35 @@ module peripheral_tb();
         end
 
         @(posedge clk.base);
-        assert_value("Read instruction 1", 32'h40046000, cpu_inst_if.data_rd);
-        assert_value("Read instruction 2", 32'h3c03fbff, cpu_inst_if.data_rd_2);
+        assert_value("Read instruction 1", 32'h3c1d8080, cpu_inst_if.data_rd);
+        assert_value("Read instruction 2", 32'h27bdffe0, cpu_inst_if.data_rd_2);
+
+        @(negedge clk.base_2x);
+        $display("[Bootrom] simultaneous read from instruction and data bus");
+        begin
+            test_inst_bus(
+                .address(32'h1FC00004)
+            );
+            test_data_bus(
+                .address(32'h1FC0000C),
+                .data(0),
+                .read(1),
+                .write(0),
+                .mask(4'b1111)
+            );
+        end
+
+        @(posedge clk.base);
+        assert_value("Read instruction 1", 32'h27bdffe0, cpu_inst_if.data_rd);
+        assert_value("Read instruction 2", 32'h3c1c8070, cpu_inst_if.data_rd_2);
+        assert_value("Data bus stall", 1'b1, cpu_data_if.stall);
+
+        @(posedge clk.base);
+        assert_value("Read instruction 1", 32'h27bdffe0, cpu_inst_if.data_rd);
+        assert_value("Read instruction 2", 32'h3c1c8070, cpu_inst_if.data_rd_2);
+        assert_value("Read data", 32'h0ff000e5, cpu_data_if.data_rd);
+        assert_value("Data bus stall", 1'b0, cpu_data_if.stall);
+
         $display("[Bootrom] test ended");
 
 
@@ -253,7 +285,7 @@ module peripheral_tb();
         begin
             test_data_bus(
                 .address(32'h06000004),
-                .data(32'h0000CAFE),
+                .data(32'h8000CAFE),
                 .read(0),
                 .write(1),
                 .mask(4'b1111)
@@ -269,7 +301,7 @@ module peripheral_tb();
         begin
             test_data_bus(
                 .address(32'h06000004),
-                .data(32'h800000FE),
+                .data(32'h000000FE),
                 .read(0),
                 .write(1),
                 .mask(4'b1111)

@@ -1,13 +1,13 @@
 `include "common_defs.svh"
 
 module color_mapper(
-    input  VgaColorNumber_t number,
+    input  VgaColorNumber_t color_number,
     output VgaColor_t       color
 );
 
 // TODO: determine the color mapping
 always_comb begin
-    unique case (number)
+    unique case (color_number)
         4'h0: color = 8'b000_000_00;
         4'h1: color = 8'b000_000_00;
         4'h2: color = 8'b000_000_00;

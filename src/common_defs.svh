@@ -15,7 +15,7 @@
 `define BUS_CLK_POSEDGE 1'b0
 `endif
 
-`define MAIN_CLOCK_FREQUENCY 60_000_000
+`define MAIN_CLOCK_FREQUENCY 30_000_000
 `define UART_BAUD_RATE 115200
 
 // data formats
@@ -100,7 +100,7 @@ typedef logic [3:0] ByteMask_t;
 
 typedef struct packed {
     logic _50M, _11M0592, _10M;
-    logic base, base_2x;
+    logic base, base_2x, base_2x_noshift;
     logic rst;
 } Clock_t;
 

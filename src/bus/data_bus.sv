@@ -2,6 +2,7 @@
 
 module data_bus(
     Bus_if.slave  cpu,
+    Bus_if.master bootrom,
     Bus_if.master ram,
     Bus_if.master flash,
     Bus_if.master uart,
@@ -13,18 +14,22 @@ module data_bus(
 );
 
     // interrupt
-    //assign cpu.interrupt = uart.interrupt | ethernet.interrupt | usb.interrupt;
-    assign cpu.interrupt = uart.interrupt;
+    assign cpu.interrupt = uart.interrupt | ethernet.interrupt | usb.interrupt;
 
     // sram
     assign ram.data_wr = cpu.data_wr;
     assign ram.address = cpu.address[2 +: `RAM_ADDRESS_WIDTH];
-    assign ram.mask = cpu.mask;
+    assign ram.mask    = cpu.mask;
 
-    // we do not write flash
+    // bootrom is read-only
+    assign bootrom.data_wr = `ZERO_WORD;
+    assign bootrom.address = cpu.address[2 +: `BOOTROM_ADDRESS_WIDTH];
+    assign bootrom.mask    = `BYTE_MASK_FULL;
+
+    // flash
     assign flash.data_wr = cpu.data_wr;
     assign flash.address = cpu.address[2 +: `FLASH_ADDRESS_WIDTH];
-    assign flash.mask = cpu.mask;
+    assign flash.mask    = cpu.mask;
 
     // uart and timer are always one-byte
     assign uart.data_wr = cpu.data_wr;
@@ -35,7 +40,7 @@ module data_bus(
 
     assign graphics.data_wr = cpu.data_wr;
     assign graphics.address = cpu.address[2 +: `GRAPHICS_ADDRESS_WIDTH];
-    assign graphics.mask = cpu.mask;
+    assign graphics.mask    = cpu.mask;
 
     assign ethernet.data_wr = cpu.data_wr;
     assign ethernet.address = cpu.address[2 +: `ETHERNET_ADDRESS_WIDTH];
@@ -49,6 +54,8 @@ module data_bus(
 
     always_comb begin
 
+        bootrom.read   = `ZERO_BIT;
+        bootrom.write  = `ZERO_BIT;
         ram.read       = `ZERO_BIT;
         ram.write      = `ZERO_BIT;
         flash.read     = `ZERO_BIT;
@@ -76,6 +83,12 @@ module data_bus(
                 ram.write   = cpu.write;
                 cpu.data_rd = ram.data_rd;
                 cpu.stall   = ram.stall;
+            end
+
+            `CONCAT_PREFIX(BOOTROM): begin
+                bootrom.read = cpu.read;
+                cpu.data_rd  = bootrom.data_rd;
+                cpu.stall    = bootrom.stall;
             end
 
             `CONCAT_PREFIX(FLASH): begin

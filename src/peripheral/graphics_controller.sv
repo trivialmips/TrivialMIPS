@@ -126,13 +126,14 @@ module graphics_controller(
 
     wire [2:0] pixel_count_mod_8 = pixel_count[2:0];
 
+    VgaColorNumber_t color_number;
     VgaColor_t color;
     // VgaColorNumber_t color_number;
     // every pixel takes 4 bits, little endian
     assign color_number = now_data[pixel_count_mod_8 * $bits(VgaColorNumber_t) +: $bits(VgaColorNumber_t)];
 
     color_mapper color_mapper_instance(
-        .number(color_number),
+        .color_number,
         .color
     );
 

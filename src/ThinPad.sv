@@ -35,9 +35,10 @@ module ThinPad(
     assign clk._11M0592 = clk_11M0592;
 
     top_clk_wiz clk_wiz_instance(
-        .clk_out1(clk.base_2x), // 80MHz
-        .clk_out2(clk.base), // 40MHz
-        .clk_out3(clk._10M),         
+        .out_60M_shift(clk.base_2x), // peripheral clock
+        .out_60M(clk.base_2x_noshift),
+        .out_30M(clk.base), // main clock
+        .out_10M(clk._10M),
         .reset(reset_btn), 
         .locked(rst_n),
         .clk_in1(clk._50M)
@@ -69,7 +70,8 @@ module ThinPad(
     // data and instruction bus
     Bus_if ram_data_if(.clk);
     Bus_if ram_inst_if(.clk);
-    Bus_if bootrom_if(.clk);
+    Bus_if bootrom_inst_if(.clk);
+    Bus_if bootrom_data_if(.clk);
     Bus_if flash_if(.clk);
     Bus_if uart_if(.clk);
     Bus_if timer_if(.clk);
@@ -80,6 +82,7 @@ module ThinPad(
 
     data_bus data_bus_instance(
         .cpu(cpu_data_if.slave),
+        .bootrom(bootrom_data_if.master),
         .ram(ram_data_if.master),
         .flash(flash_if.master),
         .uart(uart_if.master),
@@ -93,13 +96,14 @@ module ThinPad(
     instruction_bus instruction_bus_instance(
         .cpu(cpu_inst_if.slave),
         .ram(ram_inst_if.master),
-        .bootrom(bootrom_if.master)
+        .bootrom(bootrom_inst_if.master)
     );
 
 
     // pheripheral
     bootrom_controller bootrom_controller_instance(
-        .inst_bus(bootrom_if.slave)
+        .inst_bus(bootrom_inst_if.slave),
+        .data_bus(bootrom_data_if.slave)
     );
 
     sram_controller sram_controller_instance(
