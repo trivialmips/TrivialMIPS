@@ -24,6 +24,13 @@ assign regs = regs_inner;
 assign asid = regs.entry_hi[7:0];
 assign user_mode = (regs.status[4:1] == 4'b1000);
 
+logic [3:0] lfsr4_val;
+lfsr4 lfsr4_instance(
+	.clk,
+	.rst,
+	.val(lfsr4_val)
+);
+
 always_comb
 begin
 	if(rsel == 3'b0)
@@ -73,7 +80,8 @@ cp0_write_mask cp0_write_mask_instance(
 always_comb
 begin
 	regs_new = regs_inner;
-	regs_new.count = regs_new.count + 32'b1;
+	regs_new.count  = regs_new.count + 32'b1;
+	regs_new.random = lfsr4_val;
 
 	/* write register (WB stage) */
 	if(wr.we)
