@@ -30,8 +30,6 @@ module graphics_controller(
                              (mem_address_overflow - `GRAPHICS_CONFIG_ADDRESS) : mem_address_overflow);
 
 
-    assign data_bus.stall = `ZERO_BIT;
-
     Word_t gmem_data_out_a, gmem_data_in_a;
     GraphicsMemoryAddress_t gmem_address_a;
 
