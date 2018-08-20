@@ -31,6 +31,13 @@ lfsr4 lfsr4_instance(
 	.val(lfsr4_val)
 );
 
+logic [31:0] lfsr32_val;
+lfsr32 lfsr32_instance(
+	.clk,
+	.rst,
+	.val(lfsr32_val)
+);
+
 always_comb
 begin
 	if(rsel == 3'b0)
@@ -82,6 +89,7 @@ begin
 	regs_new = regs_inner;
 	regs_new.count  = regs_new.count + 32'b1;
 	regs_new.random = lfsr4_val;
+	regs_new.impl_lfsr32 = lfsr32_val;
 
 	/* write register (WB stage) */
 	if(wr.we)
