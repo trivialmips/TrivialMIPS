@@ -81,12 +81,12 @@ typedef Word_t  MemAddr_t;
 `define BOOTROM_ADDRESS_WIDTH  12 // 16 KB
 `define RAM_ADDRESS_WIDTH      21 // 8 MB
 `define FLASH_ADDRESS_WIDTH    21 // 8 MB
-`define UART_ADDRESS_WIDTH     1 // 2 address
-`define TIMER_ADDRESS_WIDTH    1 // 1 address
-`define GRAPHICS_ADDRESS_WIDTH 16 // 256 KB, use 240004 Byte
-`define ETHERNET_ADDRESS_WIDTH 1 // 2 addresses
-`define GPIO_ADDRESS_WIDTH     2 // 3 addresses 
-`define USB_ADDRESS_WIDTH      1 // 2 addresses
+`define UART_ADDRESS_WIDTH     1  // 2 address
+`define TIMER_ADDRESS_WIDTH    1  // 1 address
+`define GRAPHICS_ADDRESS_WIDTH 17 // 512 KB, use 480004 Byte
+`define ETHERNET_ADDRESS_WIDTH 1  // 2 addresses
+`define GPIO_ADDRESS_WIDTH     2  // 3 addresses 
+`define USB_ADDRESS_WIDTH      1  // 2 addresses
 
 typedef logic [`BOOTROM_ADDRESS_WIDTH - 1 : 0] BootroomAddress_t;
 typedef logic [`GRAPHICS_ADDRESS_WIDTH - 1 : 0] GraphicsMemoryAddress_t;
@@ -94,10 +94,11 @@ typedef logic [7:0] SegmentDisplay_t;
 
 typedef logic [3:0] ByteMask_t;
 `define BYTE_MASK_FULL 4'b1111
+`define BYTE_MASK_NONE 4'b0000
 
-// the configuration register of graphics is 0x02_03A980
-// take [2+:16], it is EA60
-`define GRAPHICS_CONFIG_ADDRESS 16'hEA60
+// the configuration register of graphics is 0x02_075300
+// take [2+:20], it is 1D4C0
+`define GRAPHICS_CONFIG_ADDRESS 20'h1D4C0
 
 
 typedef struct packed {

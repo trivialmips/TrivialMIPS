@@ -5,7 +5,7 @@ module graphics_controller(
     VGA_if.master vga
 );
 
-    wire vga_clk, bus_clk, bus_clk_2x;
+    wire vga_clk, bus_clk, bus_clk_2x, ram_clk;
     wire rst;
 
     assign vga.clk = vga_clk;
@@ -22,8 +22,8 @@ module graphics_controller(
     Word_t pixel_count;
 
     GraphicsMemoryAddress_t mem_address_offset, mem_address_overflow, mem_address;
-    assign mem_address_offset = GraphicsMemoryAddress_t'(pixel_offset >> 3);
-    assign mem_address_overflow = GraphicsMemoryAddress_t'(pixel_count >> 3) + mem_address_offset + 1'b1;
+    assign mem_address_offset = GraphicsMemoryAddress_t'(pixel_offset >> 2);
+    assign mem_address_overflow = GraphicsMemoryAddress_t'(pixel_count >> 2) + mem_address_offset + 1'b1;
     assign mem_address = (mem_address_overflow >= `GRAPHICS_CONFIG_ADDRESS * 2) ? 
                          (mem_address_overflow - `GRAPHICS_CONFIG_ADDRESS * 2) : (
                              (mem_address_overflow >= `GRAPHICS_CONFIG_ADDRESS) ? 
@@ -34,48 +34,69 @@ module graphics_controller(
 
     Word_t gmem_data_out_a, gmem_data_in_a;
     GraphicsMemoryAddress_t gmem_address_a;
-    logic gmem_write_a;
 
-    // port a for read/write request from bus
-    // port b for read request from vga
-    blk_mem_graphics blk_mem_graphics_instance (
-        .clka(bus_clk_2x),
-        .wea(gmem_write_a),
-        .addra(gmem_address_a),
-        .dina(gmem_data_in_a),
-        .douta(gmem_data_out_a),
-        .clkb(vga_clk),
-        .web(`ZERO_BIT),
-        .addrb(mem_address),
-        .dinb(`ZERO_WORD),
-        .doutb(mem_data)
-    );
+    ByteMask_t gmem_write_mask_a;
+
+    genvar i;
+
+    generate
+        for (i = 0; i < 4; i++) begin
+            // port a for read/write request from bus
+            // port b for read request from vga
+            blk_mem_graphics blk_mem_graphics_instance (
+                .clka(bus_clk_2x),
+                .wea(gmem_write_mask_a[i]),
+                .addra(gmem_address_a),
+                .dina(gmem_data_in_a[8 * i +: 8]),
+                .douta(gmem_data_out_a[8 * i +: 8]),
+                .clkb(vga_clk),
+                .web(`ZERO_BIT),
+                .addrb(mem_address),
+                .dinb(`ZERO_BYTE),
+                .doutb(mem_data[8 * i +: 8])
+            );
+        end
+    endgenerate
+
+    logic dbus_last_stall;
 
     always_ff @(posedge bus_clk_2x or posedge rst) begin
         if (rst) begin
             gmem_data_in_a <= `ZERO_WORD;
-            gmem_write_a <= `ZERO_BIT;
+            gmem_write_mask_a <= `BYTE_MASK_NONE;
             gmem_address_a <= GraphicsMemoryAddress_t'(`ZERO_WORD);
+            data_bus.data_rd <= `ZERO_WORD;
+            dbus_last_stall <= 1'b0;
+            data_bus.stall <= 1'b0;
         end else begin
-            if (bus_clk == ~`BUS_CLK_POSEDGE) begin// falling edge
-                gmem_data_in_a <= data_bus.data_wr;
-                gmem_write_a <= data_bus.write;
-                gmem_address_a <= GraphicsMemoryAddress_t'(data_bus.address);
+
+            dbus_last_stall <= data_bus.stall;
+
+            if (bus_clk == ~`BUS_CLK_POSEDGE) begin // falling edge of main clock
+                data_bus.stall <= 1'b0;
+                gmem_data_in_a <= `ZERO_WORD;
+                gmem_write_mask_a <= `BYTE_MASK_NONE;
+                data_bus.data_rd <= `ZERO_WORD;
+                if (data_bus.write) begin
+                    gmem_address_a <= GraphicsMemoryAddress_t'(data_bus.address);
+                    gmem_write_mask_a <= data_bus.mask;
+                    gmem_data_in_a <= data_bus.data_wr;
+                end if (data_bus.read) begin
+                    if (dbus_last_stall) begin
+                        data_bus.data_rd <= gmem_data_out_a;
+                    end else begin
+                        if (data_bus.address == `GRAPHICS_CONFIG_ADDRESS) begin
+                            data_bus.data_rd <= pixel_offset_reg_o[1];
+                        end else begin
+                            gmem_address_a <= GraphicsMemoryAddress_t'(data_bus.address);
+                            data_bus.stall <= 1'b1;
+                        end
+                    end
+                end
             end
         end
     end
 
-    always_comb begin
-        if (rst || !data_bus.read) begin
-            data_bus.data_rd = `ZERO_WORD;
-        end else begin
-            if (data_bus.address == `GRAPHICS_CONFIG_ADDRESS) begin
-                data_bus.data_rd = pixel_offset_reg_o[1];
-            end else begin
-                data_bus.data_rd = gmem_data_out_a;
-            end
-        end
-    end
 
     always_ff @(posedge bus_clk or posedge rst) begin
         if (rst) begin
@@ -124,18 +145,19 @@ module graphics_controller(
     Word_t x, y;
     Word_t visible_x, visible_y;
 
-    wire [2:0] pixel_count_mod_8 = pixel_count[2:0];
+    wire [1:0] pixel_count_mod_4 = pixel_count[1:0];
 
-    VgaColorNumber_t color_number;
-    VgaColor_t color;
     // VgaColorNumber_t color_number;
-    // every pixel takes 4 bits, little endian
-    assign color_number = now_data[pixel_count_mod_8 * $bits(VgaColorNumber_t) +: $bits(VgaColorNumber_t)];
+    // color_mapper color_mapper_instance(
+    //     .color_number,
+    //     .color
+    // );
 
-    color_mapper color_mapper_instance(
-        .color_number,
-        .color
-    );
+    VgaColor_t color;
+    // every pixel takes 8 bits, little endian
+    assign color = now_data[pixel_count_mod_4 * $bits(VgaColor_t) +: $bits(VgaColor_t)];
+
+
 
     assign {vga.red, vga.green, vga.blue} = color;
 
@@ -144,7 +166,7 @@ module graphics_controller(
         if (rst) begin
             now_data <= `ZERO_WORD;
         end else begin
-            if (pixel_count_mod_8 == 3'd7) begin
+            if (pixel_count_mod_4 == 2'd3) begin
                 now_data <= mem_data;
             end
         end

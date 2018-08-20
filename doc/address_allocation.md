@@ -21,7 +21,7 @@ This section describes the allocation of physical addresses that used in instruc
 | -------- | ------------ | ------------ | ----------------- | -------- |
 | RAM      | `0x00000000` | `0x007FFFFF` | 8 MB              | Stroage  |
 | Flash    | `0x01000000` | `0x017FFFFF` | 8 MB              | Stroage  |
-| Graphics | `0x02000000` | `0x0203A980` | 240004 Bytes      | Hybrid*  |
+| Graphics | `0x02000000` | `0x02075300` | 480004 Bytes      | Hybrid*  |
 | UART     | `0x03000000` | `0x03000004` | 2 Addresses       | Register |
 | Timer    | `0x04000000` | `0x04000004` | 2 Addresses       | Register |
 | Ethernet | `0x05000000` | `0x05000004` | 2 Addresses       | Register |
@@ -41,7 +41,7 @@ The address and size of bootrom is special due to the hardcorded value `0xBFC000
 
 ### Graphics
 
-Graphics device is of type 'hybrid', because it consists of 240000 byte graphics memory (or 'framebuffer') from `0x02000000` to `0x0203A97F` (each address stores a word) and a configuration register at `0x0203A980`. Every pixel takes 4 bits in the memory, and will converted to the format of `{RED[2:0], GREEN[2:0], BLUE[1:0]}` when displayed, with the mapping hardcoded.
+Graphics device is of type 'hybrid', because it consists of 240000 byte graphics memory (or 'framebuffer') from `0x02000000` to `0x020532FF` (each address stores a word) and a configuration register at `0x02075300`. Every pixel takes 8 bits in the memory with the format of `{RED[2:0], GREEN[2:0], BLUE[1:0]}` when displayed.
 
 The configuration register, which can be both read and written, is used to indicate the offset of first pixel in the framebuffer, designed to be used in screen scrolling in the operating system.
 
