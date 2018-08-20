@@ -12,6 +12,9 @@ module ex_mem(
 	output PipelineReq_t   mem_req_a,
 	output PipelineReq_t   mem_req_b,
 
+	input  logic [7:0] ex_interrupt_flag,
+	output logic [7:0] mem_interrupt_flag,
+
 	input  MMUResult_t ex_mmu_data_result,
 	output MMUResult_t mem_mmu_data_result,
 
@@ -61,12 +64,14 @@ begin
 		`RST_DATA_EXMEM(mem_data_b)
 		`RST_REQ_EXMEM(mem_req_a)
 		`RST_REQ_EXMEM(mem_req_b)
+		mem_interrupt_flag  <= 8'b0;
 		mem_mmu_data_result <= {$bits(MMUResult_t){1'b0}};
 	end else if(~stall.stall_ex) begin
 		mem_data_a <= ex_data_a;
 		mem_data_b <= ex_data_b;
 		mem_req_a  <= ex_req_a;
 		mem_req_b  <= ex_req_b;
+		mem_interrupt_flag  <= ex_interrupt_flag;
 		mem_mmu_data_result <= ex_mmu_data_result;
 	end
 end

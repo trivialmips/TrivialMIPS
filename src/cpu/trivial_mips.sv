@@ -441,6 +441,17 @@ cpu_ex stage_ex_b(
 assign mmu_data_vaddr = req_ex_b.memory_req.ce ?
 	req_ex_b.memory_req.addr : req_ex_a.memory_req.addr;
 
+// interrupt flags
+// pipeline through stage EX/MEM to avoid stalling issue
+logic [7:0] ex_interrupt_flag, mem_interrupt_flag;
+Interrupt_t hardware_int_in_sync, hardware_int;
+always @(posedge clk)
+begin
+	hardware_int_in_sync <= data_bus.interrupt;
+	hardware_int <= hardware_int_in_sync;
+end
+assign ex_interrupt_flag = { hardware_int, cp0_regs.cause.ip[1:0] } & cp0_regs.status.im;
+
 MMUResult_t mem_mmu_data_result;
 ex_mem stage_ex_mem(
 	.clk,
@@ -453,6 +464,9 @@ ex_mem stage_ex_mem(
 	.mem_data_b(data_exmem_b),
 	.mem_req_a(req_exmem_a),
 	.mem_req_b(req_exmem_b),
+
+	.ex_interrupt_flag,
+	.mem_interrupt_flag,
 
 	.ex_mmu_data_result(mmu_data_result),
 	.mem_mmu_data_result,
@@ -482,15 +496,6 @@ cpu_mem stage_mem(
 
 assign data_mem_a = data_exmem_a;
 assign data_mem_b = data_exmem_b;
-
-logic [7:0] mem_interrupt_flag;
-Interrupt_t hardware_int_in_sync, hardware_int;
-always @(posedge clk)
-begin
-	hardware_int_in_sync <= data_bus.interrupt;
-	hardware_int <= hardware_int_in_sync;
-	mem_interrupt_flag <= { hardware_int, cp0_regs.cause.ip[1:0] };
-end
 
 except except_handler(
 	.rst,
