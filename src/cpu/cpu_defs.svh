@@ -86,7 +86,7 @@ typedef struct packed {
 	Word_t 
 	 desave,    error_epc,  tag_hi,     tag_lo,    
 	 cache_err, err_ctl,    perf_cnt,   depc,      
-	 debug,     reserved22, reserved21, reserved20,
+	 debug,     impl_lfsr32,  reserved21, reserved20,
 	 watch_hi,  watch_lo,   ll_addr,    config0,   
 	 prid,      epc;
 	CP0CauseReg_t  cause;
