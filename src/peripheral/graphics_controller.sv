@@ -74,17 +74,21 @@ module graphics_controller(
                 data_bus.stall <= 1'b0;
                 gmem_data_in_a <= `ZERO_WORD;
                 gmem_write_mask_a <= `BYTE_MASK_NONE;
-                data_bus.data_rd <= dbus_last_stall ? gmem_data_out_a : `ZERO_WORD;
+                data_bus.data_rd <= `ZERO_WORD;
                 if (data_bus.write) begin
                     gmem_address_a <= GraphicsMemoryAddress_t'(data_bus.address);
                     gmem_write_mask_a <= data_bus.mask;
                     gmem_data_in_a <= data_bus.data_wr;
                 end else if (data_bus.read) begin
-                    if (data_bus.address == `GRAPHICS_CONFIG_ADDRESS) begin
-                        data_bus.data_rd <= pixel_offset_reg_o[1];
+                    if (dbus_last_stall) begin
+                        data_bus.data_rd <= gmem_data_out_a;
                     end else begin
-                        gmem_address_a <= GraphicsMemoryAddress_t'(data_bus.address);
-                        data_bus.stall <= 1'b1;
+                        if (data_bus.address == `GRAPHICS_CONFIG_ADDRESS) begin
+                            data_bus.data_rd <= pixel_offset_reg_o[1];
+                        end else begin
+                            gmem_address_a <= GraphicsMemoryAddress_t'(data_bus.address);
+                            data_bus.stall <= 1'b1;
+                        end
                     end
                 end
             end
