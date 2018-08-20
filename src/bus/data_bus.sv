@@ -114,6 +114,7 @@ module data_bus(
                 graphics.read  = cpu.read;
                 graphics.write = cpu.write;
                 cpu.data_rd    = graphics.data_rd;
+                cpu.stall      = graphics.stall;
             end
 
             `CONCAT_PREFIX(ETHERNET): begin
