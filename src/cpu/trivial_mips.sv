@@ -342,6 +342,16 @@ superscalar_ctrl superscalar_ctrl_instance(
 	.inst2_taken(inst_pair_forward.inst2_taken)
 );
 
+// interrupt flags
+// pipeline through stage EX/MEM to avoid stalling issue
+logic [7:0] id_interrupt_flag, ex_interrupt_flag, mem_interrupt_flag;
+Interrupt_t hardware_int_in_sync, hardware_int;
+always @(posedge clk)
+begin
+	hardware_int_in_sync <= data_bus.interrupt;
+	hardware_int <= hardware_int_in_sync;
+end
+assign id_interrupt_flag = { hardware_int, cp0_regs.cause.ip[1:0] } & cp0_regs.status.im;
 id_ex stage_id_ex(
 	.clk,
 	.rst,
@@ -349,10 +359,12 @@ id_ex stage_id_ex(
 	.id_data_b(data_id_b),
 	.id_req_a(req_id_a),
 	.id_req_b(req_id_b),
+	.id_interrupt_flag,
 	.ex_data_a(data_idex_a),
 	.ex_data_b(data_idex_b),
 	.ex_req_a(req_idex_a),
 	.ex_req_b(req_idex_b),
+	.ex_interrupt_flag,
 	.inst2_taken(inst_pair_forward.inst2_taken),
 	.stall,
 	.flush
@@ -440,17 +452,6 @@ cpu_ex stage_ex_b(
 // early lookup TLB
 assign mmu_data_vaddr = req_ex_b.memory_req.ce ?
 	req_ex_b.memory_req.addr : req_ex_a.memory_req.addr;
-
-// interrupt flags
-// pipeline through stage EX/MEM to avoid stalling issue
-logic [7:0] ex_interrupt_flag, mem_interrupt_flag;
-Interrupt_t hardware_int_in_sync, hardware_int;
-always @(posedge clk)
-begin
-	hardware_int_in_sync <= data_bus.interrupt;
-	hardware_int <= hardware_int_in_sync;
-end
-assign ex_interrupt_flag = { hardware_int, cp0_regs.cause.ip[1:0] } & cp0_regs.status.im;
 
 MMUResult_t mem_mmu_data_result;
 ex_mem stage_ex_mem(

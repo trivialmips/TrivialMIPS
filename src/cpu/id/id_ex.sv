@@ -13,6 +13,9 @@ module id_ex(
 	output PipelineReq_t  ex_req_a,
 	output PipelineReq_t  ex_req_b,
 
+	input  logic [7:0] id_interrupt_flag,
+	output logic [7:0] ex_interrupt_flag,
+
 	input  Bit_t      inst2_taken,
 	input  Stall_t    stall,
 	input  Bit_t      flush
@@ -50,9 +53,11 @@ begin
 		`RST_DATA_IDEX(ex_data_b)
 		`RST_REQ_IDEX(ex_req_a)
 		`RST_REQ_IDEX(ex_req_b)
+		ex_interrupt_flag  <= 8'b0;
 	end else if(~stall.stall_id) begin
 		ex_data_a <= id_data_a;
 		ex_req_a  <= id_req_a;
+		ex_interrupt_flag <= id_interrupt_flag;
 		if(inst2_taken)
 		begin
 			ex_data_b <= id_data_b;
