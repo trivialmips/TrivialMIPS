@@ -16,7 +16,7 @@
 
 `define GENERATE_DUMMY_CONTROLLER(NAME) dummy_controller \
      dummy_``NAME``_controller_instance( \
-        .data_bus(NAME``if.slave) \
+        .data_bus(NAME``_if.slave) \
     );
 
 `endif

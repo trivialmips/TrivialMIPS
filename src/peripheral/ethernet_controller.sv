@@ -29,7 +29,8 @@ module ethernet_controller(
             write <= `ZERO_BIT;
             data_to_write <= `ZERO_HWORD;
         end else begin
-            ethernet.cmd <= data_bus.address[0];
+            // cmd is high when using data, vise versa
+            ethernet.cmd <= ~data_bus.address[0];
             ethernet.cs_n <= 1'b1;
             ethernet.iow_n <= 1'b1;
             ethernet.ior_n <= 1'b1;
