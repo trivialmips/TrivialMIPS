@@ -343,25 +343,28 @@ ex_multi_cyc multi_cyc_instance(
 
 Bit_t fpu_busy;
 Word_t fpu_gpr_ret;
-fpu_ex fpu_ex_instance(
-	.clk,
-	.rst,
-	.flush,
-	.inst,
-	.op(data_idex.fpu_op),
-	.fcsr(ex_fcsr_we ? ex_fcsr_wdata : req_idex.fcsr),
-	.fccr(fpu_fccr),
-	.gpr1(reg1),
-	.gpr2(reg2),
-	.reg1(fpu_reg1),
-	.reg2(fpu_reg2),
-	.fpu_ret(req_ex.freg_wr.wdata),
-	.cpu_ret(fpu_gpr_ret),
-	.except(req_ex.fpu_except),
-	.fcsr_we(req_ex.fcsr_we),
-	.fcsr_wdata(req_ex.fcsr),
-	.is_busy(fpu_busy)
-);
+
+generate if (`ENABLE_CPU_FPU == 1)
+	fpu_ex fpu_ex_instance(
+		.clk,
+		.rst,
+		.flush,
+		.inst,
+		.op(data_idex.fpu_op),
+		.fcsr(ex_fcsr_we ? ex_fcsr_wdata : req_idex.fcsr),
+		.fccr(fpu_fccr),
+		.gpr1(reg1),
+		.gpr2(reg2),
+		.reg1(fpu_reg1),
+		.reg2(fpu_reg2),
+		.fpu_ret(req_ex.freg_wr.wdata),
+		.cpu_ret(fpu_gpr_ret),
+		.except(req_ex.fpu_except),
+		.fcsr_we(req_ex.fcsr_we),
+		.fcsr_wdata(req_ex.fcsr),
+		.is_busy(fpu_busy)
+	);
+endgenerate
 
 assign stall_req = fpu_busy | multi_cyc_busy;
 

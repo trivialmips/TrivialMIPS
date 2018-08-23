@@ -9,6 +9,8 @@
 `default_nettype wire
 `timescale 1ns / 1ps
 
+`include "compile_option.svh"
+
 `ifdef CLOCK_NO_PHASE_SHIFT
 `define BUS_CLK_POSEDGE 1'b1
 `else

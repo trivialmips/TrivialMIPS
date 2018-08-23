@@ -100,7 +100,7 @@ module ThinPad(
     );
 
 
-    // pheripheral
+    // mandantory peripheral
     bootrom_controller bootrom_controller_instance(
         .inst_bus(bootrom_inst_if.slave),
         .data_bus(bootrom_data_if.slave)
@@ -113,38 +113,57 @@ module ThinPad(
         .ext_ram
     );
 
-    graphics_controller graphics_controller_instance(
-        .data_bus(graphics_if.slave),
-        .vga
-    );
+    // optional peripheral
+    generate
 
-    gpio_controller gpio_controller_instance(
-        .data_bus(gpio_if.slave),
-        .gpio
-    );
+        if (`ENABLE_PERIPHERAL_GRAPHICS == 1) begin
+            graphics_controller graphics_controller_instance(
+                .data_bus(graphics_if.slave),
+                .vga
+            );
+        end
 
-    timer_controller timer_controller_instance(
-        .data_bus(timer_if.slave)
-    );
+        if (`ENABLE_PERIPHERAL_GPIO == 1) begin
+            gpio_controller gpio_controller_instance(
+                .data_bus(gpio_if.slave),
+                .gpio
+            );
+        end
 
-    uart_controller uart_controller_instance(
-        .data_bus(uart_if.slave),
-        .uart
-    );
+        if (`ENABLE_PERIPHERAL_TIMER == 1) begin
+            timer_controller timer_controller_instance(
+                .data_bus(timer_if.slave)
+            );
+        end
 
-    flash_controller flash_controller_instance(
-        .data_bus(flash_if.slave),
-        .flash
-    );
+        if (`ENABLE_PERIPHERAL_UART == 1) begin
+            uart_controller uart_controller_instance(
+                .data_bus(uart_if.slave),
+                .uart
+            );
+        end
 
-    ethernet_controller ethernet_controller_instance(
-        .data_bus(ethernet_if.slave),
-        .ethernet
-    );
+        if (`ENABLE_PERIPHERAL_FLASH == 1) begin
+            flash_controller flash_controller_instance(
+                .data_bus(flash_if.slave),
+                .flash
+            );
+        end
 
-    usb_controller usb_controller_instance(
-        .data_bus(usb_if.slave),
-        .usb
-    );
+        if (`ENABLE_PERIPHERAL_ETHERNET == 1) begin
+            ethernet_controller ethernet_controller_instance(
+                .data_bus(ethernet_if.slave),
+                .ethernet
+            );
+        end
+
+        if (`ENABLE_PERIPHERAL_USB == 1) begin
+            usb_controller usb_controller_instance(
+                .data_bus(usb_if.slave),
+                .usb
+            );
+        end
+
+    endgenerate
 
 endmodule
