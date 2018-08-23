@@ -13,7 +13,7 @@ module ethernet_controller(
     `REGISTER_IRQ(ETHERNET, ethernet.intr, data_bus.interrupt)
 
     assign data_bus.stall = `ZERO_BIT;
-    assign ethernet.pwrst_n = 1'b1;
+    assign ethernet.pwrst_n = rst;
 
     logic write;
     HalfWord_t data_to_write;
@@ -29,22 +29,23 @@ module ethernet_controller(
             write <= `ZERO_BIT;
             data_to_write <= `ZERO_HWORD;
         end else begin
-            // cmd is high when using data, vise versa
-            ethernet.cmd <= ~data_bus.address[0];
+            // cmd is 1 when using data, vise versa
+            ethernet.cmd <= data_bus.address[0];
             ethernet.cs_n <= 1'b1;
             ethernet.iow_n <= 1'b1;
             ethernet.ior_n <= 1'b1;
             write <= `ZERO_BIT;
 
-            if (bus_clk == `BUS_CLK_POSEDGE) begin
+            if (bus_clk == `BUS_CLK_POSEDGE) begin // before rising edge of main clock
                 if (data_bus.read) begin // give back the result
-                    data_bus.data_rd <= ethernet.sd;
+                    data_bus.data_rd <= {`ZERO_HWORD, ethernet.sd};
+                    ethernet.cs_n <= 1'b0;
                 end else if (data_bus.write) begin
                     // datasheet requires data hold time, so we keep data
                     ethernet.cs_n <= 1'b0;
                     write <= 1'b1;
                 end
-            end else begin // latch the request and perform it
+            end else begin // falling edge, latch and perform the request
                 if (data_bus.write) begin
                     ethernet.cs_n <= 1'b0;
                     ethernet.iow_n <= 1'b0;
