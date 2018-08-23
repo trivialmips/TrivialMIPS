@@ -116,52 +116,66 @@ module ThinPad(
     // optional peripheral
     generate
 
-        if (`ENABLE_PERIPHERAL_GRAPHICS == 1) begin
+        if (`ENABLE_PERIPHERAL_GRAPHICS) begin
             graphics_controller graphics_controller_instance(
                 .data_bus(graphics_if.slave),
                 .vga
             );
+        end else begin
+            `GENERATE_DUMMY_CONTROLLER(graphics)
         end
 
-        if (`ENABLE_PERIPHERAL_GPIO == 1) begin
+        if (`ENABLE_PERIPHERAL_GPIO) begin
             gpio_controller gpio_controller_instance(
                 .data_bus(gpio_if.slave),
                 .gpio
             );
+        end else begin
+            `GENERATE_DUMMY_CONTROLLER(gpio)
         end
 
-        if (`ENABLE_PERIPHERAL_TIMER == 1) begin
+        if (`ENABLE_PERIPHERAL_TIMER) begin
             timer_controller timer_controller_instance(
                 .data_bus(timer_if.slave)
             );
+        end else begin
+            `GENERATE_DUMMY_CONTROLLER(timer)
         end
 
-        if (`ENABLE_PERIPHERAL_UART == 1) begin
+        if (`ENABLE_PERIPHERAL_UART) begin
             uart_controller uart_controller_instance(
                 .data_bus(uart_if.slave),
                 .uart
             );
+        end else begin
+            `GENERATE_DUMMY_CONTROLLER(uart)
         end
 
-        if (`ENABLE_PERIPHERAL_FLASH == 1) begin
+        if (`ENABLE_PERIPHERAL_FLASH) begin
             flash_controller flash_controller_instance(
                 .data_bus(flash_if.slave),
                 .flash
             );
+        end else begin
+            `GENERATE_DUMMY_CONTROLLER(flash)
         end
 
-        if (`ENABLE_PERIPHERAL_ETHERNET == 1) begin
+        if (`ENABLE_PERIPHERAL_ETHERNET) begin
             ethernet_controller ethernet_controller_instance(
                 .data_bus(ethernet_if.slave),
                 .ethernet
             );
+        end else begin
+            `GENERATE_DUMMY_CONTROLLER(ethernet)
         end
 
-        if (`ENABLE_PERIPHERAL_USB == 1) begin
+        if (`ENABLE_PERIPHERAL_USB) begin
             usb_controller usb_controller_instance(
                 .data_bus(usb_if.slave),
                 .usb
             );
+        end else begin
+            `GENERATE_DUMMY_CONTROLLER(usb)
         end
 
     endgenerate
