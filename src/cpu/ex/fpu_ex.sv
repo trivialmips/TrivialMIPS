@@ -19,6 +19,9 @@ module fpu_ex(
 	output Bit_t     is_busy
 );
 
+generate if(`ENABLE_CPU_FPU)
+begin: generate_fpu_enabled_code
+
 /* cycle control */
 logic [5:0] cyc_number;
 logic [63:0] cyc_stage;
@@ -324,5 +327,15 @@ begin
 	default: cpu_ret = 32'b0;
 	endcase
 end
+
+end else begin: generate_fpu_disabled_code
+	assign is_busy = 1'b0;
+	assign except  = {$bits(FPUExcept_t){1'b0}};
+	assign cpu_ret = 32'b0;
+	assign fpu_ret = {$bits(FPUReg_t){1'b0}};
+	assign fcsr_wdata = {$bits(FCSRReg_t){1'b0}};
+	assign fcsr_we = 1'b0;
+end
+endgenerate
 
 endmodule
