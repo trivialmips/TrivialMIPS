@@ -20,8 +20,8 @@ module ethernet_controller(
     HalfWord_t data_to_write;
     assign ethernet.sd = write ? data_to_write : `HIGHZ_HWORD;
 
-    // it is safe to wait for 5 cycles after read / write, when bus_clk is at 40MHz or slower
-    `define WAIT_CYCLES 6
+    // it is safe to wait for 4 cycles after read / write, when bus_clk is at 40MHz or slower
+    `define WAIT_CYCLES 5
 
     typedef enum {
         STATE_RESET,
@@ -30,6 +30,8 @@ module ethernet_controller(
         STATE_READ,
         STATE_WAIT_[`WAIT_CYCLES]
     } EthernetState_t;
+
+    `undef WAIT_CYCLES
 
     EthernetState_t currentState;
 
@@ -104,5 +106,8 @@ end \
 
         end
     end
+
+`undef GEN_WAIT_STATE
+`undef GEN_WAIT_STATES
 
 endmodule

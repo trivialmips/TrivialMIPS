@@ -25,6 +25,8 @@ module flash_controller(
         STATE_READ_BYTE_1_[`WAIT_CYCLES]
     } FlashState_t;
 
+    `undef WAIT_CYCLES
+
     FlashState_t currentState;
 
     Word_t data_read;
