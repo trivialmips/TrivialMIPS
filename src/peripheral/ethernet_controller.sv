@@ -12,50 +12,97 @@ module ethernet_controller(
 
     `REGISTER_IRQ(ETHERNET, ethernet.intr, data_bus.interrupt)
 
-    assign data_bus.stall = `ZERO_BIT;
     assign ethernet.pwrst_n = rst;
+    // cmd is 1 when using data, vise versa
+    assign ethernet.cmd = data_bus.address[0];
 
     logic write;
     HalfWord_t data_to_write;
     assign ethernet.sd = write ? data_to_write : `HIGHZ_HWORD;
 
+    // it is safe to wait for 5 cycles after read / write, when bus_clk is at 40MHz or slower
+    `define WAIT_CYCLES 6
+
+    typedef enum {
+        STATE_RESET,
+        STATE_IDLE,
+        STATE_WRITE,
+        STATE_READ,
+        STATE_WAIT_[`WAIT_CYCLES]
+    } EthernetState_t;
+
+    EthernetState_t currentState;
+
+`define GEN_WAIT_STATE(NAME, A, B) NAME``_``A: begin \
+    currentState <= NAME``_``B; \
+end \
+
+`define GEN_WAIT_STATES(NAME) `GEN_WAIT_STATE(NAME, 0, 1)\
+`GEN_WAIT_STATE(NAME, 1, 2) \
+`GEN_WAIT_STATE(NAME, 2, 3) \
+`GEN_WAIT_STATE(NAME, 3, 4) \
+`GEN_WAIT_STATE(NAME, 4, 5) \
+
     always_ff @(posedge clk or posedge rst) begin
         if (rst) begin
-            data_bus.data_rd <= `ZERO_WORD;
-            ethernet.cmd <= `ZERO_BIT;
-            ethernet.cs_n <= 1'b1;
-            ethernet.iow_n <= 1'b1;
-            ethernet.ior_n <= 1'b1;
-            write <= `ZERO_BIT;
-            data_to_write <= `ZERO_HWORD;
+            currentState <= STATE_RESET;
         end else begin
-            // cmd is 1 when using data, vise versa
-            ethernet.cmd <= data_bus.address[0];
+
+            write <= 1'b0;
             ethernet.cs_n <= 1'b1;
             ethernet.iow_n <= 1'b1;
             ethernet.ior_n <= 1'b1;
-            write <= `ZERO_BIT;
 
-            if (bus_clk == `BUS_CLK_POSEDGE) begin // before rising edge of main clock
-                if (data_bus.read) begin // give back the result
+            unique case (currentState)
+
+                STATE_RESET: begin
+                    data_to_write <= `ZERO_HWORD;
+                    data_bus.data_rd <= `ZERO_WORD;
+                    currentState <= STATE_IDLE;
+                end
+
+                STATE_IDLE: begin
+                    if (bus_clk == ~`BUS_CLK_POSEDGE) begin
+                        data_bus.stall <= data_bus.write | data_bus.read;
+                        if (data_bus.write) begin
+                            ethernet.cs_n <= 1'b0;
+                            ethernet.iow_n <= 1'b0;
+                            data_to_write <= HalfWord_t'(data_bus.data_wr);
+                            write <= 1'b1;
+                            currentState <= STATE_WRITE;
+                        end else if (data_bus.read) begin
+                            ethernet.cs_n <= 1'b0;
+                            ethernet.ior_n <= 1'b0;
+                            currentState <= STATE_READ;
+                        end
+                    end
+                end
+
+                STATE_READ: begin
+                    currentState <= STATE_WAIT_0;
                     data_bus.data_rd <= {`ZERO_HWORD, ethernet.sd};
                     ethernet.cs_n <= 1'b0;
-                end else if (data_bus.write) begin
-                    // datasheet requires data hold time, so we keep data
+                end
+
+                STATE_WRITE: begin
+                    currentState <= STATE_WAIT_0;
                     ethernet.cs_n <= 1'b0;
                     write <= 1'b1;
                 end
-            end else begin // falling edge, latch and perform the request
-                if (data_bus.write) begin
-                    ethernet.cs_n <= 1'b0;
-                    ethernet.iow_n <= 1'b0;
-                    data_to_write <= HalfWord_t'(data_bus.data_wr);
-                    write <= 1'b1;
-                end else if (data_bus.read) begin
-                    ethernet.cs_n <= 1'b0;
-                    ethernet.ior_n <= 1'b0;
+
+                `GEN_WAIT_STATES(STATE_WAIT)
+
+                STATE_WAIT_5: begin
+                    currentState <= STATE_IDLE;
+                    data_bus.stall <= 1'b0;
                 end
-            end
+
+                default: begin
+                    currentState <= STATE_RESET;
+                end
+
+            endcase
+
         end
     end
 
