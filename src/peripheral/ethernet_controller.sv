@@ -12,7 +12,7 @@ module ethernet_controller(
 
     `REGISTER_IRQ(ETHERNET, ethernet.intr, data_bus.interrupt)
 
-    assign ethernet.pwrst_n = rst_n;
+    assign ethernet.pwrst_n = ~rst;
     // cmd is 1 when using data, vise versa
     assign ethernet.cmd = data_bus.address[0];
 
