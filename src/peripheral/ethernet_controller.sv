@@ -40,8 +40,7 @@ end \
 `define GEN_WAIT_STATES(NAME) `GEN_WAIT_STATE(NAME, 0, 1)\
 `GEN_WAIT_STATE(NAME, 1, 2) \
 `GEN_WAIT_STATE(NAME, 2, 3) \
-`GEN_WAIT_STATE(NAME, 3, 4) \
-`GEN_WAIT_STATE(NAME, 4, 5) \
+`GEN_WAIT_STATE(NAME, 3, 4)
 
     always_ff @(posedge clk or posedge rst) begin
         if (rst) begin
@@ -92,7 +91,7 @@ end \
 
                 `GEN_WAIT_STATES(STATE_WAIT)
 
-                STATE_WAIT_5: begin
+                STATE_WAIT_4: begin
                     currentState <= STATE_IDLE;
                     data_bus.stall <= 1'b0;
                 end
