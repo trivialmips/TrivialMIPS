@@ -121,6 +121,7 @@ module data_bus(
                 ethernet.read  = cpu.read;
                 ethernet.write = cpu.write;
                 cpu.data_rd    = ethernet.data_rd;
+                cpu.stall      = ethernet.stall;
             end
 
             `CONCAT_PREFIX(GPIO): begin
