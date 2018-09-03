@@ -21,9 +21,8 @@ module mmu(
 	output Word_t     tlbp_index
 );
 
-parameter mmu_enabled = 1;
 
-generate if(mmu_enabled)
+generate if(`ENABLE_CPU_MMU)
 begin: generate_mmu_enabled_code
 
 	Bit_t inst_mapped, data_mapped;

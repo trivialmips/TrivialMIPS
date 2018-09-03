@@ -2,9 +2,12 @@
 `define COMPILE_OPTION_SVH
 
 /*
-    Options to control functional parts to be compiled
+    Options to control optional components to be compiled
+    These options are used to speed up compilation when debugging
+
 */
 
+`define ENABLE_CPU_MMU                  1  // DON'T disable MMU if you don not know what will happen
 `define ENABLE_CPU_FPU                  1
 `define ENABLE_PERIPHERAL_ETHERNET      1
 `define ENABLE_PERIPHERAL_FLASH         1
