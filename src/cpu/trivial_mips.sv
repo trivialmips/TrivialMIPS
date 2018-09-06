@@ -132,9 +132,7 @@ MMUResult_t mmu_inst_result, mmu_data_result;
 TLBIndex_t tlbrw_index;
 Bit_t tlbrw_we;
 TLBEntry_t tlbrw_wdata;
-mmu #(
-	.mmu_enabled(mmu_enabled)
-) mmu_instance (
+mmu mmu_instance (
 	.clk,
 	.rst,
 	.asid(cp0_asid),
