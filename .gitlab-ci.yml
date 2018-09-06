@@ -10,3 +10,5 @@ bitstream:
   artifacts:
     paths:
       - vivado/TrivialMIPS.runs/impl_1/ThinPad.bit
+      - vivado/TrivialMIPS.runs/synth_1/runme.log
+      - vivado/TrivialMIPS.runs/impl_1/runme.log
