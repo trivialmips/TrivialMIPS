@@ -17,14 +17,13 @@ module cp0(
 	output CP0Regs_t     regs,
 	output wire [7:0]    asid,
 	output Bit_t         user_mode,
-	output Bit_t         timer_int
+	output reg           timer_int
 );
 
 CP0Regs_t regs_new, regs_inner;
 assign regs = regs_inner;
 assign asid = regs.entry_hi[7:0];
 assign user_mode = (regs.status[4:1] == 4'b1000);
-assign timer_int = (regs.compare == regs.count);
 
 logic [3:0] lfsr4_val;
 lfsr4 lfsr4_instance(
@@ -85,6 +84,16 @@ cp0_write_mask cp0_write_mask_instance(
 	.addr(wr.waddr),
 	.mask(wmask)
 );
+
+always @(posedge clk)
+begin
+	if(rst)
+		timer_int <= 1'b0;
+	else if(regs.compare != 32'b0 && regs.compare == regs.count)
+		timer_int <= 1'b1;
+	else if(wr.we && wr.sel == 3'b0 && wr.waddr == 5'd11)
+		timer_int <= 1'b0;
+end
 
 always_comb
 begin

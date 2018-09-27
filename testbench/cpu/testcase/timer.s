@@ -35,5 +35,6 @@ _wait_int:
 	mtc0 $30, $14
 	mfc0 $29, $13       # skip
 	andi $29, $29, 0x007c  # cause.exc_code, skip
+	mtc0 $0, $11
 	srl $29, $29, 2     # check
 	eret
