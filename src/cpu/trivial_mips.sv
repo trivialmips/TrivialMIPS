@@ -75,7 +75,7 @@ logic [2:0] cp0_rsel;
 CP0RegWriteReq_t cp0_reg_wr;
 Word_t cp0_rdata;
 logic [7:0] cp0_asid;
-Bit_t cp0_user_mode;
+Bit_t cp0_user_mode, cp0_timer_int;
 TLBEntry_t tlbrw_rdata;
 Word_t tlbp_index;
 cp0 cp0_instance(
@@ -94,7 +94,8 @@ cp0 cp0_instance(
 	.rdata(cp0_rdata),
 	.regs(cp0_regs),
 	.asid(cp0_asid),
-	.user_mode(cp0_user_mode)
+	.user_mode(cp0_user_mode),
+	.timer_int(cp0_timer_int)
 );
 
 // FPU registers
@@ -349,7 +350,7 @@ begin
 	hardware_int_in_sync <= data_bus.interrupt;
 	hardware_int <= hardware_int_in_sync;
 end
-assign id_interrupt_flag = { hardware_int, cp0_regs.cause.ip[1:0] } & cp0_regs.status.im;
+assign id_interrupt_flag = { cp0_timer_int, hardware_int[4:0], cp0_regs.cause.ip[1:0] } & cp0_regs.status.im;
 id_ex stage_id_ex(
 	.clk,
 	.rst,

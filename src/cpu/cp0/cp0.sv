@@ -16,13 +16,15 @@ module cp0(
 	output Word_t        rdata,
 	output CP0Regs_t     regs,
 	output wire [7:0]    asid,
-	output Bit_t         user_mode
+	output Bit_t         user_mode,
+	output Bit_t         timer_int
 );
 
 CP0Regs_t regs_new, regs_inner;
 assign regs = regs_inner;
 assign asid = regs.entry_hi[7:0];
 assign user_mode = (regs.status[4:1] == 4'b1000);
+assign timer_int = (regs.compare == regs.count);
 
 logic [3:0] lfsr4_val;
 lfsr4 lfsr4_instance(
