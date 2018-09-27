@@ -2,6 +2,8 @@ stages:
   - build
 
 bitstream:
+  tags:
+    - vivado
   stage: build
   script:
     - env
