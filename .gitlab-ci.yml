@@ -1,16 +1,49 @@
+image: vivado:2018.1
+
+
+variables:
+  VIVADO_PATH: "/opt/Xilinx/Vivado/2018.1/bin/vivado"
+  PROJECT_DIR: "vivado"
+  PROJECT_NAME: "TrivialMIPS"
+
+
+# all files in ip dir except *.xci are ignored, so the generated result will be cleaned every build
+# to avoid generating from scratch every time, the dir should be cached
+cache:
+  key: "$CI_COMMIT_REF_SLUG"
+  paths:
+    - ${PROJECT_DIR}/${PROJECT_NAME}.srcs/ip
+
+
 stages:
-  - build
+  - build_ip
+  - build_project
+
+
+ip:
+  tags:
+    - vivado
+  stage: build_ip
+  script:
+    - env
+    - cd ${PROJECT_DIR}
+    # the cached ip configuration file might be out of date, we should always use the newest one
+    - git checkout ${PROJECT_NAME}.srcs/ip
+    - ${VIVADO_PATH} -mode tcl -source scripts/generate_all_ip.tcl ${PROJECT_NAME}.xpr
+  artifacts:
+    - ${PROJECT_DIR}/${PROJECT_NAME}.srcs/ip
+
 
 bitstream:
   tags:
     - vivado
-  stage: build
+  stage: build_project
   script:
     - env
-    - /opt/Xilinx/Vivado/2018.1/bin/vivado -mode tcl -source vivado/build.tcl vivado/TrivialMIPS.xpr
-
+    - cd ${PROJECT_DIR}
+    - ${VIVADO_PATH} -mode tcl -source scripts/build_project.tcl ${PROJECT_NAME}.xpr
   artifacts:
     paths:
-      - vivado/TrivialMIPS.runs/impl_1/ThinPad.bit
-      - vivado/TrivialMIPS.runs/synth_1/runme.log
-      - vivado/TrivialMIPS.runs/impl_1/runme.log
+      - ${PROJECT_DIR}/${PROJECT_NAME}.runs/impl_1/*.bit
+      - ${PROJECT_DIR}/${PROJECT_NAME}.runs/synth_1/runme.log
+      - ${PROJECT_DIR}/${PROJECT_NAME}.runs/impl_1/runme.log
