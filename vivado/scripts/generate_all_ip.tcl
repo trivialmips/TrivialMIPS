@@ -8,12 +8,16 @@ if { [llength [get_ips]] != 0} {
         create_ip_run [get_ips $ip]
     }
 
-    set ip_runs [get_runs -filter {SRCSET != sources_1 && IS_SYNTHESIS}]
-    launch_runs -quiet -jobs 2 {*}$ip_runs
-
-    foreach r $ip_runs {
-        wait_on_run $r
+    set ip_runs [get_runs -filter {SRCSET != sources_1 && IS_SYNTHESIS && NEEDS_REFRESH}]
+    
+    if { [llength $ip_runs] != 0} {
+        launch_runs -quiet -jobs 2 {*}$ip_runs
+        
+        foreach r $ip_runs {
+            wait_on_run $r
+        }
     }
+
 }
 
 exit
