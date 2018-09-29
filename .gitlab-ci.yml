@@ -19,21 +19,18 @@ stages:
   - build_ip
   - build_project
 
+before_script:
+  - env
+  - cd ${PROJECT_DIR}
+  # the cached ip configuration file might be out of date, we should always use the newest one
+  - git checkout ${PROJECT_NAME}.srcs/ip
 
 ip:
   tags:
     - vivado
   stage: build_ip
   script:
-    - env
-    - cd ${PROJECT_DIR}
-    # the cached ip configuration file might be out of date, we should always use the newest one
-    - git checkout ${PROJECT_NAME}.srcs/ip
     - ${VIVADO_PATH} -mode tcl -source scripts/generate_all_ip.tcl ${PROJECT_NAME}.xpr
-  artifacts:
-    paths:
-      - ${PROJECT_DIR}/${PROJECT_NAME}.srcs/ip
-    expire_in: "1 hour"
 
 
 bitstream:
@@ -41,8 +38,6 @@ bitstream:
     - vivado
   stage: build_project
   script:
-    - env
-    - cd ${PROJECT_DIR}
     - ${VIVADO_PATH} -mode tcl -source scripts/build_project.tcl ${PROJECT_NAME}.xpr
   artifacts:
     paths:
