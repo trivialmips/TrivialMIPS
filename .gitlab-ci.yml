@@ -31,7 +31,9 @@ ip:
     - git checkout ${PROJECT_NAME}.srcs/ip
     - ${VIVADO_PATH} -mode tcl -source scripts/generate_all_ip.tcl ${PROJECT_NAME}.xpr
   artifacts:
-    - ${PROJECT_DIR}/${PROJECT_NAME}.srcs/ip
+    paths:
+      - ${PROJECT_DIR}/${PROJECT_NAME}.srcs/ip
+    expire_in: "1 hour"
 
 
 bitstream:
@@ -47,3 +49,4 @@ bitstream:
       - ${PROJECT_DIR}/${PROJECT_NAME}.runs/impl_1/*.bit
       - ${PROJECT_DIR}/${PROJECT_NAME}.runs/synth_1/runme.log
       - ${PROJECT_DIR}/${PROJECT_NAME}.runs/impl_1/runme.log
+    when: always
