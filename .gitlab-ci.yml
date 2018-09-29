@@ -13,7 +13,8 @@ cache:
   key: "$CI_COMMIT_REF_SLUG"
   paths:
     - ${PROJECT_DIR}/${PROJECT_NAME}.srcs/ip
-
+    - ${PROJECT_DIR}/${PROJECT_NAME}.runs
+    - ${PROJECT_DIR}/${PROJECT_NAME}.cache
 
 stages:
   - build_ip
@@ -42,6 +43,5 @@ bitstream:
   artifacts:
     paths:
       - ${PROJECT_DIR}/${PROJECT_NAME}.runs/impl_1/*.bit
-      - ${PROJECT_DIR}/${PROJECT_NAME}.runs/synth_1/runme.log
-      - ${PROJECT_DIR}/${PROJECT_NAME}.runs/impl_1/runme.log
+      - ${PROJECT_DIR}/${PROJECT_NAME}.runs/*/runme.log
     when: always
