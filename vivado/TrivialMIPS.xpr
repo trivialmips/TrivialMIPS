@@ -39,13 +39,13 @@
     <Option Name="WTVcsLaunchSim" Val="0"/>
     <Option Name="WTRivieraLaunchSim" Val="0"/>
     <Option Name="WTActivehdlLaunchSim" Val="0"/>
-    <Option Name="WTXSimExportSim" Val="50"/>
-    <Option Name="WTModelSimExportSim" Val="50"/>
-    <Option Name="WTQuestaExportSim" Val="50"/>
-    <Option Name="WTIesExportSim" Val="50"/>
-    <Option Name="WTVcsExportSim" Val="50"/>
-    <Option Name="WTRivieraExportSim" Val="50"/>
-    <Option Name="WTActivehdlExportSim" Val="50"/>
+    <Option Name="WTXSimExportSim" Val="62"/>
+    <Option Name="WTModelSimExportSim" Val="62"/>
+    <Option Name="WTQuestaExportSim" Val="62"/>
+    <Option Name="WTIesExportSim" Val="62"/>
+    <Option Name="WTVcsExportSim" Val="62"/>
+    <Option Name="WTRivieraExportSim" Val="62"/>
+    <Option Name="WTActivehdlExportSim" Val="62"/>
     <Option Name="GenerateIPUpgradeLog" Val="TRUE"/>
     <Option Name="XSimRadix" Val="hex"/>
     <Option Name="XSimTimeUnit" Val="ns"/>
@@ -771,13 +771,6 @@
       </Config>
     </FileSet>
     <FileSet Name="top_clk_wiz" Type="BlockSrcs" RelSrcDir="$PSRCDIR/top_clk_wiz">
-      <File Path="$PSRCDIR/ip/top_clk_wiz.xcix">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
       <File Path="$PSRCDIR/ip/top_clk_wiz/top_clk_wiz.xci">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -791,13 +784,6 @@
       </Config>
     </FileSet>
     <FileSet Name="blk_mem_graphics" Type="BlockSrcs" RelSrcDir="$PSRCDIR/blk_mem_graphics">
-      <File Path="$PSRCDIR/ip/blk_mem_graphics.xcix">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
       <File Path="$PSRCDIR/ip/blk_mem_graphics/blk_mem_graphics.xci">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -1426,13 +1412,6 @@
       </Config>
     </FileSet>
     <FileSet Name="fifo_uart_tx" Type="BlockSrcs" RelSrcDir="$PSRCDIR/fifo_uart_tx">
-      <File Path="$PSRCDIR/ip/fifo_uart_tx.xcix">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
       <File Path="$PSRCDIR/ip/fifo_uart_tx/fifo_uart_tx.xci">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -1446,13 +1425,6 @@
       </Config>
     </FileSet>
     <FileSet Name="fifo_uart_rx" Type="BlockSrcs" RelSrcDir="$PSRCDIR/fifo_uart_rx">
-      <File Path="$PSRCDIR/ip/fifo_uart_rx.xcix">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
       <File Path="$PSRCDIR/ip/fifo_uart_rx/fifo_uart_rx.xci">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -1466,13 +1438,6 @@
       </Config>
     </FileSet>
     <FileSet Name="blk_mem_bootrom" Type="BlockSrcs" RelSrcDir="$PSRCDIR/blk_mem_bootrom">
-      <File Path="$PSRCDIR/ip/blk_mem_bootrom.xcix">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
       <File Path="$PSRCDIR/ip/blk_mem_bootrom/blk_mem_bootrom.xci">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -1486,13 +1451,6 @@
       </Config>
     </FileSet>
     <FileSet Name="floating_point_compare" Type="BlockSrcs" RelSrcDir="$PSRCDIR/floating_point_compare">
-      <File Path="$PSRCDIR/ip/floating_point_compare.xcix">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
       <File Path="$PSRCDIR/ip/floating_point_compare/floating_point_compare.xci">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -1506,13 +1464,6 @@
       </Config>
     </FileSet>
     <FileSet Name="floating_point_sqrt" Type="BlockSrcs" RelSrcDir="$PSRCDIR/floating_point_sqrt">
-      <File Path="$PSRCDIR/ip/floating_point_sqrt.xcix">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
       <File Path="$PSRCDIR/ip/floating_point_sqrt/floating_point_sqrt.xci">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -1526,13 +1477,6 @@
       </Config>
     </FileSet>
     <FileSet Name="floating_point_divide" Type="BlockSrcs" RelSrcDir="$PSRCDIR/floating_point_divide">
-      <File Path="$PSRCDIR/ip/floating_point_divide.xcix">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
       <File Path="$PSRCDIR/ip/floating_point_divide/floating_point_divide.xci">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -1546,13 +1490,6 @@
       </Config>
     </FileSet>
     <FileSet Name="floating_point_int2float" Type="BlockSrcs" RelSrcDir="$PSRCDIR/floating_point_int2float">
-      <File Path="$PSRCDIR/ip/floating_point_int2float.xcix">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
       <File Path="$PSRCDIR/ip/floating_point_int2float/floating_point_int2float.xci">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -1566,13 +1503,6 @@
       </Config>
     </FileSet>
     <FileSet Name="floating_point_add" Type="BlockSrcs" RelSrcDir="$PSRCDIR/floating_point_add">
-      <File Path="$PSRCDIR/ip/floating_point_add.xcix">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
       <File Path="$PSRCDIR/ip/floating_point_add/floating_point_add.xci">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -1586,13 +1516,6 @@
       </Config>
     </FileSet>
     <FileSet Name="floating_point_sub" Type="BlockSrcs" RelSrcDir="$PSRCDIR/floating_point_sub">
-      <File Path="$PSRCDIR/ip/floating_point_sub.xcix">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
       <File Path="$PSRCDIR/ip/floating_point_sub/floating_point_sub.xci">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -1606,13 +1529,6 @@
       </Config>
     </FileSet>
     <FileSet Name="floating_point_multiply" Type="BlockSrcs" RelSrcDir="$PSRCDIR/floating_point_multiply">
-      <File Path="$PSRCDIR/ip/floating_point_multiply.xcix">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
       <File Path="$PSRCDIR/ip/floating_point_multiply/floating_point_multiply.xci">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
