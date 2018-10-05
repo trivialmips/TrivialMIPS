@@ -1,3 +1,6 @@
 [submodule "software"]
 	path = software
 	url = git@git.tsinghua.edu.cn:chensq16/TrivialMIPS_Software.git
+[submodule "testbench/cloud/thinpad_cloud_sdk"]
+	path = testbench/cloud/thinpad_cloud_sdk
+	url = https://gitlab.secoder.net/2017210832/Thinpad-Cloud-SDK.git

@@ -1,10 +1,9 @@
-image: vivado:2018.1
-
-
 variables:
+  GIT_SUBMODULE_STRATEGY: recursive
   VIVADO_PATH: "/opt/Xilinx/Vivado/2018.1/bin/vivado"
   PROJECT_DIR: "vivado"
   PROJECT_NAME: "TrivialMIPS"
+  TOP_MODULE_NAME: "ThinPad"
 
 
 # all files in ip dir except *.xci are ignored, so the generated result will be cleaned every build
@@ -19,6 +18,8 @@ cache:
 stages:
   - build_ip
   - build_project
+  - build_testbench
+  - run_testbench
 
 before_script:
   - env
@@ -27,6 +28,7 @@ before_script:
   - git checkout ${PROJECT_NAME}.srcs/ip
 
 ip:
+  image: vivado:2018.1
   tags:
     - vivado
   stage: build_ip
@@ -35,6 +37,7 @@ ip:
 
 
 bitstream:
+  image: vivado:2018.1
   tags:
     - vivado
   stage: build_project
@@ -42,6 +45,43 @@ bitstream:
     - ${VIVADO_PATH} -mode tcl -source scripts/build_project.tcl ${PROJECT_NAME}.xpr
   artifacts:
     paths:
-      - ${PROJECT_DIR}/${PROJECT_NAME}.runs/impl_1/*.bit
+      - ${PROJECT_DIR}/${PROJECT_NAME}.runs/impl_1/${TOP_MODULE_NAME}.bit
       - ${PROJECT_DIR}/${PROJECT_NAME}.runs/*/runme.log
     when: always
+
+
+.mips_compilation_configuration: &mips_compilation_configuration
+  image: harryleafchen/ubuntu-mips-compiler
+  tags:
+    - mips
+  stage: build_testbench
+  script:
+    - make
+
+compile_func_test:
+  <<: *mips_compilation_configuration
+  before_script:
+    - cd software/func_test
+  artifacts:
+    paths:
+      - software/func_test/main.elf
+
+compile_perf_test:
+  <<: *mips_compilation_configuration
+  before_script:
+    - cd software/perf_test
+  artifacts:
+    paths:
+      - software/perf_test/obj/*/main.elf
+
+
+test_on_cloud:
+  image: python:3.7.0-stretch
+  tags:
+    - mips
+  stage: run_testbench
+  before_script:
+    - cd testbench/cloud
+    - pip3 install --user -r thinpad_cloud_sdk/requirements.txt
+  script:
+    - python3 cloud_test.py "$THINPAD_CLOUD_USER" "$THINPAD_CLOUD_PASSWD" ../../${PROJECT_DIR}/${PROJECT_NAME}.runs/impl_1/${TOP_MODULE_NAME}.bit
