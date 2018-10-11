@@ -52,3 +52,10 @@ _start:
 	ori $5, $0, 0x0011  # ans: [+0]$5=0x00000011
 	mult $3, $3         # ans: [+36]$hilo=0x00004100fefe0001
 	div  $zero, $4, $5  # ans: [+0]$hilo=0xfffffff100000000
+
+	b j0
+
+j0:
+	ori $3, $0, 0x1111   # ans: [+2]$3=0x00001111
+.org 0x1000
+	ori $2, $0, 0xdead   # ans: [+1]$2=0x0000dead
