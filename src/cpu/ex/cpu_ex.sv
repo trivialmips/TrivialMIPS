@@ -1,7 +1,7 @@
 `include "cpu_defs.svh"
 
 module cpu_ex(
-	input  clk, rst,
+	input  clk, clk_2x, rst,
 	input  Bit_t          flush,
 	input  Word_t         cp0_rdata_unsafe,
 	input  DoubleWord_t   hilo_unsafe,
@@ -330,6 +330,7 @@ Word_t mult_word;
 DoubleWord_t multi_cyc_ret;
 ex_multi_cyc multi_cyc_instance(
 	.clk,
+	.clk_2x,
 	.rst,
 	.flush,
 	.op,

@@ -7,8 +7,9 @@ module trivial_mips(
 
 parameter mmu_enabled = 1;
 
-wire clk, rst;
+wire clk, clk_2x, rst;
 assign clk = inst_bus.clk.base;
+assign clk_2x = inst_bus.clk.base_2x_noshift;
 assign rst = inst_bus.clk.rst;
 
 Bit_t flush;
@@ -387,6 +388,7 @@ assign fpu_reg_raddr4 = data_idex_b.fpu_raddr2;
 
 cpu_ex stage_ex_a(
 	.clk,
+	.clk_2x,
 	.rst,
 	.flush,
 	.hilo_unsafe(reg_hilo),
@@ -418,6 +420,7 @@ cpu_ex stage_ex_a(
 
 cpu_ex stage_ex_b(
 	.clk,
+	.clk_2x,
 	.rst,
 	.flush,
 	.hilo_unsafe(reg_hilo),
