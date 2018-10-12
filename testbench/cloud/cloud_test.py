@@ -27,10 +27,9 @@ def reset_board():
 def upload_and_run_test(test):
     print('Found test ELF file: ' + str(test))
     print('Uploading test to flash')
+    t.set_reset_btn(1)
     t.write_memory(thinpad.MEM_FLASH, test.read_bytes(), offset=0)
-    print('Uploading bitstream')
-    t.upload_design(sys.argv[3])
-    reset_board()
+    t.set_reset_btn(0)
 
 
 def run_func_test(test):
@@ -65,6 +64,8 @@ def main():
     # find software dir
     software_dir = Path(__file__).resolve().parents[2] / 'software'
 
+    ret = 0
+
     try:
         print("--- Login ---")
         t.login(sys.argv[1], sys.argv[2])
@@ -72,6 +73,9 @@ def main():
         t.open_uart_port(thinpad.UART_EXT, baud=115200)
 
         set_switch()
+
+        print('Uploading bitstream')
+        t.upload_design(sys.argv[3])
 
         func_test_file = software_dir / 'func_test' / 'main.elf'
 
@@ -86,9 +90,11 @@ def main():
 
     except:
         traceback.print_exc()
+        ret = 1
 
     print('-- Disconnect --')
     t.close()
+    sys.exit(ret)
 
 if __name__ == '__main__':
     main()
