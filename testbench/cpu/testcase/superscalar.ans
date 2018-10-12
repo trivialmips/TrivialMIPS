@@ -29,5 +29,5 @@
 [31]$4=0xffff0000
 [32]$4=0xfffffff1
 [32]$5=0x00000011
-[68]$hilo=0x00004100fefe0001
-[68]$hilo=0xfffffff100000000
+[50]$hilo=0x00004100fefe0001
+[50]$hilo=0xfffffff100000000
