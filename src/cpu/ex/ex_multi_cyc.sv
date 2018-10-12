@@ -1,7 +1,7 @@
 `include "cpu_defs.svh"
 
 module ex_multi_cyc(
-	input  clk, rst,
+	input  clk, clk_2x, rst,
 	input  Bit_t          flush,
 	input  Oper_t         op,
 	input  Word_t         reg1,
@@ -12,7 +12,7 @@ module ex_multi_cyc(
 	output Bit_t          is_busy
 );
 
-parameter DIV_CYC = 36;
+parameter DIV_CYC = 18;
 
 /* cycle control */
 logic [5:0] cyc_number;
@@ -88,7 +88,7 @@ Word_t div_quotient, div_remainder;
 div_uu #(
 	.z_width(64)
 ) div_uu_instance (
-	.clk,
+	.clk(clk_2x),
 	.ena(op == OP_DIV || op == OP_DIVU),
 	.z( { 32'b0, abs_reg1 } ),
 	.d(abs_reg2),

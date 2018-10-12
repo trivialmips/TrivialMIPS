@@ -22,7 +22,6 @@ stages:
   - run_testbench
 
 before_script:
-  - env
   - cd ${PROJECT_DIR}
   # the cached ip configuration file might be out of date, we should always use the newest one
   - git checkout ${PROJECT_NAME}.srcs/ip
