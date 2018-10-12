@@ -6,9 +6,11 @@ module if_id(
 	input  Bit_t        if_delayslot,
 	input  InstPair_t   if_inst_pair,
 	input  ExceptInfo_t if_except,
+	input  Bit_t        if_inst2_avail,
 	output InstAddr_t   id_pc,
 	output Bit_t        id_delayslot,
 	output ExceptInfo_t id_except,
+	output Bit_t        id_inst2_avail,
 
 	output Bit_t      set_empty_inst,
 	output Bit_t      keep_inst,
@@ -42,6 +44,7 @@ begin
 		id_pc              <= `ZERO_WORD;
 		id_delayslot       <= 1'b0;
 		id_except          <= {$bits(ExceptInfo_t){1'b0}};
+		id_inst2_avail     <= 1'b0;
 /*		id_inst_pair_new.inst1 <= `ZERO_WORD;
 		id_inst_pair_new.inst2 <= `ZERO_WORD;
 		id_inst_pair_new.inst2_taken <= `ZERO_WORD;
@@ -51,6 +54,7 @@ begin
 	end else if(~stall.stall_if) begin
 		id_delayslot <= if_delayslot;
 		id_except    <= if_except;
+		id_inst2_avail <= if_inst2_avail;
 /*		if(~inst_pair_forward.inst2_taken && ~is_hard_reset)
 		begin
 			id_inst_pair.inst1 <= inst_pair_forward.inst2;

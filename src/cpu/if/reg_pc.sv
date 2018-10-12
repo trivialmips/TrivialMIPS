@@ -4,6 +4,7 @@ module reg_pc(
 	input  clk, rst,
 	input  Bit_t       hold_pc,
 	input  Bit_t       inst2_taken,
+	input  Bit_t       inst2_avail,
 	input  Bit_t       jump,
 	input  InstAddr_t  jump_to,
 	input  ExceptReq_t except_req,
@@ -67,9 +68,9 @@ begin
 		begin
 			pc <= jump_to;
 		end else if(next_status == ST_AHEAD) begin
-			pc <= pc + 32'h4;
+			pc <= pc + (inst2_avail ? 32'h4 : 32'h0);
 		end else begin
-			pc <= pc + 32'h8;
+			pc <= pc + (inst2_avail ? 32'h8 : 32'h4);
 		end
 	end
 end

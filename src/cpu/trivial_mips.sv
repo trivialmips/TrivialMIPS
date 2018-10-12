@@ -179,11 +179,13 @@ InstPair_t inst_pair_forward;
 InstAddr_t if_pc, jump_to;
 Bit_t is_branch, jump, pc_ce;
 Bit_t is_pc_hard_reset;
+Bit_t if_inst2_avail, id_inst2_avail;
 
 reg_pc pc_instance(
 	.clk,
 	.rst,
 	.pc(if_pc),
+	.inst2_avail(if_inst2_avail),
 	.inst2_taken(inst_pair_forward.inst2_taken),
 	.jump,
 	.jump_to,
@@ -200,6 +202,7 @@ cpu_if stage_if(
 	.pc_ce,
 	.mmu_inst_result,
 	.mmu_inst_vaddr,
+	.inst2_avail(if_inst2_avail),
 	.inst_bus,
 	.except(if_except),
 	.stall_req(stall_from_if)
@@ -221,8 +224,10 @@ if_id stage_if_id(
 	.if_except,
 	.if_delayslot(is_branch & ~inst_pair_forward.inst2_taken),
 	.if_inst_pair,
+	.if_inst2_avail,
 	.id_pc,
 	.id_except(ifid_except),
+	.id_inst2_avail,
 	.id_inst_left,
 	.id_inst_pair_new,
 	.id_inst_pair_old,
@@ -252,6 +257,8 @@ begin
 		end else begin
 			id_inst_pair = id_inst_pair_new;
 		end
+
+		if(!id_inst2_avail) id_inst_pair.inst2 = `ZERO_WORD;
 	end
 end
 

@@ -153,6 +153,7 @@ begin
 	unittest("interrupt", 0);
 	unittest("timer", 0);
 	unittest("usermode", 0);
+	unittest("across_tlb", 0);
 	unittest("superscalar", 1);
 	unittest("fpu_arith", 0);
 	unittest("fpu_compare", 0);

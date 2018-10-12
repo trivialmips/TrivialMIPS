@@ -7,6 +7,7 @@ module cpu_if(
 
 	input  MMUResult_t   mmu_inst_result,
 	output MemAddr_t     mmu_inst_vaddr,
+	output Bit_t         inst2_avail,
 
 	Bus_if.master        inst_bus,
 	output Bit_t         stall_req,
@@ -19,6 +20,7 @@ assign inst_bus.data_wr = `ZERO_WORD;
 assign inst_bus.write   = `ZERO_BIT;
 assign inst_bus.address = mmu_inst_result.phy_addr;
 assign mmu_inst_vaddr   = pc;
+assign inst2_avail      = (pc & 12'hfff) != 12'hffc;
 
 always_comb
 begin
