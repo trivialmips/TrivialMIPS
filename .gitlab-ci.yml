@@ -44,6 +44,11 @@ run_all_testbenches:
   script:
     - export SIMULATION=sim_cpu
     - ${VIVADO_PATH} -mode tcl -source scripts/run_simulation.tcl ${PROJECT_NAME}.xpr
+    - scripts/check_simulation.sh
+  artifacts:
+    paths:
+      - ${PROJECT_DIR}/${PROJECT_NAME}.sim/*/behav/xsim/simulate.log
+    when: always
 
 generate_bitstream:
   image: vivado:2018.1
