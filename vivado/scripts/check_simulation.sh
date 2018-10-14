@@ -2,7 +2,7 @@
 
 # check CPU simulation
 
-grep "\[Done\]" TrivialMIPS.sim/sim_cpu/behav/xsim/simulate.log 2&>1 >/dev/null
+grep "\[Done\]" TrivialMIPS.sim/sim_cpu/behav/xsim/simulate.log > /dev/null
 
 if [ $? -eq 0 ]; then
     echo "CPU simulation succeeded."
