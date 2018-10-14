@@ -16,26 +16,36 @@ cache:
     - ${PROJECT_DIR}/${PROJECT_NAME}.cache
 
 stages:
-  - build_ip
+  - init_project
+  - run_simulation
   - build_project
-  - build_testbench
-  - run_testbench
+  - build_online_test
+  - run_online_test
 
 before_script:
   - cd ${PROJECT_DIR}
   # the cached ip configuration file might be out of date, we should always use the newest one
   - git checkout ${PROJECT_NAME}.srcs/ip
 
-ip:
+build_ip:
   image: vivado:2018.1
   tags:
     - vivado
-  stage: build_ip
+  stage: init_project
   script:
-    - ${VIVADO_PATH} -mode tcl -source scripts/generate_all_ip.tcl ${PROJECT_NAME}.xpr
+    - ${VIVADO_PATH} -mode tcl -source scripts/generate_all_ips.tcl ${PROJECT_NAME}.xpr
 
 
-bitstream:
+run_all_testbenches:
+  image: vivado:2018.1
+  tags:
+    - vivado
+  stage: run_simulation
+  script:
+    - export SIMULATION=sim_cpu
+    - ${VIVADO_PATH} -mode tcl -source scripts/run_simulation.tcl ${PROJECT_NAME}.xpr
+
+generate_bitstream:
   image: vivado:2018.1
   tags:
     - vivado
@@ -53,7 +63,7 @@ bitstream:
   image: harryleafchen/ubuntu-mips-compiler
   tags:
     - mips
-  stage: build_testbench
+  stage: build_online_test
   script:
     - make
 
@@ -74,11 +84,11 @@ compile_perf_test:
       - software/perf_test/obj/*/main.elf
 
 
-test_on_cloud:
+run_on_thinpad_cloud:
   image: python:3.7.0-stretch
   tags:
     - mips
-  stage: run_testbench
+  stage: run_online_test
   before_script:
     - cd testbench/cloud
     - pip3 install --user -r thinpad_cloud_sdk/requirements.txt
