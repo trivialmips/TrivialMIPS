@@ -12,6 +12,7 @@ module cp0(
 	input  TLBEntry_t    tlbr_res,
 	input  Bit_t         tlbp_req,
 	input  Word_t        tlbp_res,
+	input  Bit_t         tlbwr_req,
 
 	output Word_t        rdata,
 	output CP0Regs_t     regs,
@@ -99,7 +100,8 @@ always_comb
 begin
 	regs_new = regs_inner;
 	regs_new.count  = regs_new.count + 32'b1;
-	regs_new.random = lfsr4_val;
+//	regs_new.random = lfsr4_val;
+	regs_new.random = regs_inner.random + tlbwr_req;
 	regs_new.impl_lfsr32 = lfsr32_val;
 
 	/* write register (WB stage) */

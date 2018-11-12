@@ -91,6 +91,7 @@ cp0 cp0_instance(
 	.tlbp_res(tlbp_index),
 	.tlbr_req(req_memwb_a.tlb_read),
 	.tlbr_res(tlbrw_rdata),
+	.tlbwr_req(req_memwb_a.tlb_wr),
 
 	.rdata(cp0_rdata),
 	.regs(cp0_regs),
