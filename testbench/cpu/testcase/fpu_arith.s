@@ -2,10 +2,6 @@
 	.global _start
 	.set noat
 _start:
-	mfc0 $4, $12        # ans: skip
-	ori  $4, $4, 0x10   # ans: skip
-	mtc0 $4, $12
-
 	# 2.3
 	la $1, 0x40133333 # ans: skip
 	                  # ans: $1=0x40133333

@@ -52,7 +52,8 @@ Bit_t fpu_except_occur;
 Bit_t fpu_except_occur_a, fpu_except_occur_b;
 assign fpu_except_occur_a = |fpu_except_a;
 assign fpu_except_occur_b = |fpu_except_b;
-assign fpu_except_occur = fpu_except_occur_a | fpu_except_occur_b;
+// assign fpu_except_occur = fpu_except_occur_a | fpu_except_occur_b;
+assign fpu_except_occur = 1'b0;  // disable FPU exception
 
 Bit_t except_occur;
 logic [4:0] except_code;
