@@ -252,14 +252,7 @@ begin
 	end else if(ifid_keep_inst) begin
 		id_inst_pair = id_inst_pair_old;
 	end else begin
-		if(id_inst_left) 
-		begin
-			id_inst_pair.inst1 = id_inst_pair_old.inst2;
-			id_inst_pair.inst2 = id_inst_pair_new.inst1;
-		end else begin
-			id_inst_pair = id_inst_pair_new;
-		end
-
+		id_inst_pair = id_inst_pair_new;
 		if(!id_inst2_avail) id_inst_pair.inst2 = `ZERO_WORD;
 	end
 end
