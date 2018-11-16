@@ -46,9 +46,11 @@ begin: generate_mmu_enabled_code
 	assign inst_result.virt_addr = inst_vaddr;
 
 	// note that dirty = 1 when writable
+	Bit_t user_peripheral;
+	assign user_peripheral = (data_vaddr[31:24] >= 8'ha2 && data_vaddr[31:24] <= 8'ha7);
 	assign data_result.dirty    = (~data_mapped | data_tlb_result.dirty);
 	assign data_result.miss     = (data_mapped & data_tlb_result.miss);
-	assign data_result.illegal  = (is_user_mode & data_vaddr[31]);
+	assign data_result.illegal  = (is_user_mode & data_vaddr[31]) | user_peripheral;
 	assign data_result.invalid  = (data_mapped & ~data_tlb_result.valid);
 	assign data_result.phy_addr = data_mapped ? data_tlb_result.phy_addr : { 3'b0, data_vaddr[28:0] };
 	assign data_result.virt_addr = data_vaddr;
