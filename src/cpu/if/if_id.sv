@@ -18,6 +18,9 @@ module if_id(
 	output InstPair_t id_inst_pair_new,
 	output InstPair_t id_inst_pair_old,
 
+	input  Bit_t      id_inst2_avail_forward,
+	output Bit_t      id_inst2_avail_post,
+
 	input  Bit_t      is_ahead,
 	input  Bit_t      is_hard_reset,
 	input  InstPair_t inst_pair_forward,
@@ -44,7 +47,8 @@ begin
 		id_pc              <= `ZERO_WORD;
 		id_delayslot       <= 1'b0;
 		id_except          <= {$bits(ExceptInfo_t){1'b0}};
-		id_inst2_avail     <= 1'b0;
+		id_inst2_avail     <= 1'b1;
+		id_inst2_avail_post <= 1'b1;
 /*		id_inst_pair_new.inst1 <= `ZERO_WORD;
 		id_inst_pair_new.inst2 <= `ZERO_WORD;
 		id_inst_pair_new.inst2_taken <= `ZERO_WORD;
@@ -55,6 +59,7 @@ begin
 		id_delayslot <= if_delayslot;
 		id_except    <= if_except;
 		id_inst2_avail <= if_inst2_avail;
+		id_inst2_avail_post <= id_inst2_avail_forward;
 /*		if(~inst_pair_forward.inst2_taken && ~is_hard_reset)
 		begin
 			id_inst_pair.inst1 <= inst_pair_forward.inst2;
@@ -66,7 +71,7 @@ begin
 //		id_inst_pair_old <= inst_pair_forward;
 //		id_inst_left <= ~inst_pair_forward.inst2_taken & ~is_hard_reset;
 
-		if(~inst_pair_forward.inst2_taken & ~is_hard_reset)
+		if(~inst_pair_forward.inst2_taken & ~is_hard_reset & id_inst2_avail_forward)
 		begin
 			id_pc <= if_pc - 32'h4;
 		end else begin

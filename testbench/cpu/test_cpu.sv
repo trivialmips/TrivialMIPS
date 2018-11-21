@@ -157,6 +157,7 @@ begin
 	unittest("across_tlb2", 0);
 	unittest("across_tlb3", 0);
 	unittest("across_tlb4", 0);
+	unittest("across_tlb5", 0);
 	unittest("superscalar", 1);
 	unittest("fpu_arith", 0);
 	unittest("fpu_compare", 0);

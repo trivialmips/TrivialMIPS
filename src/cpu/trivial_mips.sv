@@ -181,14 +181,14 @@ InstPair_t inst_pair_forward;
 InstAddr_t if_pc, jump_to;
 Bit_t is_branch, jump, pc_ce;
 Bit_t is_pc_hard_reset;
-Bit_t if_inst2_avail, id_inst2_avail;
+Bit_t if_inst2_avail, id_inst2_avail, id_inst2_avail_post;
 
 reg_pc pc_instance(
 	.clk,
 	.rst,
 	.pc(if_pc),
 	.inst2_avail(if_inst2_avail),
-	.inst2_taken(inst_pair_forward.inst2_taken),
+	.inst2_taken(inst_pair_forward.inst2_taken | ~id_inst2_avail),
 	.jump,
 	.jump_to,
 	.except_req,
@@ -234,6 +234,8 @@ if_id stage_if_id(
 	.id_inst_pair_new,
 	.id_inst_pair_old,
 	.id_delayslot,
+	.id_inst2_avail_forward(id_inst2_avail),
+	.id_inst2_avail_post,
 	.keep_inst(ifid_keep_inst),
 	.set_empty_inst(ifid_set_empty_inst),
 	.inst_pair_forward,
@@ -252,7 +254,7 @@ begin
 	end else if(ifid_keep_inst) begin
 		id_inst_pair = id_inst_pair_old;
 	end else begin
-		if(id_inst_left) 
+		if(id_inst_left & id_inst2_avail_post) 
 		begin
 			id_inst_pair.inst1 = id_inst_pair_old.inst2;
 			id_inst_pair.inst2 = id_inst_pair_new.inst1;

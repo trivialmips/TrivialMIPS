@@ -25,7 +25,11 @@ _start:
 	ori $2, $0, 0x0002   # ans: $2=0x00000002
 	ori $3, $0, 0x0003   # ans: $3=0x00000003
 	ori $4, $0, 0xdead   # PA=0x1000, not in TLB
+	ori $5, $0, 0xdeaf
+	ori $5, $0, 0xdeae
 
 	# pc = 0x1000 (PA=0x2000)
 .org 0x2000
 	ori $5, $0, 0x2333   # ans: $5=0x00002333
+	ori $6, $0, 0x1333   # ans: $6=0x00001333
+	ori $7, $0, 0x0333   # ans: $7=0x00000333
