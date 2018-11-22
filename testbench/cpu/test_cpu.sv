@@ -26,11 +26,14 @@ trivial_mips trivial_cpu_instance(
 	.data_bus(data_bus_if.master)
 );
 
+FPURegWriteReq_t fpu_reg_wr1, fpu_reg_wr2;
 RegWriteReq_t reg_wr1, reg_wr2;
 HiloWriteReq_t hilo_wr1, hilo_wr2;
 Bit_t mem_access_path1;
 assign reg_wr1 = trivial_cpu_instance.reg_wr1;
 assign reg_wr2 = trivial_cpu_instance.reg_wr2;
+assign fpu_reg_wr1 = trivial_cpu_instance.fpu_reg_wr1;
+assign fpu_reg_wr2 = trivial_cpu_instance.fpu_reg_wr2;
 assign hilo_wr1 = trivial_cpu_instance.stage_wb.req_a.hilo_wr;
 assign hilo_wr2 = trivial_cpu_instance.stage_wb.req_b.hilo_wr;
 assign mem_access_path1 = trivial_cpu_instance.stage_mem.req_mem_a.memory_req.ce;
@@ -64,7 +67,8 @@ assign data_bus_if.interrupt[5:1] = 5'b0;
 
 task unittest(
 	input [128 * 8 - 1:0] name,
-	input check_cyc
+	input check_cyc,
+	input dump_fpu
 );
 	integer i, fans, cycle = 0, is_event = 0;
 	string ans, out, info;
@@ -108,6 +112,12 @@ task unittest(
 			judge(fans, cycle, out, check_cyc);
 		end 
 
+		if(fpu_reg_wr1.we && dump_fpu)
+		begin
+			$sformat(out, "$f%0d=0x%x", fpu_reg_wr1.waddr, fpu_reg_wr1.wdata.val);
+			judge(fans, cycle, out, check_cyc);
+		end 
+
 		if(hilo_wr1.we) begin
 			$sformat(out, "$hilo=0x%x", hilo_wr1.hilo);
 			judge(fans, cycle, out, check_cyc);
@@ -124,6 +134,12 @@ task unittest(
 			judge(fans, cycle, out, check_cyc);
 		end 
 
+		if(fpu_reg_wr2.we && dump_fpu)
+		begin
+			$sformat(out, "$f%0d=0x%x", fpu_reg_wr2.waddr, fpu_reg_wr2.wdata.val);
+			judge(fans, cycle, out, check_cyc);
+		end 
+
 		if(hilo_wr2.we) begin
 			$sformat(out, "$hilo=0x%x", hilo_wr2.hilo);
 			judge(fans, cycle, out, check_cyc);
@@ -137,32 +153,36 @@ endtask
 initial
 begin
 	wait (clk.rst == 1'b0);
-	unittest("inst_ori", 0);
-	unittest("inst_logical", 0);
-	unittest("inst_move", 0);
-	unittest("inst_shift", 0);
-	unittest("inst_trap", 0);
-	unittest("inst_arith", 0);
-	unittest("inst_mem_aligned", 0);
-	unittest("inst_mem_unaligned", 0);
-	unittest("inst_llsc", 0);
-	unittest("inst_jump", 0);
-	unittest("inst_multicyc", 0);
-	unittest("except", 0);
-	unittest("except_delayslot", 0);
-	unittest("interrupt", 0);
-	unittest("timer", 0);
-	unittest("usermode", 0);
-	unittest("across_tlb1", 0);
-	unittest("across_tlb2", 0);
-	unittest("across_tlb3", 0);
-	unittest("across_tlb4", 0);
-	unittest("across_tlb5", 0);
-	unittest("superscalar", 1);
-	unittest("fpu_arith", 0);
-	unittest("fpu_compare", 0);
-	unittest("fpu_transfer", 0);
-	$display("[Done]");
+	unittest("inst_ori", 0, 0);
+	unittest("inst_logical", 0, 0);
+	unittest("inst_move", 0, 0);
+	unittest("inst_shift", 0, 0);
+	unittest("inst_trap", 0, 0);
+	unittest("inst_arith", 0, 0);
+	unittest("inst_mem_aligned", 0, 0);
+	unittest("inst_mem_unaligned", 0, 0);
+	unittest("inst_llsc", 0, 0);
+	unittest("inst_jump", 0, 0);
+	unittest("inst_multicyc", 0, 0);
+	unittest("except", 0, 0);
+	unittest("except_delayslot", 0, 0);
+	unittest("interrupt", 0, 0);
+	unittest("timer", 0, 0);
+	unittest("usermode", 0, 0);
+	unittest("across_tlb1", 0, 0);
+	unittest("across_tlb2", 0, 0);
+	unittest("across_tlb3", 0, 0);
+	unittest("across_tlb4", 0, 0);
+	unittest("across_tlb5", 0, 0);
+	unittest("across_tlb6", 0, 0);
+	unittest("superscalar", 1, 0);
+	unittest("fpu_arith", 0, 0);
+	unittest("fpu_arith2", 0, 0);
+	unittest("fpu_test2", 0, 1);
+	unittest("fpu_test3", 0, 0);
+	unittest("fpu_compare", 0, 0);
+	unittest("fpu_transfer", 0, 0);
+	$display("[Done]", 0);
 	$finish;
 end
 
