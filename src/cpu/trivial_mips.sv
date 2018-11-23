@@ -13,18 +13,18 @@ assign clk_2x = inst_bus.clk.base_2x_noshift;
 assign rst = inst_bus.clk.rst;
 
 Bit_t flush;
-PipelineData_t data_id_a, data_idex_a;
-PipelineData_t data_ex_a, data_exmem_a;
+(*MARK_DEBUG="TRUE"*)PipelineData_t data_id_a, data_idex_a;
+(*MARK_DEBUG="TRUE"*)PipelineData_t data_ex_a, data_exmem_a;
 PipelineData_t data_mem_a;
-PipelineReq_t req_id_a, req_idex_a;
-PipelineReq_t req_ex_a, req_exmem_a;
+(*MARK_DEBUG="TRUE"*)PipelineReq_t req_id_a, req_idex_a;
+(*MARK_DEBUG="TRUE"*)PipelineReq_t req_ex_a, req_exmem_a;
 PipelineReq_t req_mem_a, req_memwb_a;
 
-PipelineData_t data_id_b, data_idex_b;
-PipelineData_t data_ex_b, data_exmem_b;
+(*MARK_DEBUG="TRUE"*)PipelineData_t data_id_b, data_idex_b;
+(*MARK_DEBUG="TRUE"*)PipelineData_t data_ex_b, data_exmem_b;
 PipelineData_t data_mem_b;
-PipelineReq_t req_id_b, req_idex_b;
-PipelineReq_t req_ex_b, req_exmem_b;
+(*MARK_DEBUG="TRUE"*)PipelineReq_t req_id_b, req_idex_b;
+(*MARK_DEBUG="TRUE"*)PipelineReq_t req_ex_b, req_exmem_b;
 PipelineReq_t req_mem_b, req_memwb_b;
 
 // general registers
@@ -409,6 +409,7 @@ cpu_ex stage_ex_a(
 	.cp0_raddr(cp0_raddr),
 	.cp0_rsel(cp0_rsel),
 	.stall_req(stall_from_ex_a),
+	.stall_from_mem,
 
 	.data_idex(data_idex_a),
 	.data_ex(data_ex_a),
@@ -442,6 +443,7 @@ cpu_ex stage_ex_b(
 	.cp0_raddr(),
 	.cp0_rsel(),
 	.stall_req(stall_from_ex_b),
+	.stall_from_mem,
 
 	.data_idex(data_idex_b),
 	.data_ex(data_ex_b),

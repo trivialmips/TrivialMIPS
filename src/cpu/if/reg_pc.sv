@@ -10,7 +10,7 @@ module reg_pc(
 	input  ExceptReq_t except_req,
 	output Bit_t       ce,
 	output Bit_t       is_hard_reset,
-	output InstAddr_t  pc
+	(*MARK_DEBUG="TRUE"*)output InstAddr_t  pc
 );
 
 always @(posedge clk)

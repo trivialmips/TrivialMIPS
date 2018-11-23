@@ -11,6 +11,7 @@ module cpu_ex(
 	output RegAddr_t      cp0_raddr,
 	output wire [2:0]     cp0_rsel,
 	output Bit_t          stall_req,
+	input  Bit_t          stall_from_mem,
 
 	input  PipelineData_t  data_idex,
 	input  PipelineReq_t   req_idex,
@@ -362,6 +363,7 @@ fpu_ex fpu_ex_instance(
 	.except(req_ex.fpu_except),
 	.fcsr_we(req_ex.fcsr_we),
 	.fcsr_wdata(req_ex.fcsr),
+	.stall_from_mem,
 	.is_busy(fpu_busy)
 );
 

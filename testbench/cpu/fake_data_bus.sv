@@ -20,13 +20,28 @@ end
 
 Word_t data_w;
 
+reg read_ready;
+
+always @(posedge clk)
+begin
+	if(rst) begin
+		read_ready <= 1'b0;
+	end else if(data_bus.read && ~read_ready) begin
+		read_ready <= 1'b1;
+	end else begin
+		read_ready <= 1'b0;
+	end
+end
+
+assign data_bus.stall = data_bus.read & ~read_ready;
+
 always_comb
 begin
 	if(rst == 1'b1 || data_bus.read == 1'b0)
 	begin
 		data_bus.data_rd = `ZERO_WORD;
 	end else begin
-		data_bus.data_rd = inst_ram[data_bus.address[15:2]];
+		data_bus.data_rd = read_ready ? inst_ram[data_bus.address[15:2]] : 32'b0;
 	end
 end
 

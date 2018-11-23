@@ -9,7 +9,7 @@ info:
 mem: $(MEMS) $(ANSES)
 
 %.om: %.s
-	$(ARCH)-as -mips32 -EB $< -o $@ 
+	$(ARCH)-as -mips32 -O0 -EB $< -o $@ 
 
 %.ans: %.s
 	grep -Po "(?<=# ans:\s).*" $< | awk -f extract_ans.awk | sed "s/\s*$$//" > $@

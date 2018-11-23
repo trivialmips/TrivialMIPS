@@ -63,6 +63,12 @@ begin
 	dbus_data_delay <= fake_data_bus_instance.data_w;
 end
 
+Bit_t post_stall;
+always @(negedge clk.base)
+begin
+	post_stall <= data_bus_if.stall;
+end
+
 assign data_bus_if.interrupt[5:1] = 5'b0;
 
 task unittest(
@@ -101,49 +107,51 @@ task unittest(
 		cycle = cycle + 1;
 		data_bus_if.interrupt[0] = (40 <= cycle && cycle <= 45);
 
-		if(dbus_we_delay && mem_access_path1) begin
-			$sformat(out, "[0x%x]=0x%x", dbus_addr_delay[15:0], dbus_data_delay);
-			judge(fans, cycle, out, check_cyc);
-		end 
+		if(!post_stall) begin
+			if(dbus_we_delay && mem_access_path1) begin
+				$sformat(out, "[0x%x]=0x%x", dbus_addr_delay[15:0], dbus_data_delay);
+				judge(fans, cycle, out, check_cyc);
+			end 
 
-		if(reg_wr1.we && reg_wr1.waddr)
-		begin
-			$sformat(out, "$%0d=0x%x", reg_wr1.waddr, reg_wr1.wdata);
-			judge(fans, cycle, out, check_cyc);
-		end 
+			if(reg_wr1.we && reg_wr1.waddr)
+			begin
+				$sformat(out, "$%0d=0x%x", reg_wr1.waddr, reg_wr1.wdata);
+				judge(fans, cycle, out, check_cyc);
+			end 
 
-		if(fpu_reg_wr1.we && dump_fpu)
-		begin
-			$sformat(out, "$f%0d=0x%x", fpu_reg_wr1.waddr, fpu_reg_wr1.wdata.val);
-			judge(fans, cycle, out, check_cyc);
-		end 
+			if(fpu_reg_wr1.we && dump_fpu)
+			begin
+				$sformat(out, "$f%0d=0x%x", fpu_reg_wr1.waddr, fpu_reg_wr1.wdata.val);
+				judge(fans, cycle, out, check_cyc);
+			end 
 
-		if(hilo_wr1.we) begin
-			$sformat(out, "$hilo=0x%x", hilo_wr1.hilo);
-			judge(fans, cycle, out, check_cyc);
-		end 
+			if(hilo_wr1.we) begin
+				$sformat(out, "$hilo=0x%x", hilo_wr1.hilo);
+				judge(fans, cycle, out, check_cyc);
+			end 
 
-		if(dbus_we_delay && ~mem_access_path1) begin
-			$sformat(out, "[0x%x]=0x%x", dbus_addr_delay[15:0], dbus_data_delay);
-			judge(fans, cycle, out, check_cyc);
-		end 
+			if(dbus_we_delay && ~mem_access_path1) begin
+				$sformat(out, "[0x%x]=0x%x", dbus_addr_delay[15:0], dbus_data_delay);
+				judge(fans, cycle, out, check_cyc);
+			end 
 
-		if(reg_wr2.we && reg_wr2.waddr)
-		begin
-			$sformat(out, "$%0d=0x%x", reg_wr2.waddr, reg_wr2.wdata);
-			judge(fans, cycle, out, check_cyc);
-		end 
+			if(reg_wr2.we && reg_wr2.waddr)
+			begin
+				$sformat(out, "$%0d=0x%x", reg_wr2.waddr, reg_wr2.wdata);
+				judge(fans, cycle, out, check_cyc);
+			end 
 
-		if(fpu_reg_wr2.we && dump_fpu)
-		begin
-			$sformat(out, "$f%0d=0x%x", fpu_reg_wr2.waddr, fpu_reg_wr2.wdata.val);
-			judge(fans, cycle, out, check_cyc);
-		end 
+			if(fpu_reg_wr2.we && dump_fpu)
+			begin
+				$sformat(out, "$f%0d=0x%x", fpu_reg_wr2.waddr, fpu_reg_wr2.wdata.val);
+				judge(fans, cycle, out, check_cyc);
+			end 
 
-		if(hilo_wr2.we) begin
-			$sformat(out, "$hilo=0x%x", hilo_wr2.hilo);
-			judge(fans, cycle, out, check_cyc);
-		end 
+			if(hilo_wr2.we) begin
+				$sformat(out, "$hilo=0x%x", hilo_wr2.hilo);
+				judge(fans, cycle, out, check_cyc);
+			end 
+		end
 	end
 
 	$display("[OK] %0s\n", name);

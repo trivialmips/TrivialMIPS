@@ -11,6 +11,7 @@ module fpu_ex(
 	input  Word_t    gpr2,
 	input  FPUReg_t  reg1,
 	input  FPUReg_t  reg2,
+	input  Bit_t     stall_from_mem,
 	output Bit_t     fcsr_we,
 	output FCSRReg_t fcsr_wdata,
 	output FPUReg_t  fpu_ret,
@@ -31,7 +32,7 @@ begin
 	if(rst || flush) 
 	begin
 		cyc_stage <= 0;
-	end else if(cyc_stage != 0) begin
+	end else if(cyc_stage != 0 && ~stall_from_mem) begin
 		cyc_stage <= cyc_stage >> 1;
 	end else begin
 		cyc_stage <= ((1 << cyc_number) >> 2);
@@ -54,6 +55,9 @@ begin
 		FPU_OP_COND: cyc_number = 2;
 		default:     cyc_number = 1;
 		endcase
+		if(op != FPU_OP_NOP) begin
+			cyc_number += stall_from_mem;
+		end
 	end
 end
 
