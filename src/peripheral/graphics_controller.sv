@@ -36,10 +36,11 @@ module graphics_controller(
     ByteMask_t gmem_write_mask_a;
 
     function Word_t bit_expand(input Nibble_t bits);
-        bit_expand[0 +: 8] = {8{bits[0]}};
-        bit_expand[8 +: 8] = {8{bits[1]}};
-        bit_expand[16 +: 8] = {8{bits[2]}};
-        bit_expand[24 +: 8] = {8{bits[3]}};
+        // bits is MSB first
+        bit_expand[0 +: 8] = {8{bits[3]}};
+        bit_expand[8 +: 8] = {8{bits[2]}};
+        bit_expand[16 +: 8] = {8{bits[1]}};
+        bit_expand[24 +: 8] = {8{bits[0]}};
     endfunction
 
     genvar i;
