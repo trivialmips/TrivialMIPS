@@ -154,7 +154,7 @@ begin
 			inst2_taken = 1'b0;
 		end else begin
 			// otherwise
-			inst2_taken = 1'b0;
+			inst2_taken = 1'b1;
 		end
 	end
 end

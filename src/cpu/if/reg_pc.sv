@@ -67,8 +67,10 @@ begin
 		if(jump)
 		begin
 			pc <= jump_to;
+		end else if(next_status == ST_AHEAD) begin
+			pc <= pc + (inst2_avail ? 32'h4 : 32'h0);
 		end else begin
-			pc <= pc + 32'h4;
+			pc <= pc + (inst2_avail ? 32'h8 : 32'h4);
 		end
 	end
 end
