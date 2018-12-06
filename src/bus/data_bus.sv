@@ -82,12 +82,14 @@ module data_bus(
                 ram.read    = cpu.read;
                 ram.write   = cpu.write;
                 cpu.data_rd = ram.data_rd;
+                cpu.data_rd_2 = ram.data_rd_2;
                 cpu.stall   = ram.stall;
             end
 
             `CONCAT_PREFIX(BOOTROM): begin
                 bootrom.read = cpu.read;
                 cpu.data_rd  = bootrom.data_rd;
+                cpu.data_rd_2 = bootrom.data_rd_2;
                 cpu.stall    = bootrom.stall;
             end
 
