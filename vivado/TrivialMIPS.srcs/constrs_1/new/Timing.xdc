@@ -1,12 +1,11 @@
 create_clock -period 20.000 -name clk_50M -waveform {0.000 10.000} [get_ports clk_50M]
 create_clock -period 90.422 -name clk_11M0592 -waveform {0.000 45.211} [get_ports clk_11M0592]
-create_clock -period 16.667 -name clk_60M_virt -waveform {0.000 8.333}
 
 set all_mmcm_clk   [get_clocks -of_objects [get_pins clk_wiz_instance/inst/mmcm_adv_inst/CLKOUT*]]
-set sram_clk       [get_clocks clk_60M_virt]
+set storage_clk    [get_clocks out_60M_top_clk_wiz]
+set sram_clk       [get_clocks out_60M_top_clk_wiz]
 set vga_clk        [get_clocks clk_50M]
 set main_clk       [get_clocks out_30M_top_clk_wiz]
-set bootrom_clk    [get_clocks out_60M_top_clk_wiz]
 set peripheral_clk [get_clocks out_60M_shift_top_clk_wiz]
 
 # ignore vga clocks
@@ -14,9 +13,9 @@ set_false_path -from $vga_clk               -to $all_mmcm_clk
 set_false_path -from $all_mmcm_clk          -to $vga_clk
 # ignore results returned from peripheral controllers (combinational)
 set_false_path -from $peripheral_clk        -to $main_clk
-set_false_path -from $bootrom_clk           -to $main_clk
+set_false_path -from $storage_clk           -to $main_clk
 # from peripheral to div_uu (combinational)
-set_false_path -from $peripheral_clk        -to $bootrom_clk
+set_false_path -from $peripheral_clk        -to $storage_clk
 # ignore reset logic
 set_false_path -from [get_pins rst_reg_*/*] -to *
 # vivado thinks we will fetch data on the same clock edge 
