@@ -7,13 +7,13 @@ module sram_controller(
     Sram_if.master ext_ram
 );
 
-    wire bus_clk, clk, sample_clk, rst;
-    logic main_posedge;
+    wire bus_clk, clk, rst;
 
     assign bus_clk = inst_bus.clk.base;
-    assign sample_clk = inst_bus.clk.base_2x;
     assign clk = inst_bus.clk.base_2x_noshift;
     assign rst = inst_bus.clk.rst;
+
+    `SAMPLE_MAIN_CLOCK(main_posedge, inst_bus.clk.base_2x, bus_clk, rst);
 
     assign inst_bus.stall = `ZERO_BIT;
     assign data_bus.stall = `ZERO_BIT;
@@ -93,13 +93,6 @@ module sram_controller(
         end
     end
 
-    always_ff @(posedge sample_clk or posedge rst) begin
-        if (rst) begin
-            main_posedge <= `ZERO_BIT;
-        end else begin
-            main_posedge <= ~bus_clk;
-        end
-    end
 
     always_ff @(posedge clk or posedge rst) begin
         if (rst) begin

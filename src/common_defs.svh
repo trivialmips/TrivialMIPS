@@ -17,6 +17,15 @@
 `define BUS_CLK_POSEDGE 1'b0
 `endif
 
+`define SAMPLE_MAIN_CLOCK(NAME, SAMPLE, MAIN, RST) logic NAME;\
+    always_ff @(posedge SAMPLE or posedge RST) begin \
+        if (RST) begin \
+            NAME <= `ZERO_BIT; \
+        end else begin \
+            NAME <= ~MAIN; \
+        end \
+    end \
+
 `define MAIN_CLOCK_FREQUENCY 30_000_000
 `define PERIPHERAL_CLOCK_FREQUENCY (`MAIN_CLOCK_FREQUENCY * 2)
 `define UART_CLOCK_FREQUENCY 11_059_200
