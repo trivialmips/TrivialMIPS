@@ -9,6 +9,7 @@
 
 `define ENABLE_CPU_MMU                  1  // DON'T disable MMU if you don not know what will happen
 `define ENABLE_CPU_FPU                  1
+`define ENABLE_CPU_FPU_CONTROL          0
 `define ENABLE_PERIPHERAL_ETHERNET      1
 `define ENABLE_PERIPHERAL_FLASH         1
 `define ENABLE_PERIPHERAL_GPIO          1

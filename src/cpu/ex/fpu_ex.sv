@@ -53,6 +53,7 @@ begin
 		FPU_OP_DIV:  cyc_number = 6;
 		FPU_OP_SQRT: cyc_number = 5;
 		FPU_OP_COND: cyc_number = 2;
+		FPU_OP_MFC:  cyc_number = 2;  // for timing issue
 		default:     cyc_number = 1;
 		endcase
 		if(op != FPU_OP_NOP) begin
@@ -315,18 +316,23 @@ end
 always_comb
 begin
 	unique case(op)
-	FPU_OP_MFC: cpu_ret = reg2.val;
+	FPU_OP_MFC: cpu_ret = pipe_val2;  // for timing issue
 	FPU_OP_CFC:
 	begin
-		unique case(inst[15:11])
-		5'd0:  cpu_ret = fccr;
-		5'd25: cpu_ret = { 24'b0, fcsr.fcc };
-		5'd26: cpu_ret = { 14'b0, fcsr.cause, 5'b0, fcsr.flags[4:0], 2'b0 };
-		5'd28: cpu_ret = { 20'b0, fcsr.enables[4:0], 4'b0, fcsr.fs, fcsr.rm };
-		5'd31: cpu_ret = { fcsr.fcc[7:1], fcsr.fs, fcsr.fcc[0], 5'b0,
-			fcsr.cause, fcsr.enables[4:0], fcsr.flags[4:0], fcsr.rm };
-		default: cpu_ret = 32'b0;
-		endcase
+		if(`ENABLE_CPU_FPU_CONTROL)
+		begin
+			unique case(inst[15:11])
+			5'd0:  cpu_ret = fccr;
+			5'd25: cpu_ret = { 24'b0, fcsr.fcc };
+			5'd26: cpu_ret = { 14'b0, fcsr.cause, 5'b0, fcsr.flags[4:0], 2'b0 };
+			5'd28: cpu_ret = { 20'b0, fcsr.enables[4:0], 4'b0, fcsr.fs, fcsr.rm };
+			5'd31: cpu_ret = { fcsr.fcc[7:1], fcsr.fs, fcsr.fcc[0], 5'b0,
+				fcsr.cause, fcsr.enables[4:0], fcsr.flags[4:0], fcsr.rm };
+			default: cpu_ret = 32'b0;
+			endcase
+		end else begin
+			cpu_ret = 32'b0;
+		end
 	end
 	default: cpu_ret = 32'b0;
 	endcase
