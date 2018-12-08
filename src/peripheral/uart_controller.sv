@@ -6,14 +6,16 @@ module uart_controller(
 );
 
     logic interrupt;
+
     `REGISTER_IRQ(UART, interrupt, data_bus.interrupt)
 
 
-    wire clk, rst;
-    assign clk = data_bus.clk.base_2x_noshift;
+    wire clk, clk_bus, clk_uart, rst;
+    assign clk = data_bus.clk.base_2x;
+    assign clk_uart = data_bus.clk._11M0592;
+    assign clk_bus = data_bus.clk.base;
     assign rst = data_bus.clk.rst;
-    `SAMPLE_MAIN_CLOCK(main_posedge, data_bus.clk.base_2x, data_bus.clk.base, rst);
-    
+
     assign data_bus.stall = `ZERO_BIT;
 
 
@@ -84,7 +86,7 @@ module uart_controller(
             tx_fifo_write <= `ZERO_BIT;
         end else begin
             tx_fifo_write <= `ZERO_BIT;
-            if (~main_posedge) begin // falling edge of main clock
+            if(clk_bus == ~`BUS_CLK_POSEDGE) begin // falling edge of clk_bus
                 if (data_bus.write && data_bus.address[0] == 1'b1 && !tx_fifo_full) begin
                     tx_fifo_in <= Byte_t'(data_bus.data_wr);
                     tx_fifo_write <= 1'b1;
@@ -132,7 +134,7 @@ module uart_controller(
             rx_fifo_read <= `ZERO_BIT;
         end else begin
             rx_fifo_read <= `ZERO_BIT;
-            if (~main_posedge) begin // falling edge of main clock
+            if (clk_bus == ~`BUS_CLK_POSEDGE) begin // falling edge of clk_bus
                 if (data_bus.read && data_bus.address[0] == 1'b1 && !rx_fifo_empty) begin
                     data_bus.data_rd <= rx_fifo_out;
                     rx_fifo_read <= 1'b1;

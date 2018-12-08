@@ -13,9 +13,9 @@ module clock(
     end
 
     initial begin
-        #14584 clk.base_2x = 1;
+        #10938 clk.base_2x = 1;
         while (1) begin
-            #8333 clk.base_2x = ~clk.base_2x;
+            #6250 clk.base_2x = ~clk.base_2x;
         end
     end
 
@@ -30,8 +30,8 @@ module clock(
     end
 
     always #10000   clk._50M = ~clk._50M;
-    always #16666   clk.base = ~clk.base;
-    always #8333    clk.base_2x_noshift = ~clk.base_2x_noshift;
+    always #12500   clk.base = ~clk.base;
+    always #6250    clk.base_2x_noshift = ~clk.base_2x_noshift;
     always #45211   clk._11M0592 = ~clk._11M0592;
     always #50000   clk._10M = ~clk._10M;
 
