@@ -2,15 +2,24 @@ create_clock -period 20.000 -name clk_50M -waveform {0.000 10.000} [get_ports cl
 create_clock -period 90.422 -name clk_11M0592 -waveform {0.000 45.211} [get_ports clk_11M0592]
 
 set all_mmcm_clk   [get_clocks -of_objects [get_pins clk_wiz_instance/inst/mmcm_adv_inst/CLKOUT*]]
-set sram_clk       [get_clocks out_60M_shift_top_clk_wiz]
+set storage_clk    [get_clocks out_60M_top_clk_wiz]
+set sram_clk       [get_clocks out_60M_top_clk_wiz]
 set vga_clk        [get_clocks clk_50M]
 set main_clk       [get_clocks out_30M_top_clk_wiz]
 set peripheral_clk [get_clocks out_60M_shift_top_clk_wiz]
 
+# ignore vga clocks
 set_false_path -from $vga_clk               -to $all_mmcm_clk
 set_false_path -from $all_mmcm_clk          -to $vga_clk
+# ignore results returned from peripheral controllers (combinational)
 set_false_path -from $peripheral_clk        -to $main_clk
+set_false_path -from $storage_clk           -to $main_clk
+# from peripheral to div_uu (combinational)
+set_false_path -from $peripheral_clk        -to $storage_clk
+# ignore reset logic
 set_false_path -from [get_pins rst_reg_*/*] -to *
+# vivado thinks we will fetch data on the same clock edge 
+set_false_path -from [get_ports {*_ram\\.data[*]}] -to [get_pins {sram_controller_instance/data_bus\\.data_rd*/*}] 
 
 set_input_delay  -clock $sram_clk -min -add_delay 8.000  [get_ports {base_ram\.data[*]}]
 set_input_delay  -clock $sram_clk -max -add_delay 10.000 [get_ports {base_ram\.data[*]}]

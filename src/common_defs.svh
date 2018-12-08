@@ -17,6 +17,15 @@
 `define BUS_CLK_POSEDGE 1'b0
 `endif
 
+`define SAMPLE_MAIN_CLOCK(NAME, SAMPLE, MAIN, RST) logic NAME;\
+    always_ff @(posedge SAMPLE or posedge RST) begin \
+        if (RST) begin \
+            NAME <= `ZERO_BIT; \
+        end else begin \
+            NAME <= ~MAIN; \
+        end \
+    end \
+
 `define MAIN_CLOCK_FREQUENCY 30_000_000
 `define PERIPHERAL_CLOCK_FREQUENCY (`MAIN_CLOCK_FREQUENCY * 2)
 `define UART_CLOCK_FREQUENCY 11_059_200
@@ -24,6 +33,7 @@
 
 // data formats
 typedef logic           Bit_t;
+typedef logic [3:0]     Nibble_t;
 typedef logic [7:0]     Byte_t;
 typedef logic [15:0]    HalfWord_t;
 typedef logic [31:0]    Word_t;
@@ -96,12 +106,16 @@ typedef logic [7:0] SegmentDisplay_t;
 
 typedef logic [3:0] ByteMask_t;
 `define BYTE_MASK_FULL 4'b1111
+`define BYTE_MASK_HALF_LO 4'b0011
+`define BYTE_MASK_HALF_HI 4'b1100
 `define BYTE_MASK_NONE 4'b0000
 
 // the configuration register of graphics is 0x02_075300
 // take [2+:20], it is 1D4C0
 `define GRAPHICS_CONFIG_ADDRESS 20'h1D4C0
 
+`define VGA_WHITE 8'hFF
+`define VGA_BLACK 8'h00
 
 typedef struct packed {
     logic _50M, _11M0592, _10M;

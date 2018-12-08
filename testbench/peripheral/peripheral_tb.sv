@@ -257,7 +257,7 @@ module peripheral_tb();
         @(posedge clk.base);
         assert_value("Read instruction 1", 32'h27bdffe0, cpu_inst_if.data_rd);
         assert_value("Read instruction 2", 32'h3c1c8070, cpu_inst_if.data_rd_2);
-        assert_value("Read data", 32'h0ff000e5, cpu_data_if.data_rd);
+        assert_value("Read data", 32'h0ff0021e, cpu_data_if.data_rd);
         assert_value("Data bus stall", 1'b0, cpu_data_if.stall);
 
         $display("[Bootrom] test ended");
@@ -331,7 +331,7 @@ module peripheral_tb();
 
         // sram
         $display("[SRAM] test begin");
-        @(negedge clk.base_2x);
+        @(posedge clk.base);
         begin
             test_data_bus(
                 .address(32'h00000000),
@@ -340,23 +340,15 @@ module peripheral_tb();
                 .write(1),
                 .mask(4'b1111)
             );
-        end
-
-        @(posedge clk.base);
-        assert_value("Data bus stall this clock", 1'b1, cpu_data_if.stall);
-
-        @(negedge clk.base_2x);
-        begin
             test_inst_bus(
                 .address(32'h00000000)
             );
         end
 
         @(posedge clk.base);
-        assert_value("Data bus stall next clock", 1'b0, cpu_data_if.stall);
+        assert_value("Data bus stall this clock", 1'b0, cpu_data_if.stall);
         assert_value("Inst 1 read this clock", 32'h66666666, cpu_inst_if.data_rd);
 
-        @(negedge clk.base_2x);
         begin
             test_data_bus(
                 .address(32'h00000004),
@@ -371,16 +363,11 @@ module peripheral_tb();
         end
 
         @(posedge clk.base);
-        assert_value("Data bus stall this clock", 1'b1, cpu_data_if.stall);
+        assert_value("Data bus stall this clock", 1'b0, cpu_data_if.stall);
         assert_value("Inst 1 read this clock", 32'h66666666, cpu_inst_if.data_rd);
-
-        @(posedge clk.base);
-        assert_value("Data bus stall next clock", 1'b0, cpu_data_if.stall);
-        assert_value("Inst 1 read next clock", 32'h66666666, cpu_inst_if.data_rd);
-        assert_value("Inst 2 read next clock", 32'h77777777, cpu_inst_if.data_rd_2);
+        assert_value("Inst 2 read this clock", 32'h77777777, cpu_inst_if.data_rd_2);
 
 
-        @(negedge clk.base_2x);
         begin
             test_data_bus(
                 .address(32'h00000004),
@@ -395,16 +382,10 @@ module peripheral_tb();
         end
 
         @(posedge clk.base);
-        assert_value("Data bus stall this clock", 1'b1, cpu_data_if.stall);
+        assert_value("Data bus stall this clock", 1'b0, cpu_data_if.stall);
         assert_value("Inst 1 read this clock", 32'h66666666, cpu_inst_if.data_rd);
-        assert_value("Inst 2 read this clock", 32'h77777777, cpu_inst_if.data_rd_2);
+        assert_value("Inst 2 read this clock", 32'h11773377, cpu_inst_if.data_rd_2);
 
-        @(posedge clk.base);
-        assert_value("Data bus stall next clock", 1'b0, cpu_data_if.stall);
-        assert_value("Inst 1 read next clock", 32'h66666666, cpu_inst_if.data_rd);
-        assert_value("Inst 2 read next clock", 32'h11773377, cpu_inst_if.data_rd_2);
-
-        @(negedge clk.base_2x);
         begin
             test_data_bus(
                 .address(32'h00000000),
@@ -419,15 +400,11 @@ module peripheral_tb();
         end
 
         @(posedge clk.base);
-        assert_value("Data bus stall this clock", 1'b1, cpu_data_if.stall);
+        assert_value("Data bus stall this clock", 1'b0, cpu_data_if.stall);
+        assert_value("Data 1 read this clock", 32'h66666666, cpu_data_if.data_rd);
+        assert_value("Data 2 read next clock", 32'h11773377, cpu_data_if.data_rd_2);
         assert_value("Inst 1 read this clock", 32'h66666666, cpu_inst_if.data_rd);
         assert_value("Inst 2 read this clock", 32'h11773377, cpu_inst_if.data_rd_2);
-
-        @(posedge clk.base);
-        assert_value("Data bus stall next clock", 1'b0, cpu_data_if.stall);
-        assert_value("Data read next clock", 32'h66666666, cpu_data_if.data_rd);
-        assert_value("Inst 1 read next clock", 32'h66666666, cpu_inst_if.data_rd);
-        assert_value("Inst 2 read next clock", 32'h11773377, cpu_inst_if.data_rd_2);
 
         $display("[SRAM] test ended");
 

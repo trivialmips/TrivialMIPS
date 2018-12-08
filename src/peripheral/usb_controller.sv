@@ -14,10 +14,11 @@ module usb_controller(
     assign usb.rst_n = 1'b1;
     assign usb.dack_n = 1'b1; // in host mode, disable DMA ack
 
-    wire clk, clk_bus, rst;
-    assign clk = data_bus.clk.base_2x;
-    assign clk_bus = data_bus.clk.base;
+    wire clk, rst;
+    assign clk = data_bus.clk.base_2x_noshift;
     assign rst = data_bus.clk.rst;
+    `SAMPLE_MAIN_CLOCK(main_posedge, data_bus.clk.base_2x, data_bus.clk.base, rst);
+
 
     typedef enum {
         STATE_INIT,
@@ -51,7 +52,7 @@ end \
             data_read <= `ZERO_WORD;
             data_bus.stall <= `ZERO_BIT;
         end else begin
-            if (clk_bus == ~`BUS_CLK_POSEDGE) begin // falling edge of clk_bus
+            if (~main_posedge) begin // falling edge of main clock
                 unique case (currentState)
 
                     STATE_INIT: begin
