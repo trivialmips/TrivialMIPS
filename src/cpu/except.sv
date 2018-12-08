@@ -50,6 +50,7 @@ assign interrupt_occur = (
 
 Bit_t fpu_except_occur;
 Bit_t fpu_except_occur_a, fpu_except_occur_b;
+/* disable FPU exception */
 assign fpu_except_occur_a = |fpu_except_a;
 assign fpu_except_occur_b = |fpu_except_b;
 // assign fpu_except_occur = fpu_except_occur_a | fpu_except_occur_b;
