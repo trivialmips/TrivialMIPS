@@ -213,6 +213,17 @@ cpu_if stage_if(
 assign if_inst_pair.inst1 = inst_bus.data_rd;
 assign if_inst_pair.inst2 = inst_bus.data_rd_2;
 
+// interrupt flags
+// pipeline through stage EX/MEM to avoid stalling issue
+logic [7:0] if_interrupt_flag, id_interrupt_flag, ex_interrupt_flag, mem_interrupt_flag;
+Interrupt_t hardware_int_in_sync, hardware_int;
+always @(posedge clk)
+begin
+	hardware_int_in_sync <= data_bus.interrupt;
+	hardware_int <= hardware_int_in_sync;
+end
+assign if_interrupt_flag = { cp0_timer_int, hardware_int[4:0], cp0_regs.cause.ip[1:0] } & cp0_regs.status.im;
+
 ExceptInfo_t ifid_except;
 Bit_t      id_inst_left, ifid_keep_inst, ifid_set_empty_inst;
 InstPair_t id_inst_pair_old, id_inst_pair_new;
@@ -227,6 +238,7 @@ if_id stage_if_id(
 	.if_delayslot(is_branch & ~inst_pair_forward.inst2_taken),
 	.if_inst_pair,
 	.if_inst2_avail,
+	.if_interrupt_flag,
 	.id_pc,
 	.id_except(ifid_except),
 	.id_inst2_avail,
@@ -236,6 +248,7 @@ if_id stage_if_id(
 	.id_delayslot,
 	.id_inst2_avail_forward(id_inst2_avail),
 	.id_inst2_avail_post,
+	.id_interrupt_flag,
 	.keep_inst(ifid_keep_inst),
 	.set_empty_inst(ifid_set_empty_inst),
 	.inst_pair_forward,
@@ -352,16 +365,6 @@ superscalar_ctrl superscalar_ctrl_instance(
 	.inst2_taken(inst_pair_forward.inst2_taken)
 );
 
-// interrupt flags
-// pipeline through stage EX/MEM to avoid stalling issue
-logic [7:0] id_interrupt_flag, ex_interrupt_flag, mem_interrupt_flag;
-Interrupt_t hardware_int_in_sync, hardware_int;
-always @(posedge clk)
-begin
-	hardware_int_in_sync <= data_bus.interrupt;
-	hardware_int <= hardware_int_in_sync;
-end
-assign id_interrupt_flag = { cp0_timer_int, hardware_int[4:0], cp0_regs.cause.ip[1:0] } & cp0_regs.status.im;
 id_ex stage_id_ex(
 	.clk,
 	.rst,

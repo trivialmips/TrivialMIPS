@@ -18,6 +18,9 @@ module if_id(
 	output InstPair_t id_inst_pair_new,
 	output InstPair_t id_inst_pair_old,
 
+	input  logic [7:0] if_interrupt_flag,
+	output logic [7:0] id_interrupt_flag,
+
 	input  Bit_t      id_inst2_avail_forward,
 	output Bit_t      id_inst2_avail_post,
 
@@ -49,6 +52,7 @@ begin
 		id_except          <= {$bits(ExceptInfo_t){1'b0}};
 		id_inst2_avail     <= 1'b1;
 		id_inst2_avail_post <= 1'b1;
+		id_interrupt_flag  <= 8'b0;
 /*		id_inst_pair_new.inst1 <= `ZERO_WORD;
 		id_inst_pair_new.inst2 <= `ZERO_WORD;
 		id_inst_pair_new.inst2_taken <= `ZERO_WORD;
@@ -60,6 +64,7 @@ begin
 		id_except    <= if_except;
 		id_inst2_avail <= if_inst2_avail;
 		id_inst2_avail_post <= id_inst2_avail_forward;
+		id_interrupt_flag <= if_interrupt_flag;
 /*		if(~inst_pair_forward.inst2_taken && ~is_hard_reset)
 		begin
 			id_inst_pair.inst1 <= inst_pair_forward.inst2;
