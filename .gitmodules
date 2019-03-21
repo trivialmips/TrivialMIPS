@@ -3,4 +3,4 @@
 	url = ../TrivialMIPS_Software.git
 [submodule "testbench/cloud/thinpad_cloud_sdk"]
 	path = testbench/cloud/thinpad_cloud_sdk
-	url = https://gitlab.secoder.net/2017210832/Thinpad-Cloud-SDK.git
+	url = https://github.com/z4yx/Thinpad-Cloud-SDK.git
