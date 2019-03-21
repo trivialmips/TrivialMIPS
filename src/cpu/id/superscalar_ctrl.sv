@@ -146,7 +146,7 @@ begin
 			// privileged instructions
 			// only pipeline-A can access CP0, for timing optimization
 			inst2_taken = 1'b0;
-		end else if(data_a.op == OP_MUL && reg_data_related) begin
+		end else if((data_a.op == OP_MUL || data_a.op == OP_MFC1) && reg_data_related) begin
 			// MUL requires two cycles
 			inst2_taken = 1'b0;
 		end else if((data_b.pc & 12'hfff) == 12'b0) begin

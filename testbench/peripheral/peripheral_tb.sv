@@ -257,7 +257,7 @@ module peripheral_tb();
         @(posedge clk.base);
         assert_value("Read instruction 1", 32'h27bdffe0, cpu_inst_if.data_rd);
         assert_value("Read instruction 2", 32'h3c1c8070, cpu_inst_if.data_rd_2);
-        assert_value("Read data", 32'h0ff000e5, cpu_data_if.data_rd);
+        assert_value("Read data", 32'h0ff0021e, cpu_data_if.data_rd);
         assert_value("Data bus stall", 1'b0, cpu_data_if.stall);
 
         $display("[Bootrom] test ended");

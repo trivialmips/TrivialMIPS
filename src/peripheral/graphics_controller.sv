@@ -35,6 +35,14 @@ module graphics_controller(
 
     ByteMask_t gmem_write_mask_a;
 
+    function Word_t bit_expand(input Nibble_t bits);
+        // bits is MSB first
+        bit_expand[0 +: 8] = {8{bits[3]}};
+        bit_expand[8 +: 8] = {8{bits[2]}};
+        bit_expand[16 +: 8] = {8{bits[1]}};
+        bit_expand[24 +: 8] = {8{bits[0]}};
+    endfunction
+
     genvar i;
 
     generate
@@ -77,8 +85,15 @@ module graphics_controller(
                 data_bus.data_rd <= `ZERO_WORD;
                 if (data_bus.write) begin
                     gmem_address_a <= GraphicsMemoryAddress_t'(data_bus.address);
-                    gmem_write_mask_a <= data_bus.mask;
-                    gmem_data_in_a <= data_bus.data_wr;
+                    if (data_bus.mask == `BYTE_MASK_HALF_LO || data_bus.mask == `BYTE_MASK_HALF_HI) begin 
+                        // hardware extension
+                        gmem_write_mask_a <= `BYTE_MASK_FULL;
+                        gmem_data_in_a <= bit_expand(Nibble_t'(data_bus.data_wr));
+                    end else begin
+                        // normal write
+                        gmem_write_mask_a <= data_bus.mask;
+                        gmem_data_in_a <= data_bus.data_wr;
+                    end
                 end else if (data_bus.read) begin
                     if (dbus_last_stall) begin
                         data_bus.data_rd <= gmem_data_out_a;
