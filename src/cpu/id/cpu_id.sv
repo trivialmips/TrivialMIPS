@@ -62,9 +62,10 @@ assign immediate = inst[15:0];
 
 // load related stalling
 Bit_t is_ex_load_inst;
-assign is_ex_load_inst = (
-	ex_memory_req_a.ce && ~ex_memory_req_a.we ||
-	ex_memory_req_b.ce && ~ex_memory_req_b.we);
+//assign is_ex_load_inst = (
+//	ex_memory_req_a.ce && ~ex_memory_req_a.we ||
+//	ex_memory_req_b.ce && ~ex_memory_req_b.we);
+assign is_ex_load_inst = (ex_memory_req_a.ce || ex_memory_req_b.ce);
 assign stall_req = is_ex_load_inst && 
 	(ex_wr_a.waddr == reg_raddr1 && reg_raddr1 != 5'b0 ||
 	 ex_wr_a.waddr == reg_raddr2 && reg_raddr2 != 5'b0 ||
