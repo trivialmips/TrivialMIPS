@@ -67,10 +67,18 @@ begin
 				6'b001001: `INST_W(OP_JALR, rs, rt, rd) //      rt      = 0
 				/* shift */
 				6'b000000: `INST_W(OP_SLL,  rs, rt, rd) // rs           = 0
-				6'b000010: `INST_W(OP_SRL,  rs, rt, rd) // rs           = 0
+				6'b000010: if(rs[0]) begin
+					`INST_W(OP_ROR,  5'b0, rt, rd)
+				end else begin
+					`INST_W(OP_SRL,  5'b0, rt, rd)
+				end
 				6'b000011: `INST_W(OP_SRA,  rs, rt, rd) // rs           = 0
 				6'b000100: `INST_W(OP_SLLV, rs, rt, rd)
-				6'b000110: `INST_W(OP_SRLV, rs, rt, rd)
+				6'b000110: if(inst[6]) begin
+					`INST_W(OP_RORV, rs, rt, rd)
+				end else begin
+					`INST_W(OP_SRLV, rs, rt, rd)
+				end
 				6'b000111: `INST_W(OP_SRAV, rs, rt, rd)
 				/* add and substract */
 				6'b100000: `INST_W(OP_ADD,  rs, rt, rd)
@@ -113,6 +121,21 @@ begin
 			6'b000101: `INST_R(OP_MSUBU, rs, rt)  // rd = 0
 
 			6'b000010: `INST_W(OP_MUL, rs, rt, rd)
+			default: op = OP_INVALID;
+			endcase
+		end
+		6'b011111:  // SPECIAL3
+		begin
+			unique case(inst[5:0])
+			6'b000000: `INST_W(OP_EXT, rs, 5'b0, rt)
+			6'b000100: `INST_W(OP_INS, rs, rt, rt)
+			6'b100000:
+				unique case(inst[10:6])
+				5'b10000: `INST_W(OP_SEB, 5'b0, rt, rd)
+				5'b11000: `INST_W(OP_SEH, 5'b0, rt, rd)
+				5'b00010: `INST_W(OP_WSBH, 5'b0, rt, rd)
+				default: op = OP_INVALID;
+				endcase
 			default: op = OP_INVALID;
 			endcase
 		end

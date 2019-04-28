@@ -162,6 +162,7 @@ initial
 begin
 	wait (clk.rst == 1'b0);
 	unittest("inst_ori", 0, 0);
+	unittest("inst_ext", 0, 0);
 	unittest("inst_logical", 0, 0);
 	unittest("inst_move", 0, 0);
 	unittest("inst_shift", 0, 0);

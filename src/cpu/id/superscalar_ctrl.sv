@@ -138,7 +138,7 @@ begin
 		end else if(memory_inst_a && memory_inst_b) begin
 			// only one memory instruction can be executed.
 			inst2_taken = 1'b0;
-		end else if(read_memory_a && reg_data_related) begin
+		end else if((read_memory_a || data_a.op == OP_SC) && reg_data_related) begin
 			// load-related
 			// data will arrive at MEM stage, but required at ID stage.
 			inst2_taken = 1'b0;
