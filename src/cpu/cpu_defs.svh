@@ -133,6 +133,10 @@ typedef struct packed {
 typedef enum {
 	/* instruction control instructions */
 	OP_NOP, OP_SSNOP,
+		
+	/* Release 2 instructions */
+	OP_EXT, OP_INS, OP_SEB, OP_SEH, OP_WSBH,
+	OP_ROR, OP_RORV,
 
 	/* arithmetic instructions */
 	OP_ADD, OP_ADDU, OP_SUB, OP_SUBU,

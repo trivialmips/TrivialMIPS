@@ -367,6 +367,20 @@ fpu_ex fpu_ex_instance(
 	.is_busy(fpu_busy)
 );
 
+Word_t ret_ext, ret_ins;
+ex_ext ext_instance(
+	.inst,
+	.in(reg1),
+	.out(ret_ext)
+);
+
+ex_ins ins_instance(
+	.inst,
+	.in1(reg1),
+	.in2(reg2),
+	.out(ret_ins)
+);
+
 assign stall_req = fpu_busy | multi_cyc_busy;
 
 always_comb
@@ -382,6 +396,13 @@ begin
 		hilo_wr.hilo = hilo_safe;
 
 		unique case(op)
+		/* special3 */
+		OP_EXT:  ret = ret_ext;
+		OP_INS:  ret = ret_ins;
+		OP_SEB:  ret = { {24{reg2[7]}}, reg2[7:0] };
+		OP_SEH:  ret = { {16{reg2[15]}}, reg2[15:0] };
+		OP_WSBH: ret = { reg2[23:16], reg2[31:24], reg2[7:0], reg2[15:8] };
+
 		/* logical instructions */
 		OP_LUI:  ret = { imm[15:0], 16'b0 };
 		OP_AND:  ret = reg1 & reg2;
@@ -414,6 +435,8 @@ begin
 		OP_SLLV: ret = reg2 << reg1[4:0];
 		OP_SRL:  ret = reg2 >> inst[10:6];
 		OP_SRLV: ret = reg2 >> reg1[4:0];
+		OP_ROR:  ret = (reg2 >> inst[10:6]) | (reg2 << (32 - inst[10:6]));
+		OP_RORV:  ret = (reg2 >> reg1[4:0]) | (reg2 << (32 - reg1[4:0]));
 		OP_SRA:  ret = $signed(reg2) >>> inst[10:6];
 		OP_SRAV: ret = $signed(reg2) >>> reg1[4:0];
 
